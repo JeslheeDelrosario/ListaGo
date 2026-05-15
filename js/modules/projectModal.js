@@ -246,8 +246,10 @@ function filterTasksByProject(projectId) {
     });
     document.querySelector(`[data-project-id="${projectId}"]`)?.classList.add('active');
 
-    // Update view title
+    // Update view title and add "New Task" button to header
     const viewTitle = document.getElementById('viewTitle');
+    const headerActions = document.querySelector('.header-actions');
+    
     if (viewTitle) {
         viewTitle.innerHTML = `
             <div class="project-view-header">
@@ -257,6 +259,11 @@ function filterTasksByProject(projectId) {
                 ${project.name}
             </div>
         `;
+    }
+
+    // Remove add button from header for project views
+    if (headerActions) {
+        headerActions.innerHTML = '';
     }
 
     // Show project page with dedicated task input
@@ -350,9 +357,19 @@ function setupProjectTaskInput(projectId) {
             addTaskHandler();
         }
     });
-    
+}
+
     // Focus the input
     taskInput.focus();
+
+
+// Global function to scroll to project input when New Task button is clicked
+window.scrollToProjectInput = function() {
+    const projectInput = document.getElementById('projectTaskInput');
+    if (projectInput) {
+        projectInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        projectInput.focus();
+    }
 }
 
 // Function to show global input (when not viewing a project)
@@ -404,18 +421,22 @@ function returnToDashboard() {
 window.deleteProjectHandler = function(projectId) {
     const project = getProjectById(projectId);
     if (!project) return;
+    
+    // Get number of tasks in this project
+    const taskCount = getProjectTaskCount(projectId);
 
-    if (confirm(`Are you sure you want to delete "${project.name}"? All tasks will be moved to Inbox.`)) {
-        if (deleteProject(projectId)) {
+    // Show custom project delete modal
+    window.showProjectDeleteConfirmation(projectId, project.name, taskCount, (id) => {
+        if (deleteProject(id)) {
             renderProjectsList();
             showNotification(`Project "${project.name}" deleted`, 'success');
             
             // If we're currently viewing this project, go back to dashboard
-            if (window.currentProject && window.currentProject.id === projectId) {
+            if (window.currentProject && window.currentProject.id === id) {
                 showDashboard();
             }
         }
-    }
+    });
 };
 
 // Initialize on page load

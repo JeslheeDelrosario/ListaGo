@@ -69,6 +69,16 @@ export function switchView(viewName) {
 
     // Check if we're currently in a project view and need to clean up
     if (window.currentProject) {
+        // Restore original header
+        const headerActions = document.querySelector('.header-actions');
+        if (headerActions) {
+            headerActions.innerHTML = `
+                <button id="addTaskBtn" class="add-task-btn">
+                    <i class="fas fa-plus"></i> New Task
+                </button>
+            `;
+        }
+        
         // Remove project-specific input area
         const projectInputArea = document.querySelector('.project-input-area');
         if (projectInputArea) {

@@ -18,6 +18,59 @@ import { setupSidebar, updateSidebarStats } from './modules/sidebar.js';
 import { setupProjectModal, renderProjectsList } from './modules/projectModal.js';
 import { getProjects, loadProjects } from './modules/projectManager.js';
 
+// Mobile sidebar toggle functionality
+function setupMobileSidebar() {
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const sidebar = document.querySelector('.sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    if (!hamburgerMenu || !sidebar || !sidebarOverlay) return;
+    
+    // Toggle sidebar when hamburger is clicked
+    hamburgerMenu.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('active');
+        document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+    });
+    
+    // Close sidebar when overlay is clicked
+    sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    });
+    
+    // Close sidebar when a navigation item or project is clicked (for better UX)
+    const navItems = sidebar.querySelectorAll('.nav-item, .project-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('open');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+    
+    // Close sidebar when Escape key is pressed
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+    
+    // Handle window resize - if screen becomes larger than mobile, reset sidebar
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('open');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    });
+}
+
 // Initialize the app
 function init() {
     // Load tasks from storage
@@ -47,6 +100,9 @@ function init() {
     setupProjectModal();
     renderProjectsList();
     
+    // Mobile sidebar toggle setup
+    setupMobileSidebar();
+    
     // Set up event listeners
     setupEventListeners();
     
@@ -64,23 +120,127 @@ function init() {
     console.log('App initialized! 🚀');
 }
 
-// NEW: Update project dropdown
+// NEW: Update custom project dropdown
 function updateProjectDropdown() {
-    const projectSelect = document.getElementById('projectSelect');
-    if (!projectSelect) return;
+    const dropdownMenu = document.getElementById('projectDropdownMenu');
+    const hiddenInput = document.getElementById('projectSelect');
+    const trigger = document.getElementById('projectDropdownTrigger');
     
-    // Clear existing options except the first one
-    projectSelect.innerHTML = '<option value="">Select Project</option>';
+    if (!dropdownMenu || !hiddenInput) return;
+    
+    // Clear existing items except "No Project"
+    dropdownMenu.innerHTML = `
+        <div class="dropdown-item" data-project-id="">
+            <span class="dropdown-item-text">No Project</span>
+        </div>
+    `;
+    
+    // Add click handler for "No Project" option
+    const noProjectItem = dropdownMenu.querySelector('[data-project-id=""]');
+    if (noProjectItem) {
+        noProjectItem.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectProject('', 'No Project', null, null);
+        });
+    }
     
     // Add projects from project manager
     const projects = getProjects();
     projects.forEach(project => {
-        const option = document.createElement('option');
-        option.value = project.id;
-        option.textContent = project.name;
-        option.style.color = project.color;
-        projectSelect.appendChild(option);
+        const item = document.createElement('div');
+        item.className = 'dropdown-item';
+        item.setAttribute('data-project-id', project.id);
+        item.innerHTML = `
+            <div class="dropdown-item-icon" style="background-color: ${project.color}">
+                <i class="${project.icon}"></i>
+            </div>
+            <span class="dropdown-item-text">${project.name}</span>
+        `;
+        
+        // Add click handler for selection
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectProject(project.id, project.name, project.color, project.icon);
+        });
+        
+        dropdownMenu.appendChild(item);
     });
+    
+    // Set up dropdown toggle
+    if (trigger) {
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleDropdown();
+        });
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+        closeDropdown();
+    });
+}
+
+// Helper function to select a project
+function selectProject(projectId, projectName, projectColor, projectIcon) {
+    const hiddenInput = document.getElementById('projectSelect');
+    const triggerText = document.querySelector('.trigger-text');
+    const trigger = document.getElementById('projectDropdownTrigger');
+    
+    // Update hidden input value
+    hiddenInput.value = projectId;
+    
+    // Update trigger to show selected project with icon
+    if (projectId === '') {
+        trigger.innerHTML = `
+            <span class="trigger-text">No Project</span>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+        `;
+    } else {
+        trigger.innerHTML = `
+            <div class="trigger-content">
+                <div class="trigger-icon" style="background-color: ${projectColor}">
+                    <i class="${projectIcon}"></i>
+                </div>
+                <span class="trigger-text">${projectName}</span>
+            </div>
+            <i class="fas fa-chevron-down dropdown-arrow"></i>
+        `;
+    }
+    
+    // Update selected state in dropdown items
+    const items = document.querySelectorAll('.dropdown-item');
+    items.forEach(item => {
+        if (item.getAttribute('data-project-id') === projectId) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+    
+    // Close dropdown
+    closeDropdown();
+}
+
+// Toggle dropdown open/closed
+function toggleDropdown() {
+    const trigger = document.getElementById('projectDropdownTrigger');
+    const menu = document.getElementById('projectDropdownMenu');
+    
+    if (trigger && menu) {
+        trigger.classList.toggle('active');
+        menu.classList.toggle('active');
+    }
+}
+
+// Close dropdown
+function closeDropdown() {
+    const trigger = document.getElementById('projectDropdownTrigger');
+    const menu = document.getElementById('projectDropdownMenu');
+    
+    if (trigger && menu) {
+        trigger.classList.remove('active');
+        menu.classList.remove('active');
+    }
 }
 
 // Set minimum date to today for date picker
@@ -114,6 +274,17 @@ function setupEventListeners() {
                 if (input) input.value = '';
                 if (dateInput) dateInput.value = ''; // Clear date picker
                 if (projectSelect) projectSelect.value = ''; // Clear project selection
+                // Reset dropdown trigger to show "Select Project"
+                const trigger = document.getElementById('projectDropdownTrigger');
+                if (trigger) {
+                    trigger.innerHTML = `
+                        <span class="trigger-text">Select Project</span>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    `;
+                    // Remove selected state from all dropdown items
+                    const items = document.querySelectorAll('.dropdown-item');
+                    items.forEach(item => item.classList.remove('selected'));
+                }
                 input.focus();
             }
         });
@@ -133,6 +304,17 @@ function setupEventListeners() {
                     e.target.value = '';
                     if (dateInput) dateInput.value = '';
                     if (projectSelect) projectSelect.value = '';
+                    // Reset dropdown trigger to show "Select Project"
+                    const trigger = document.getElementById('projectDropdownTrigger');
+                    if (trigger) {
+                        trigger.innerHTML = `
+                            <span class="trigger-text">Select Project</span>
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
+                        `;
+                        // Remove selected state from all dropdown items
+                        const items = document.querySelectorAll('.dropdown-item');
+                        items.forEach(item => item.classList.remove('selected'));
+                    }
                 }
             }
         });

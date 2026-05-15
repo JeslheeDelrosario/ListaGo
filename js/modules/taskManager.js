@@ -256,6 +256,45 @@ export function deleteAllCompletedTasks() {
     return true;
 }
 
+// NEW: Delete multiple selected tasks
+export function deleteMultipleTasks(taskIds) {
+    const tasks = getTasks();
+    const deleteCount = taskIds.length;
+    
+    if (deleteCount === 0) {
+        showNotification('No tasks selected!', 'info');
+        return false;
+    }
+    
+    const updatedTasks = tasks.filter(task => !taskIds.includes(task.id));
+    setTasks(updatedTasks);
+    
+    if (renderCallback) renderCallback();
+    showNotification(`Deleted ${deleteCount} task${deleteCount > 1 ? 's' : ''}!`, 'success');
+    return true;
+}
+
+// Track selected tasks for bulk operations
+let selectedTaskIds = [];
+
+export function toggleTaskSelection(taskId) {
+    const index = selectedTaskIds.indexOf(taskId);
+    if (index > -1) {
+        selectedTaskIds.splice(index, 1);
+    } else {
+        selectedTaskIds.push(taskId);
+    }
+    return selectedTaskIds;
+}
+
+export function getSelectedTaskIds() {
+    return [...selectedTaskIds];
+}
+
+export function clearSelectedTasks() {
+    selectedTaskIds = [];
+}
+
 // NEW: Get task statistics with dates
 export function getTaskStatistics() {
     const tasks = getTasks();

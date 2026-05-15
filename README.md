@@ -1,18 +1,44 @@
-# ListaGo - Modern ToDo List Application
+# ListaGo - Modern ToDo List Application with Project Management
 
-A beautiful, feature-rich todo list application with a modern glassmorphism design, built with vanilla JavaScript and ES6 modules.
+A beautiful, feature-rich todo list application with a modern glassmorphism design, built with vanilla JavaScript and ES6 modules. Track your tasks, organize them into projects, and manage deadlines with a comprehensive dashboard.
 
-![ListaGo App Screenshot](assets/screenshots/default.png)
+![ListaGo App Screenshot](assets/screenshots/dashboard.png)
 
 ## ✨ Features
 
 ### 🎯 Core Functionality
 - **Add Tasks**: Quickly add new tasks with Enter key or button click
 - **Complete Tasks**: Check/uncheck tasks with smooth animations
-- **Edit Tasks**: Double-click or use edit button for inline editing
+- **Edit Tasks**: Inline editing with modal dialog
 - **Delete Tasks**: Safe deletion with confirmation modal
 - **Filter Tasks**: View All, Active, or Completed tasks
-- **Persistent Storage**: Tasks saved in browser's localStorage
+- **Due Dates**: Assign dates to tasks and track overdue items
+- **Persistent Storage**: Tasks and projects saved in browser's localStorage
+- **Search Tasks**: Real-time search across all your tasks
+
+### 📁 Project Management
+- **Create Projects**: Organize tasks into custom projects
+- **Custom Icons & Colors**: Choose from a variety of icons and colors for each project
+- **Project Filtering**: View tasks by specific project
+- **Default Inbox**: Catch-all project for uncategorized tasks
+- **Project Deletion**: Safe project removal with automatic task migration to Inbox
+
+### 📊 Dashboard & Views
+- **Dashboard**: Overview with statistics and task sections (Today, Upcoming, Overdue)
+- **Today View**: See all tasks due today
+- **Upcoming View**: Track tasks due in the next 7 days
+- **All Tasks View**: Complete list of every task
+- **Statistics Cards**: Visual metrics for total, pending, completed, and overdue tasks
+- **Overdue Tracking**: Automatic highlighting of overdue tasks with pulse animations
+
+### 🎨 Modern Design
+- **Glassmorphism UI**: Beautiful frosted glass effect with backdrop blur
+- **Gradient Backgrounds**: Stunning purple-blue gradient theme
+- **Smooth Animations**: Subtle transitions and hover effects
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
+- **Dark Theme**: Easy on the eyes with carefully chosen colors
+- **Font Awesome Icons**: Professional iconography throughout the interface
+- **Sidebar Navigation**: Collapsible sidebar with quick access to all views
 
 ### 🎨 Modern Design
 - **Glassmorphism UI**: Beautiful frosted glass effect with backdrop blur
@@ -26,15 +52,19 @@ A beautiful, feature-rich todo list application with a modern glassmorphism desi
 - `Delete` - Clear all completed tasks (with confirmation)
 - `Escape` - Reset filter to "All"
 - `Enter` - Add task (when input is focused)
-- `Double-click` - Edit task inline
+- `/` - Focus search bar from anywhere in the app
 
 ### 🛡️ Advanced Features
 - **XSS Protection**: All user input is properly escaped
-- **Input Validation**: Maximum task length of 200 characters
-- **Duplicate Prevention**: Cannot add identical tasks
+- **Input Validation**: Maximum task length of 200 characters, project name validation
+- **Duplicate Prevention**: Cannot add identical tasks or projects with the same name
 - **Error Handling**: Graceful handling of localStorage issues
 - **Debouncing**: Prevents accidental double-clicks
-- **Modal Confirmation**: Safe delete with preview
+- **Multiple Modals**: Delete, edit, and project creation modals with previews
+- **UUID Generation**: Unique identifiers for all tasks and projects
+- **Date Filtering**: Intelligent filtering of tasks by due date
+- **Search Indexing**: Real-time search across all task content
+- **Project Migration**: Automatic task migration when projects are deleted
 
 ## 🚀 Quick Start
 
@@ -47,28 +77,39 @@ A beautiful, feature-rich todo list application with a modern glassmorphism desi
 ```
 listaGo/
 ├── index.html              # Main HTML file
+├── modal-test.html         # Modal testing page
 ├── assets/                 # Assets directory
 │   ├── favicon/            # Favicon files
 │   │   ├── favicon.ico
 │   │   ├── apple-touch-icon.png
+│   │   ├── site.webmanifest
 │   │   └── ...
+│   ├── icon/               # App icon
+│   │   └── icon.jpeg
 │   └── screenshots/        # Screenshot files
 │       ├── default.png
 │       ├── addtask.png
 │       └── deletemodal.png
 ├── css/
-│   ├── style.css          # Main styling with glassmorphism design
-│   └── modal.css          # Modal styles
+│   ├── style.css           # Main styling with glassmorphism design
+│   ├── modal.css           # All modal styles
+│   └── dashboard.css       # Dashboard-specific styling
 ├── js/
-│   ├── app.js             # Main application entry point
+│   ├── app.js              # Main application entry point
+│   ├── script-backup.js    # Legacy backup script
 │   └── modules/
-│       ├── storage.js     # localStorage operations
-│       ├── taskManager.js # Task CRUD operations
-│       ├── uiRenderer.js  # UI rendering functions
-│       ├── notifications.js # Toast notifications
-│       ├── modal.js       # Delete confirmation modal
-│       ├── editModal.js   # Edit task modal
-│       └── utils.js       # Helper functions
+│       ├── storage.js              # localStorage operations
+│       ├── taskManager.js          # Task CRUD operations (with due dates)
+│       ├── projectManager.js       # Project management functionality
+│       ├── uiRenderer.js           # UI rendering functions
+│       ├── sidebar.js              # Sidebar navigation and view switching
+│       ├── notifications.js        # Toast notifications
+│       ├── modal.js                # Delete confirmation modal
+│       ├── editModal.js            # Edit task modal
+│       ├── projectModal.js         # Project creation modal
+│       ├── utils.js                # Helper functions
+│       └── views/
+│           └── dashboardView.js     # Dashboard view rendering
 ├── LICENSE                # MIT License
 ├── README.md              # This file
 └── .gitignore             # Git ignore file
@@ -113,6 +154,32 @@ listaGo/
 - **Debouncing**: Prevents excessive function calls
 - **Efficient DOM Updates**: Minimal re-renders
 - **Local Storage**: Fast client-side persistence
+- **Responsive Grid Layouts**: CSS Grid for efficient space utilization
+
+### Data Models
+
+**Task Object**
+```javascript
+{
+  id: "uuid-string",
+  text: "Task description",
+  completed: false,
+  createdAt: "ISO-date-string",
+  dueDate: "YYYY-MM-DD" || null,
+  projectId: "project-uuid" || null
+}
+```
+
+**Project Object**
+```javascript
+{
+  id: "uuid-string",
+  name: "Project Name",
+  color: "#hex-color",
+  icon: "fas fa-icon-name",
+  createdAt: "ISO-date-string"
+}
+```
 
 ## 🔧 Customization
 
@@ -133,14 +200,20 @@ Change the maximum task length in [`taskManager.js`](js/modules/taskManager.js):
 const MAX_TASK_LENGTH = 200; // Change as needed
 ```
 
-### Customizing Animations
-Adjust animation timings in [`style.css`](css/style.css):
+### Customizing Dashboard Animations
+Adjust pulse animation for overdue tasks in [`dashboard.css`](css/dashboard.css):
 
 ```css
-.task-item {
-  animation: slideIn 0.4s ease forwards;
+.stat-card-compact.overdue.has-overdue {
+    animation: pulse 2s infinite;
 }
 ```
+
+### Adding More Project Icons
+Extend the available project icons in [`projectModal.js`](js/modules/projectModal.js) to add more Font Awesome icons for projects.
+
+### Customizing Project Colors
+Add more color options to the project creation modal in the color picker to expand your customization options.
 
 ## 🐛 Troubleshooting
 
@@ -148,6 +221,20 @@ Adjust animation timings in [`style.css`](css/style.css):
 - Check if localStorage is enabled in your browser
 - Ensure you're not in private/incognito mode
 - Try clearing browser data and reloading
+
+### Projects Not Loading
+- Clear browser cache and refresh
+- Check browser console for JSON parsing errors
+- Ensure localStorage has sufficient space available
+
+### Dashboard Not Rendering
+- Check if you have JavaScript enabled
+- Verify all module files are present in the correct directories
+- Check browser console for module loading errors
+
+### Search Not Working
+- Refresh the page to reset the search functionality
+- Clear any browser extensions that might interfere with input events
 
 ### Buttons Not Working
 - Refresh the page (F5)
@@ -158,6 +245,7 @@ Adjust animation timings in [`style.css`](css/style.css):
 - Try rotating your device
 - Clear browser cache
 - Update to latest browser version
+- Verify glassmorphism effects are supported on your mobile browser
 
 ## 🤝 Contributing
 

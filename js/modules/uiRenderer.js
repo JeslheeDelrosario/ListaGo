@@ -1,6 +1,7 @@
 // uiRenderer.js - Handle all UI rendering with date support
-import { getTasks, getFilteredTasks, getCurrentFilter } from './taskManager.js';
+import { getTasks, getFilteredTasks, getCurrentFilter, toggleTaskSelection, getSelectedTaskIds, clearSelectedTasks } from './taskManager.js';
 import { escapeHtml } from './utils.js';
+import { getProjectById } from './projectManager.js';
 
 // Helper function to format date nicely
 function formatDate(dateString) {
@@ -66,6 +67,10 @@ export function renderTasks(customTasks = null) {
     const tasks = customTasks || getTasks();
     const filteredTasks = customTasks || getFilteredTasks();
     const currentFilter = getCurrentFilter();
+    const selectedIds = getSelectedTaskIds();
+    
+    // Show bulk delete toolbar if tasks are selected
+    updateBulkDeleteToolbar(selectedIds);
     
     if (filteredTasks.length === 0) {
         let emptyMessage = '';
@@ -85,6 +90,20 @@ export function renderTasks(customTasks = null) {
         `;
     } else {
         taskList.innerHTML = filteredTasks.map(task => {
+            // Generate project label HTML if task belongs to a project
+            let projectHTML = '';
+            if (task.projectId && task.projectId !== 'inbox') {
+                const project = getProjectById(task.projectId);
+                if (project) {
+                    projectHTML = `
+                        <span class="task-project-label" style="background-color: ${project.color}20; color: ${project.color}; border: 1px solid ${project.color}40;">
+                            <i class="${project.icon}" style="font-size: 0.7rem; margin-right: 4px;"></i>
+                            ${escapeHtml(project.name)}
+                        </span>
+                    `;
+                }
+            }
+            
             // Generate date HTML if task has due date
             let dateHTML = '';
             if (task.dueDate) {
@@ -103,18 +122,22 @@ export function renderTasks(customTasks = null) {
                 `;
             }
             
+            const isSelected = selectedIds.includes(task.id);
             return `
-                <li class="task-item" data-task-id="${task.id}">
+                <li class="task-item ${isSelected ? 'selected' : ''}" data-task-id="${task.id}" onclick="window.handleTaskClick(event, '${task.id}')">
                     <input 
                         type="checkbox" 
                         class="task-checkbox" 
                         ${task.completed ? 'checked' : ''} 
-                        onchange="window.toggleTaskHandler('${task.id}')"
+                        onclick="event.stopPropagation(); window.toggleTaskHandler('${task.id}')"
                     >
                     <div class="task-content">
-                        <span class="task-text ${task.completed ? 'completed' : ''}" ondblclick="window.editTaskHandler('${task.id}')">
-                            ${escapeHtml(task.text)}
-                        </span>
+                        <div class="task-header">
+                            <span class="task-text ${task.completed ? 'completed' : ''}" ondblclick="window.editTaskHandler('${task.id}')">
+                                ${escapeHtml(task.text)}
+                            </span>
+                            ${projectHTML}
+                        </div>
                         ${dateHTML}
                     </div>
                     <div class="task-actions">
@@ -127,6 +150,57 @@ export function renderTasks(customTasks = null) {
     }
     
     updateStats();
+}
+
+// Update bulk delete toolbar visibility and content - integrated into main header
+function updateBulkDeleteToolbar(selectedIds) {
+    const headerActions = document.querySelector('.header-actions');
+    if (!headerActions) return;
+    
+    // Save original header content if not already saved
+    if (!window.originalHeaderContent) {
+        window.originalHeaderContent = headerActions.innerHTML;
+    }
+    
+    if (selectedIds.length > 0) {
+        // Show bulk delete controls in header
+        headerActions.innerHTML = `
+            <span class="selected-count" id="selectedCount">${selectedIds.length} selected</span>
+            <button class="cancel-bulk-btn" onclick="window.cancelBulkSelection()">Cancel</button>
+            <button class="delete-selected-btn" onclick="window.confirmBulkDelete()">Delete Selected</button>
+        `;
+    } else {
+        // Restore original header content
+        headerActions.innerHTML = window.originalHeaderContent;
+    }
+}
+
+// Make bulk selection functions globally available
+window.handleTaskClick = (event, taskId) => {
+    // Don't select if clicking on buttons or links
+    if (event.target.closest('button') || event.target.tagName === 'INPUT') return;
+    
+    // Toggle selection
+    toggleTaskSelection(taskId);
+    renderTasks();
+};
+
+window.cancelBulkSelection = () => {
+    clearSelectedTasks();
+    renderTasks();
+};
+
+window.confirmBulkDelete = () => {
+    const selectedIds = getSelectedTaskIds();
+    if (selectedIds.length === 0) return;
+    
+    // Show custom bulk delete modal
+    window.showBulkDeleteConfirmation(selectedIds, selectedIds.length, (ids) => {
+        import('./taskManager.js').then(module => {
+            module.deleteMultipleTasks(ids);
+            clearSelectedTasks();
+        });
+    });
 }
 
 export function updateStats() {
