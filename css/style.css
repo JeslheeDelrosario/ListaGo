@@ -868,24 +868,54 @@ body {
     
     .input-area {
         padding: 15px 20px;
-        gap: 10px;
+        gap: 12px;
     }
     
     #taskInput {
         padding: 12px 14px;
         font-size: 0.95rem;
-        min-width: 100%;
+        width: 100%;
+    }
+    
+    /* Mobile row for side-by-side dropdown and date */
+    .mobile-row {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        align-items: center;
+    }
+    
+    .custom-project-dropdown {
+        flex: 1.4; /* Give more space to project dropdown */
+        min-width: 0; /* Prevent overflow */
     }
     
     .date-input {
-        padding: 12px 14px;
+        padding: 12px 10px;
         flex: 1;
+        min-width: 130px;
+        font-size: 0.85rem;
+    }
+    
+    /* Fix date picker icon size on mobile */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        transform: scale(0.9);
+        margin-left: 4px;
+    }
+    
+    .dropdown-trigger {
+        padding: 12px 10px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .input-task-btn {
         padding: 12px 20px;
         width: 100%;
         justify-content: center;
+        font-size: 1rem;
     }
     
     .task-list {
@@ -1106,16 +1136,28 @@ body {
     .mobile-row {
         display: flex;
         width: 100%;
-        gap: 10px;
+        gap: 8px;
         align-items: center;
     }
     
     .custom-project-dropdown {
-        flex: 1;
+        flex: 1.3; /* Slightly more space for project name */
         min-width: 0;
     }
     
+    .date-input {
+        flex: 1;
+        min-width: 120px;
+        padding: 11px 8px;
+        font-size: 0.8rem;
+    }
+    
     .dropdown-trigger {
+        padding: 11px 8px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         min-width: 100%;
         padding: 11px 12px;
     }

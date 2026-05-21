@@ -90,20 +90,23 @@
             <!-- Task Input -->
             <div class="input-area glass">
                 <input type="text" id="taskInput" placeholder="What needs to be done today?">
-                <!-- Custom Project Dropdown -->
-                <div class="custom-project-dropdown" id="projectDropdown">
-                    <div class="dropdown-trigger" id="projectDropdownTrigger">
-                        <span class="trigger-text">Select Project</span>
-                        <i class="fas fa-chevron-down dropdown-arrow"></i>
-                    </div>
-                    <div class="dropdown-menu" id="projectDropdownMenu">
-                        <div class="dropdown-item" data-project-id="">
-                            <span class="item-text">No Project</span>
+                <!-- Mobile row wrapper for dropdown and date -->
+                <div class="mobile-row">
+                    <!-- Custom Project Dropdown -->
+                    <div class="custom-project-dropdown" id="projectDropdown">
+                        <div class="dropdown-trigger" id="projectDropdownTrigger">
+                            <span class="trigger-text">Select Project</span>
+                            <i class="fas fa-chevron-down dropdown-arrow"></i>
                         </div>
+                        <div class="dropdown-menu" id="projectDropdownMenu">
+                            <div class="dropdown-item" data-project-id="">
+                                <span class="item-text">No Project</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="projectSelect" name="projectId">
                     </div>
-                    <input type="hidden" id="projectSelect" name="projectId">
+                    <input type="date" id="taskDate" class="date-input">
                 </div>
-                <input type="date" id="taskDate" class="date-input">
                 <button id="addTaskButton" class="input-task-btn">Add</button>
             </div>
 
