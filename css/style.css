@@ -946,12 +946,66 @@ body {
     .input-area {
         padding: 12px 16px;
         flex-direction: column;
+        gap: 12px;
     }
     
-    #taskInput,
-    .date-input,
+    #taskInput {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    /* Create a row for dropdown and date input on mobile */
+    .mobile-row {
+        display: flex;
+        width: 100%;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .custom-project-dropdown {
+        flex: 1;
+        min-width: 0; /* Allow flex shrinking */
+    }
+    
+    .dropdown-trigger {
+        min-width: 100%;
+        padding: 12px 14px;
+    }
+    
+    .trigger-text {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+    }
+    
+    .date-input {
+        width: auto;
+        flex-shrink: 0;
+        padding: 12px 14px;
+        min-width: 130px;
+        font-size: 0.85rem;
+    }
+    
     .input-task-btn {
         width: 100%;
+        padding: 13px 20px;
+        font-size: 1rem;
+    }
+    
+    /* Fix dropdown menu for mobile */
+    .dropdown-menu {
+        min-width: 100%;
+        left: 0;
+        right: 0;
+    }
+    
+    /* Fix date input calendar icon on mobile */
+    .date-input::-webkit-calendar-picker-indicator {
+        transform: scale(0.9);
+        margin-left: 4px;
+        cursor: pointer;
     }
     
     .task-item {
@@ -1031,6 +1085,51 @@ body {
     
     .task-text {
         font-size: 0.85rem;
+    }
+    
+    /* Add mobile row improvements for 375px screens */
+    .mobile-row {
+        display: flex;
+        width: 100%;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .custom-project-dropdown {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .dropdown-trigger {
+        min-width: 100%;
+        padding: 11px 12px;
+    }
+    
+    .trigger-text {
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80px;
+    }
+    
+    .date-input {
+        width: auto;
+        flex-shrink: 0;
+        padding: 11px 10px;
+        min-width: 120px;
+        font-size: 0.78rem;
+    }
+    
+    .input-task-btn {
+        width: 100%;
+        padding: 12px 20px;
+    }
+    
+    /* Fix date input calendar icon on small mobile */
+    .date-input::-webkit-calendar-picker-indicator {
+        transform: scale(0.8);
+        margin-left: 2px;
     }
 }
 
