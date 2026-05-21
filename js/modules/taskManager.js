@@ -284,6 +284,12 @@ export function toggleTaskSelection(taskId) {
     } else {
         selectedTaskIds.push(taskId);
     }
+    
+    // Update bulk delete toolbar to show/hide delete button
+    import('./uiRenderer.js').then(module => {
+        module.updateBulkDeleteToolbar([...selectedTaskIds]);
+    });
+    
     return selectedTaskIds;
 }
 
@@ -293,6 +299,11 @@ export function getSelectedTaskIds() {
 
 export function clearSelectedTasks() {
     selectedTaskIds = [];
+    
+    // Update bulk delete toolbar to hide delete button
+    import('./uiRenderer.js').then(module => {
+        module.updateBulkDeleteToolbar([]);
+    });
 }
 
 // NEW: Get task statistics with dates

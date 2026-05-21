@@ -152,28 +152,7 @@ export function renderTasks(customTasks = null) {
     updateStats();
 }
 
-// Update bulk delete toolbar visibility and content - integrated into main header
-function updateBulkDeleteToolbar(selectedIds) {
-    const headerActions = document.querySelector('.header-actions');
-    if (!headerActions) return;
-    
-    // Save original header content if not already saved
-    if (!window.originalHeaderContent) {
-        window.originalHeaderContent = headerActions.innerHTML;
-    }
-    
-    if (selectedIds.length > 0) {
-        // Show bulk delete controls in header
-        headerActions.innerHTML = `
-            <span class="selected-count" id="selectedCount">${selectedIds.length} selected</span>
-            <button class="cancel-bulk-btn" onclick="window.cancelBulkSelection()">Cancel</button>
-            <button class="delete-selected-btn" onclick="window.confirmBulkDelete()">Delete Selected</button>
-        `;
-    } else {
-        // Restore original header content
-        headerActions.innerHTML = window.originalHeaderContent;
-    }
-}
+
 
 // Make bulk selection functions globally available
 window.handleTaskClick = (event, taskId) => {
@@ -201,6 +180,28 @@ window.confirmBulkDelete = () => {
             clearSelectedTasks();
         });
     });
+}
+
+export function updateBulkDeleteToolbar(selectedIds) {
+    const headerActions = document.querySelector('.header-actions');
+    if (!headerActions) return;
+    
+    // Save original header content if not already saved
+    if (!window.originalHeaderContent) {
+        window.originalHeaderContent = headerActions.innerHTML;
+    }
+    
+    if (selectedIds.length > 0) {
+        // Show bulk delete controls in header
+        headerActions.innerHTML = `
+            <span class="selected-count" id="selectedCount">${selectedIds.length} selected</span>
+            <button class="cancel-bulk-btn" onclick="window.cancelBulkSelection()">Cancel</button>
+            <button class="delete-selected-btn" onclick="window.confirmBulkDelete()">Delete Selected</button>
+        `;
+    } else {
+        // Restore original header content
+        headerActions.innerHTML = window.originalHeaderContent;
+    }
 }
 
 export function updateStats() {
