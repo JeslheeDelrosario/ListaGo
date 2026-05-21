@@ -910,12 +910,18 @@ body {
     }
     
     .logo h2 {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
+        display: block !important; /* Always show logo text */
     }
     
     .logo img {
-        width: 32px;
-        height: 32px;
+        width: 36px;
+        height: 36px;
+    }
+    
+    .project-name {
+        display: block !important; /* Always show project names */
+        font-size: 0.9rem;
     }
     
     .nav-item {
@@ -1062,21 +1068,30 @@ body {
 /* Mobile Small (375px and below) */
 @media (max-width: 375px) {
     .sidebar {
-        max-height: 220px;
+        width: 280px; /* Keep full sidebar width when open */
+        max-height: 100vh; /* Full height when open, not restricted */
     }
     
+    /* When sidebar is open, always show the text labels */
+    .sidebar.open .nav-item span:not(i),
+    .sidebar.open .project-name,
+    .sidebar.open .logo h2 {
+        display: block !important; /* Show text when sidebar is open */
+    }
+    
+    /* Only hide text when sidebar is in collapsed state (which it never is on mobile, but just in case) */
     .nav-item span:not(i) {
-        display: none; /* Hide text, show only icons on very small screens */
+        display: flex; /* Always show text by default on mobile */
     }
     
     .nav-item {
-        padding: 10px;
-        justify-content: center;
+        padding: 12px 14px;
+        justify-content: flex-start; /* Align items to the left with proper spacing */
     }
     
     .nav-item i {
         margin: 0;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     
     .main-header h1 {
