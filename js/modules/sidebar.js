@@ -54,9 +54,24 @@ function setupNavigationButtons() {
     });
 }
 
+// Prevent rapid view switching with a simple throttle
+let isSwitchingView = false;
+let viewSwitchTimeout = null;
+
 // Switch between different views
 export function switchView(viewName) {
     if (!viewConfigs[viewName]) return;
+    
+    // If we're already switching views OR trying to switch to the same view, ignore
+    if (isSwitchingView || currentView === viewName) return;
+    
+    // Lock view switching
+    isSwitchingView = true;
+    
+    // Automatically unlock after 300ms to prevent permanent lock
+    viewSwitchTimeout = setTimeout(() => {
+        isSwitchingView = false;
+    }, 300);
 
     currentView = viewName;
     const config = viewConfigs[viewName];
@@ -150,6 +165,11 @@ export function switchView(viewName) {
     } 
     updateViewDescription(config.description);
     console.log(`Switched to ${viewName} view`);
+    
+    // Always unlock view switching when done
+    setTimeout(() => {
+        isSwitchingView = false;
+    }, 50);
 }
 
 // Update active navigation item
