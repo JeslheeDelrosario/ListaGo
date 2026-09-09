@@ -102,17 +102,6 @@
         }
     }
     
-    // 🔍 DEBUG: Log what we're rendering
-    console.log('📋 All tasks:', allTasks);
-    console.log('📋 Filtered tasks:', filteredTasks);
-    filteredTasks.forEach((task, index) => {
-        console.log(`  ${index + 1}. "${task.title || task.text}" - Description:`, {
-            exists: !!task.description,
-            value: task.description?.substring(0, 50),
-            length: task.description?.length || 0
-        });
-    });
-    
     const selectedIds = getSelectedTaskIds();
     
     // Show bulk delete toolbar if tasks are selected
@@ -203,49 +192,76 @@
                 const isSelected = selectedIds.includes(task.id);
                 const taskTitle = task.title || task.text || 'Untitled';
                 const taskDescription = task.description || '';
+                const descPlain = stripHtml(taskDescription);
 
-                // DEBUG: Log to see if description is being passed
-                console.log('🔍 Rendering task:', taskTitle, 'Description exists?', !!taskDescription);
+                if (currentView === 'grid') {
+                    return `
+                        <li class="task-item ${isSelected ? 'selected' : ''}"
+                            data-task-id="${task.id}"
+                            data-priority="${task.priority || 'medium'}"
+                            onclick="window.handleTaskClick(event, '${task.id}')"
+                            ondblclick="window.showTaskDetail('${task.id}')">
+                            <div class="task-card-inner">
+                                <div class="task-card-top">
+                                    <input type="checkbox" class="task-checkbox"
+                                        ${task.completed ? 'checked' : ''}
+                                        onclick="event.stopPropagation(); window.toggleTaskHandler('${task.id}')">
+                                    <span class="task-text ${task.completed ? 'completed' : ''}">${escapeHtml(taskTitle)}</span>
+                                    <div class="task-card-menu" onclick="event.stopPropagation()">
+                                        <button class="edit-card-btn" onclick="window.editTaskHandler('${task.id}')" title="Edit"><i class="fas fa-pen"></i></button>
+                                        <button class="delete-card-btn" onclick="window.deleteTaskHandler('${task.id}', '${escapeHtml(taskTitle)}')" title="Delete"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                ${descPlain
+                                    ? `<div class="task-full-description">${escapeHtml(descPlain)}</div>`
+                                    : `<div class="task-no-description">No description</div>`
+                                }
+                                <div class="task-badges">
+                                    ${priorityBadge}
+                                    ${statusBadge}
+                                </div>
+                            </div>
+                            <div class="task-card-footer">
+                                <div class="task-date ${getDateStatus(task.dueDate, task.completed).class}">
+                                    ${task.dueDate
+                                        ? `<i class="fas fa-calendar-alt"></i> ${formatDate(task.dueDate)}${getDateStatus(task.dueDate, task.completed).text}`
+                                        : `<i class="fas fa-calendar-alt"></i> No due date`
+                                    }
+                                </div>
+                                ${projectHTML}
+                            </div>
+                        </li>
+                    `;
+                }
+
+                const dateStatus = getDateStatus(task.dueDate, task.completed);
+                const inlineDateHTML = task.dueDate
+                    ? `<div class="task-date ${dateStatus.class}"><i class="fas fa-calendar-alt"></i> ${formatDate(task.dueDate)}${dateStatus.text}</div>`
+                    : '';
 
                 return `
-                    <li class="task-item ${isSelected ? "selected" : ""}" 
-                        data-task-id="${task.id}" 
+                    <li class="task-item ${isSelected ? 'selected' : ''}"
+                        data-task-id="${task.id}"
+                        data-priority="${task.priority || 'medium'}"
                         onclick="window.handleTaskClick(event, '${task.id}')"
                         ondblclick="window.showTaskDetail('${task.id}')">
-                        <input 
-                            type="checkbox" 
-                            class="task-checkbox" 
-                            ${task.completed ? "checked" : ""} 
-                            onclick="event.stopPropagation(); window.toggleTaskHandler('${task.id}')"
-                        >
+                        <input type="checkbox" class="task-checkbox"
+                            ${task.completed ? 'checked' : ''}
+                            onclick="event.stopPropagation(); window.toggleTaskHandler('${task.id}')">
                         <div class="task-content" onclick="event.stopPropagation(); window.showTaskDetail('${task.id}')">
                             <div class="task-header">
-                                <span class="task-text ${task.completed ? "completed" : ""}">
-                                    ${escapeHtml(taskTitle)}
-                                </span>
+                                <span class="task-text ${task.completed ? 'completed' : ''}">${escapeHtml(taskTitle)}</span>
                                 <div class="task-badges">
                                     ${projectHTML}
                                     ${priorityBadge}
                                     ${statusBadge}
                                 </div>
+                                ${inlineDateHTML}
                             </div>
-                            ${dateHTML}
-                            ${taskDescription ? `
-                                <div class="task-full-description">
-                                    ${taskDescription.length > 300 ? 
-                                        taskDescription.substring(0, 300) + '... <span class="view-full-link" onclick="window.viewTaskDescription(\'' + task.id + "', '" + escapeHtml(taskTitle) + "')\">View full description</span>" : 
-                                        taskDescription
-                                    }
-                                </div>
-                            ` : `
-                                <div class="task-no-description" style="color: #64748b; font-size: 0.8rem; margin-top: 4px; opacity: 0.5;">
-                                    No description
-                                </div>
-                            `}
                         </div>
                         <div class="task-actions" onclick="event.stopPropagation();">
-                            <button class="edit-btn" onclick="window.editTaskHandler('${task.id}')" title="Edit task">✏️</button>
-                            <button class="delete-btn" onclick="window.deleteTaskHandler('${task.id}', '${escapeHtml(taskTitle)}')" title="Delete task">🗑️</button>
+                            <button class="edit-btn" onclick="window.editTaskHandler('${task.id}')" title="Edit">✏️</button>
+                            <button class="delete-btn" onclick="window.deleteTaskHandler('${task.id}', '${escapeHtml(taskTitle)}')" title="Delete">🗑️</button>
                         </div>
                     </li>
                 `;
@@ -387,7 +403,7 @@
     }
 
     // ========== VIEW MANAGEMENT ==========
-    let currentView = 'list';
+    let currentView = 'grid';
 
     export function setupViewToggle() {
         const viewBtns = document.querySelectorAll('.view-btn');
@@ -396,7 +412,7 @@
         if (!viewBtns.length || !taskList) return;
         
         // Load saved view preference from localStorage
-        const savedView = localStorage.getItem('preferredView') || 'list';
+        const savedView = localStorage.getItem('preferredView') || 'grid';
         currentView = savedView;
         applyView(taskList);
         
@@ -429,12 +445,10 @@
 
     function applyView(taskList) {
         if (!taskList) return;
-        
-        // Remove all view classes
         taskList.classList.remove('task-list-view', 'task-grid-view', 'task-compact-view');
-        
-        // Add the selected view class
         taskList.classList.add(`task-${currentView}-view`);
+        // Let CSS control display — remove any inline override
+        taskList.style.display = '';
     }
 
     // ========== TASK DETAIL MODAL ==========

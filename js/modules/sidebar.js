@@ -157,7 +157,7 @@ export function switchView(viewName) {
 
         // Show normal task UI
         if (inputArea) inputArea.style.display = 'flex';
-        if (taskList) taskList.style.display = 'block';
+        if (taskList) taskList.style.display = '';
         if (emptyState) emptyState.style.display = 'none';
 
         // Apply filter

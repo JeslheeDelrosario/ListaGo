@@ -311,7 +311,7 @@ function showProjectPage(project) {
     const dashboardContainer = document.getElementById('dashboardContainer');
     const taskList = document.getElementById('taskList');
     if (dashboardContainer) dashboardContainer.style.display = 'none';
-    if (taskList) taskList.style.display = 'block';
+    if (taskList) taskList.style.display = '';
     
     // Filter and render project tasks
     const projectTasks = getTasksByProject(project.id);
