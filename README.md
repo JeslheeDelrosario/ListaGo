@@ -1,70 +1,72 @@
 # ListaGo - Modern ToDo List Application with Project Management
 
-A beautiful, feature-rich todo list application with a modern glassmorphism design, built with vanilla JavaScript and ES6 modules. Track your tasks, organize them into projects, and manage deadlines with a comprehensive dashboard.
+A beautiful, feature-rich task management application with a modern glassmorphism design, built with vanilla JavaScript and ES6 modules. Track your tasks, organize them into projects, manage priorities, and collaborate with a comprehensive dashboard that looks and feels professional.
 
 ![ListaGo App Screenshot](assets/screenshots/dashboard.png)
 
 ## ✨ Features
 
-### 🎯 Core Functionality
-- **Add Tasks**: Quickly add new tasks with Enter key or button click
-- **Complete Tasks**: Check/uncheck tasks with smooth animations
-- **Edit Tasks**: Inline editing with modal dialog
+### 🎯 Core Task Management
+- **Jira-Style Task Creation**: Professional modal for creating tasks with comprehensive fields
+- **Rich Text Descriptions**: CKEditor 5 integration for formatted task descriptions
+- **Task Priorities**: Assign Low, Medium, High, or Urgent priorities with visual indicators
+- **Task Statuses**: Track tasks with To Do, In Progress, Review, and Done statuses
+- **Complete Tasks**: Check/uncheck tasks with smooth animations (synced with status field)
+- **Edit Tasks**: Inline editing with enhanced modal dialog
+- **Bulk Delete**: Delete multiple selected tasks at once with confirmation
 - **Delete Tasks**: Safe deletion with confirmation modal
 - **Filter Tasks**: View All, Active, or Completed tasks
 - **Due Dates**: Assign dates to tasks and track overdue items
 - **Persistent Storage**: Tasks and projects saved in browser's localStorage
 - **Search Tasks**: Real-time search across all your tasks
 
-### 📁 Project Management
-- **Create Projects**: Organize tasks into custom projects
-- **Custom Icons & Colors**: Choose from a variety of icons and colors for each project
-- **Project Filtering**: View tasks by specific project
+### 📁 Advanced Project Management
+- **Create Projects**: Organize tasks into custom projects with beautiful cards
+- **Custom Icons & Colors**: Choose from a variety of icons and colors to personalize each project
+- **Project Filtering**: View tasks by specific project from sidebar navigation
 - **Default Inbox**: Catch-all project for uncategorized tasks
-- **Project Deletion**: Safe project removal with automatic task migration to Inbox
+- **Project Deletion**: Safe project removal with task handling options
+- **Visual Project Indicators**: Each task displays its project's color and icon
 
-### 📊 Dashboard & Views
-- **Dashboard**: Overview with statistics and task sections (Today, Upcoming, Overdue)
-- **Today View**: See all tasks due today
+### 📊 Comprehensive Dashboard & Views
+- **Dashboard**: Overview with statistics cards and organized task sections (Today, Upcoming, Overdue)
+- **Today View**: See all tasks due today in a clean list
 - **Upcoming View**: Track tasks due in the next 7 days
-- **All Tasks View**: Complete list of every task
+- **All Tasks View**: Complete list of every task in the system
 - **Statistics Cards**: Visual metrics for total, pending, completed, and overdue tasks
 - **Overdue Tracking**: Automatic highlighting of overdue tasks with pulse animations
+- **Real-time Stats**: Sidebar displays live task counts that update automatically
 
-### 🎨 Modern Design
+### 🎨 Professional Modern Design
 - **Glassmorphism UI**: Beautiful frosted glass effect with backdrop blur
-- **Gradient Backgrounds**: Stunning purple-blue gradient theme
-- **Smooth Animations**: Subtle transitions and hover effects
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
-- **Dark Theme**: Easy on the eyes with carefully chosen colors
+- **Gradient Backgrounds**: Stunning purple-blue gradient theme (#0f0c29 to #24243e)
+- **Smooth Animations**: Subtle transitions, hover effects, and slide-in animations
+- **Fully Responsive**: Works perfectly on desktop, tablet, and mobile devices
+- **Dark Theme**: Easy on the eyes with carefully chosen contrast ratios
 - **Font Awesome Icons**: Professional iconography throughout the interface
-- **Sidebar Navigation**: Collapsible sidebar with quick access to all views
-
-### 🎨 Modern Design
-- **Glassmorphism UI**: Beautiful frosted glass effect with backdrop blur
-- **Gradient Backgrounds**: Stunning purple-blue gradient theme
-- **Smooth Animations**: Subtle transitions and hover effects
-- **Responsive Design**: Works perfectly on desktop, tablet, and mobile
-- **Dark Theme**: Easy on the eyes with carefully chosen colors
+- **Collapsible Sidebar**: Hamburger menu for mobile with overlay backdrop
+- **Professional Modals**: Jira-inspired task creation modal with clean form design
+- **Priority Badges**: Color-coded priority indicators (Urgent: red, High: orange, Medium: yellow, Low: green)
 
 ### ⌨️ Keyboard Shortcuts
 - `Ctrl/Cmd + A` - Focus input field
 - `Delete` - Clear all completed tasks (with confirmation)
-- `Escape` - Reset filter to "All"
+- `Escape` - Close any open modal or reset filters
 - `Enter` - Add task (when input is focused)
 - `/` - Focus search bar from anywhere in the app
 
-### 🛡️ Advanced Features
-- **XSS Protection**: All user input is properly escaped
-- **Input Validation**: Maximum task length of 200 characters, project name validation
+### 🛡️ Enterprise-Grade Features
+- **XSS Protection**: All user input is properly escaped before rendering
+- **Input Validation**: Maximum task length of 200 characters, project name validation (50 char limit)
 - **Duplicate Prevention**: Cannot add identical tasks or projects with the same name
-- **Error Handling**: Graceful handling of localStorage issues
-- **Debouncing**: Prevents accidental double-clicks
-- **Multiple Modals**: Delete, edit, and project creation modals with previews
-- **UUID Generation**: Unique identifiers for all tasks and projects
-- **Date Filtering**: Intelligent filtering of tasks by due date
-- **Search Indexing**: Real-time search across all task content
-- **Project Migration**: Automatic task migration when projects are deleted
+- **Error Handling**: Graceful handling of localStorage quota issues
+- **Debouncing**: Prevents accidental double-clicks and excessive API calls
+- **Multiple Modals**: Task creation, edit, delete, bulk delete, project creation, and project deletion modals
+- **UUID Generation**: Unique identifiers for all tasks and projects using crypto.randomUUID()
+- **Date Filtering**: Intelligent filtering of tasks by due date with automatic categorization
+- **Real-time Search**: Instant search across all task titles and descriptions
+- **Mobile-First Approach**: Fully responsive with touch-friendly interactions
+- **Rich Text Support**: CKEditor 5 integration for professional task descriptions
 
 ## 🚀 Quick Start
 
@@ -98,18 +100,20 @@ listaGo/
 │   ├── app.js              # Main application entry point
 │   ├── script-backup.js    # Legacy backup script
 │   └── modules/
-│       ├── storage.js              # localStorage operations
-│       ├── taskManager.js          # Task CRUD operations (with due dates)
-│       ├── projectManager.js       # Project management functionality
-│       ├── uiRenderer.js           # UI rendering functions
-│       ├── sidebar.js              # Sidebar navigation and view switching
-│       ├── notifications.js        # Toast notifications
-│       ├── modal.js                # Delete confirmation modal
-│       ├── editModal.js            # Edit task modal
-│       ├── projectModal.js         # Project creation modal
-│       ├── utils.js                # Helper functions
+│       ├── storage.js                      # localStorage operations
+│       ├── taskManager.js                  # Enhanced task CRUD with priorities & statuses
+│       ├── projectManager.js               # Project management functionality
+│       ├── uiRenderer.js                   # UI rendering functions
+│       ├── sidebar.js                      # Sidebar navigation and view switching
+│       ├── notifications.js                # Toast notification system
+│       ├── modal.js                        # Delete confirmation modal
+│       ├── editModal.js                    # Legacy edit task modal (for backward compatibility)
+│       ├── projectModal.js                 # Project creation modal
+│       ├── taskFormModal.js                # NEW: Jira-style task creation modal
+│       ├── uiRenderer.js                   # UI rendering with priority badges and status indicators
+│       ├── utils.js                        # Helper functions including debouncing
 │       └── views/
-│           └── dashboardView.js     # Dashboard view rendering
+│           └── dashboardView.js            # Dashboard view rendering with statistics
 ├── LICENSE                # MIT License
 ├── README.md              # This file
 └── .gitignore             # Git ignore file
@@ -162,11 +166,16 @@ listaGo/
 ```javascript
 {
   id: "uuid-string",
-  text: "Task description",
+  title: "Task description",
+  text: "Task description", // Backward compatibility
+  description: "Rich text description of the task",
   completed: false,
   createdAt: "ISO-date-string",
   dueDate: "YYYY-MM-DD" || null,
-  projectId: "project-uuid" || null
+  createdDate: "Date.toDateString()",
+  projectId: "project-uuid" || null,
+  priority: "low" | "medium" | "high" | "urgent",
+  status: "todo" | "inprogress" | "review" | "done"
 }
 ```
 

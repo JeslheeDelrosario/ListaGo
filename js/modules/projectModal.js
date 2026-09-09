@@ -271,10 +271,8 @@ function filterTasksByProject(projectId) {
 }
 
 function showProjectPage(project) {
-    // Hide global task input and show project-specific input
+    // Hide global task input
     const globalInputArea = document.querySelector('.input-area');
-    const mainContent = document.querySelector('.main-content');
-    
     if (globalInputArea) {
         globalInputArea.style.display = 'none';
     }
@@ -285,42 +283,41 @@ function showProjectPage(project) {
         existingProjectInput.remove();
     }
     
-    // Create project-specific input area
+    // Create project-specific input area with two buttons
     const projectInputArea = document.createElement('div');
     projectInputArea.className = 'input-area glass project-input-area';
     projectInputArea.innerHTML = `
-        <div class="project-input-header">
-            <div class="project-input-icon" style="background-color: ${project.color}">
-                <i class="${project.icon}"></i>
+        <div class="project-input-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+            <div class="project-input-icon" style="background-color: ${project.color}; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                <i class="${project.icon}" style="color: #fff;"></i>
             </div>
-            <span class="project-input-title">Add task to ${project.name}</span>
+            <span class="project-input-title" style="font-weight: 600; font-size: 1rem; color: #e2e8f0;">${project.name}</span>
         </div>
-        <div class="project-input-form">
-            <input type="text" id="projectTaskInput" class="project-task-input" placeholder="What needs to be done in ${project.name}?">
-            <input type="date" id="projectTaskDate" class="project-date-input">
-            <button id="addProjectTaskBtn" class="project-add-btn">Add Task</button>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <input type="text" id="projectTaskInput" class="project-task-input" placeholder="Add task..." style="flex: 1; min-width: 200px; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.95rem;">
+            <button id="addProjectTaskBtn" class="project-add-btn" style="padding: 10px 16px; background: transparent; border: 1px solid var(--color-primary); border-radius: 6px; color: var(--color-primary); cursor: pointer; font-weight: 400; transition: all 0.15s ease; font-size: 0.9rem;">Add</button>
+            <button id="createFullProjectTaskBtn" class="project-add-btn" style="padding: 10px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #a0aec0; cursor: pointer; font-weight: 400; transition: all 0.15s ease; font-size: 0.9rem;">New Task</button>
         </div>
     `;
     
     // Insert after the main header
     const mainHeader = document.querySelector('.main-header');
+    const mainContent = document.querySelector('.main-content');
     if (mainHeader && mainContent) {
         mainContent.insertBefore(projectInputArea, mainHeader.nextSibling);
     }
 
-    // Hide global dashboard and normal task UI
+    // Hide dashboard and show task list
     const dashboardContainer = document.getElementById('dashboardContainer');
     const taskList = document.getElementById('taskList');
-    const emptyState = document.getElementById('emptyState');
     if (dashboardContainer) dashboardContainer.style.display = 'none';
     if (taskList) taskList.style.display = 'block';
-    if (emptyState) emptyState.style.display = 'none';
     
     // Filter and render project tasks
     const projectTasks = getTasksByProject(project.id);
     renderTasks(projectTasks);
     
-    // Set up event listeners for project-specific task input
+    // Set up event listeners
     setupProjectTaskInput(project.id);
     
     // Store current project for navigation
@@ -329,38 +326,56 @@ function showProjectPage(project) {
 
 function setupProjectTaskInput(projectId) {
     const taskInput = document.getElementById('projectTaskInput');
-    const taskDate = document.getElementById('projectTaskDate');
     const addButton = document.getElementById('addProjectTaskBtn');
+    const fullTaskBtn = document.getElementById('createFullProjectTaskBtn');
     
-    if (!taskInput || !addButton) return;
+    if (!taskInput) return;
     
+    // Quick add handler
     const addTaskHandler = () => {
         const taskText = taskInput.value.trim();
-        const dueDate = taskDate ? taskDate.value : null;
-        
         if (taskText) {
-            addTask(taskText, dueDate, projectId);
-            taskInput.value = '';
-            if (taskDate) taskDate.value = '';
-            
-            // Refresh project tasks and project counts
-            const projectTasks = getTasksByProject(projectId);
-            renderTasks(projectTasks);
-            renderProjectsList();
+            import('./taskManager.js').then(module => {
+                module.addTask({
+                    title: taskText,
+                    projectId: projectId,
+                    description: '',
+                    priority: 'medium',
+                    status: 'todo',
+                    dueDate: null
+                });
+                taskInput.value = '';
+                taskInput.focus();
+                
+                const projectTasks = getTasksByProject(projectId);
+                renderTasks(projectTasks);
+                renderProjectsList();
+            });
         }
     };
     
-    addButton.addEventListener('click', addTaskHandler);
+    if (addButton) {
+        addButton.addEventListener('click', addTaskHandler);
+    }
     
     taskInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
+            e.preventDefault();
             addTaskHandler();
         }
     });
+    
+    // Full task button - opens the full modal
+    if (fullTaskBtn) {
+        fullTaskBtn.addEventListener('click', () => {
+            import('./taskFormModal.js').then(module => {
+                module.openTaskFormModal(null, projectId);
+            });
+        });
+    }
+    
+    setTimeout(() => taskInput.focus(), 100);
 }
-
-    // Focus the input
-    taskInput.focus();
 
 
 // Global function to scroll to project input when New Task button is clicked

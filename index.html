@@ -11,10 +11,15 @@
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
     <link rel="manifest" href="assets/favicon/site.webmanifest">
 
+    <!-- Design tokens MUST load first: style.css, modal.css and dashboard.css
+         all reference var(--...) tokens defined here. -->
+    <link rel="stylesheet" href="css/tokens.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/modal.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <!-- CKEditor 5 Rich Text Editor (Free, no API key required) -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
 </head>
 <body>
     <div class="app">
@@ -84,34 +89,29 @@
                     <h1 id="viewTitle">Dashboard</h1>
                 </div>
                 <div class="header-actions">
+                    <button id="openTaskFormBtn" class="create-task-btn" onclick="window.openTaskFormModal && window.openTaskFormModal()">
+                        <i class="fas fa-plus"></i>
+                        <span>Create Task</span>
+                    </button>
                 </div>
             </header>
 
-            <!-- Task Input -->
-            <div class="input-area glass">
-                <input type="text" id="taskInput" placeholder="What needs to be done today?">
-                <!-- Mobile row wrapper for dropdown and date -->
-                <div class="mobile-row">
-                    <!-- Custom Project Dropdown -->
-                    <div class="custom-project-dropdown" id="projectDropdown">
-                        <div class="dropdown-trigger" id="projectDropdownTrigger">
-                            <span class="trigger-text">Select Project</span>
-                            <i class="fas fa-chevron-down dropdown-arrow"></i>
-                        </div>
-                        <div class="dropdown-menu" id="projectDropdownMenu">
-                            <div class="dropdown-item" data-project-id="">
-                                <span class="item-text">No Project</span>
-                            </div>
-                        </div>
-                        <input type="hidden" id="projectSelect" name="projectId">
-                    </div>
-                    <input type="date" id="taskDate" class="date-input">
+            <!-- Task Controls with View Toggle -->
+            <div class="task-controls">
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="list" title="List View">
+                        <i class="fas fa-list"></i>
+                    </button>
+                    <button class="view-btn" data-view="grid" title="Grid View">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="view-btn" data-view="compact" title="Compact View">
+                        <i class="fas fa-compress"></i>
+                    </button>
                 </div>
-                <button id="addTaskButton" class="input-task-btn">Add</button>
             </div>
-
             <!-- Task List -->
-            <div id="taskList" class="task-list"></div>
+            <div id="taskList" class="task-list task-list-view"></div>
 
             <!-- Empty State -->
             <div id="emptyState" class="empty-state" style="display: none;">
@@ -121,8 +121,77 @@
         </main>
     </div>
 
-       <!-- Edit Task Modal -->
-    <div id="editTaskModal" class="modal edit-task-modal">
+    <!-- Create/Edit Task Modal (Jira-style) -->
+    <div id="taskFormModal" class="modal task-form-modal">
+        <div class="modal-content task-form-modal-content">
+            <div class="modal-header task-form-header">
+                <div class="modal-icon task-form-icon">📝</div>
+                <h3 class="task-form-title" id="taskFormModalTitle">Create New Task</h3>
+                <button class="modal-close task-form-close" id="closeTaskFormModal">&times;</button>
+            </div>
+            <div class="modal-body task-form-body">
+                <!-- Task Title -->
+                <div class="form-group">
+                    <label for="taskTitleInput" class="form-label">Task Title</label>
+                    <input type="text" id="taskTitleInput" class="form-input" placeholder="What needs to be done?" required>
+                </div>
+
+                <!-- Task Description with Rich Text Editor -->
+                <div class="form-group">
+                    <label for="taskDescriptionInput" class="form-label">Description</label>
+                    <textarea id="taskDescriptionInput" class="form-textarea" placeholder="Add a description..."></textarea>
+                </div>
+
+                <!-- Form Row for metadata fields -->
+                <div class="form-row">
+                    <!-- Project -->
+                    <div class="form-group form-group-half">
+                        <label for="taskProjectSelect" class="form-label">Project</label>
+                        <select id="taskProjectSelect" class="form-select">
+                            <option value="">No Project</option>
+                        </select>
+                    </div>
+
+                    <!-- Due Date -->
+                    <div class="form-group form-group-half">
+                        <label for="taskDueDateInput" class="form-label">Due Date</label>
+                        <input type="date" id="taskDueDateInput" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <!-- Priority -->
+                    <div class="form-group form-group-half">
+                        <label for="taskPrioritySelect" class="form-label">Priority</label>
+                        <select id="taskPrioritySelect" class="form-select">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-group form-group-half">
+                        <label for="taskStatusSelect" class="form-label">Status</label>
+                        <select id="taskStatusSelect" class="form-select">
+                            <option value="todo" selected>To Do</option>
+                            <option value="inprogress">In Progress</option>
+                            <option value="review">Review</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer task-form-footer">
+                <button class="modal-btn cancel-btn" id="cancelTaskFormBtn">Cancel</button>
+                <button class="modal-btn confirm-btn" id="confirmTaskFormBtn">Create Task</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legacy Edit Task Modal (kept for backward compatibility) -->
+    <div id="editTaskModal" class="modal edit-task-modal" style="display: none;">
         <div class="modal-content edit-modal-content">
             <div class="modal-header edit-modal-header">
                 <div class="modal-icon edit-modal-icon">✏️</div>

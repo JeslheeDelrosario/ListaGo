@@ -1,0 +1,152 @@
+/* ====================================================================
+   tokens.css - ListaGo Design System
+   Single source of truth for color, elevation, radius, blur and motion.
+   Import this BEFORE style.css, modal.css and dashboard.css.
+   ==================================================================== */
+
+:root {
+  /* ---------- Brand ---------- */
+  --color-primary: #6366f1; /* indigo */
+  --color-secondary: #8b5cf6; /* purple */
+  --color-accent: #a855f7; /* magenta-purple, used on primary CTAs */
+  --color-primary-light: #a5b4fc;
+  --color-primary-lighter: #c7d2fe;
+  --color-primary-lightest: #e0e7ff;
+  --color-primary-active: #5254d8;
+  --color-secondary-active: #7c3aed;
+
+  /* ---------- Semantic status ---------- */
+  --color-danger: #ef4444;
+  --color-danger-dark: #dc2626;
+  --color-danger-light: #f87171;
+  --color-danger-lighter: #fca5a5;
+
+  --color-success: #22c55e; /* priority: low / status: done */
+  --color-success-alt: #10b981; /* dashboard "completed" stat, checkboxes */
+
+  --color-warning: #f59e0b; /* pending stat, "due today" */
+  --color-warning-alt: #eab308; /* priority: medium */
+
+  --color-orange: #f97316; /* priority: high */
+
+  --color-info: #3b82f6; /* status: in progress, edit actions */
+  --color-info-dark: #2563eb;
+
+  --color-purple: #8b5cf6; /* status: review (alias of --color-secondary) */
+  --color-gray: #6b7280; /* status: to do */
+
+  /* ---------- Background ---------- */
+  --gradient-bg: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+
+  /* ---------- Brand gradients (buttons, active nav, accents) ---------- */
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+  --gradient-primary-alt: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-accent) 100%
+  );
+  --gradient-primary-tint: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.1) 0%,
+    rgba(139, 92, 246, 0.1) 100%
+  );
+
+  /* Vertical variants used by scrollbar thumbs */
+  --gradient-primary-v: linear-gradient(
+    180deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+  --gradient-primary-v-hover: linear-gradient(180deg, #7c7ff5, #a06cf7);
+  --gradient-primary-v-active: linear-gradient(
+    180deg,
+    var(--color-primary-active),
+    var(--color-secondary-active)
+  );
+  --gradient-primary-hover: linear-gradient(135deg, #7c7ff5, #a06cf7);
+
+  --gradient-danger: linear-gradient(
+    135deg,
+    var(--color-danger) 0%,
+    var(--color-danger-dark) 100%
+  );
+  --gradient-info: linear-gradient(
+    135deg,
+    var(--color-info) 0%,
+    var(--color-info-dark) 100%
+  );
+
+  /* Modal / surface gradients */
+  --gradient-modal: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  --gradient-modal-alt: linear-gradient(135deg, #1e2a3a 0%, #0f1724 100%);
+  --gradient-modal-project: linear-gradient(
+    135deg,
+    rgb(30, 30, 46) 0%,
+    rgb(26, 26, 62) 100%
+  );
+  --gradient-modal-footer: linear-gradient(
+    135deg,
+    rgba(26, 26, 46, 0.8) 0%,
+    rgba(22, 33, 62, 0.8) 100%
+  );
+
+  /* ---------- Glass surfaces ---------- */
+  --glass-bg-faintest: rgba(255, 255, 255, 0.03);
+  --glass-bg-faint: rgba(255, 255, 255, 0.04);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.05);
+  --glass-bg-soft: rgba(255, 255, 255, 0.06);
+  --glass-bg-base: rgba(255, 255, 255, 0.08);
+  --glass-bg-strong: rgba(255, 255, 255, 0.1);
+  --glass-bg-stronger: rgba(255, 255, 255, 0.12);
+  --glass-bg-strongest: rgba(255, 255, 255, 0.15);
+
+  --glass-bg-intense: rgba(255, 255, 255, 0.2);
+  --glass-bg-brighter: rgba(255, 255, 255, 0.3);
+  --glass-bg-brightest: rgba(255, 255, 255, 0.4);
+
+  --glass-border-soft: rgba(255, 255, 255, 0.08);
+  --glass-border-base: rgba(255, 255, 255, 0.1);
+  --glass-border-strong: rgba(255, 255, 255, 0.12);
+  --glass-border-stronger: rgba(255, 255, 255, 0.15);
+  --glass-border-strongest: rgba(255, 255, 255, 0.2);
+
+  /* ---------- Blur ---------- */
+  --blur-sm: blur(8px);
+  --blur-md: blur(10px);
+  --blur-lg: blur(12px);
+  --blur-xl: blur(15px);
+  --blur-2xl: blur(20px);
+
+  /* ---------- Radius scale ---------- */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-full: 50%;
+
+  /* ---------- Elevation (box-shadow) ---------- */
+  --shadow-primary-sm: 0 4px 15px rgba(99, 102, 241, 0.3);
+  --shadow-primary-md: 0 6px 20px rgba(99, 102, 241, 0.4);
+  --shadow-primary-lg: 0 8px 20px rgba(99, 102, 241, 0.4);
+  --shadow-danger-sm: 0 4px 15px rgba(239, 68, 68, 0.3);
+  --shadow-danger-md: 0 6px 20px rgba(239, 68, 68, 0.4);
+  --shadow-info-sm: 0 4px 15px rgba(59, 130, 246, 0.3);
+  --shadow-info-md: 0 6px 20px rgba(59, 130, 246, 0.4);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-modal-strong: 0 30px 60px -15px rgba(0, 0, 0, 0.7);
+  --shadow-dropdown: 0 10px 40px rgba(0, 0, 0, 0.4);
+  --shadow-sidebar: 4px 0 25px rgba(0, 0, 0, 0.4);
+  --shadow-glow-primary: 0 0 6px rgba(139, 92, 246, 0.35);
+  --shadow-glow-primary-hover: 0 0 10px rgba(165, 132, 247, 0.55);
+
+  /* ---------- Motion ---------- */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}

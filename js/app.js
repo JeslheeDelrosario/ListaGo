@@ -9,14 +9,15 @@ import {
     setRenderCallback,
     deleteAllCompletedTasks
 } from './modules/taskManager.js';
-import { renderTasks, setupFilters, updateStats } from './modules/uiRenderer.js';
+import { renderTasks, setupFilters, updateStats, setupViewToggle } from './modules/uiRenderer.js';
 import { setupModal } from './modules/modal.js';
 import { showNotification } from './modules/notifications.js';
 import { debounce } from './modules/utils.js';
-import { setupEditModal, showEditModal, setupInlineEdit } from './modules/editModal.js';
+import { setupEditModal, setupInlineEdit } from './modules/editModal.js';
 import { setupSidebar, updateSidebarStats } from './modules/sidebar.js';
 import { setupProjectModal, renderProjectsList } from './modules/projectModal.js';
 import { getProjects, loadProjects } from './modules/projectManager.js';
+import { setupTaskFormModal } from './modules/taskFormModal.js';
 
 // Mobile sidebar toggle functionality
 function setupMobileSidebar() {
@@ -83,9 +84,10 @@ function init() {
         updateSidebarStats();
     });
     
-    // Set up modal
+    // Set up modals
     setupModal();
-    setupEditModal();
+    setupEditModal(); // Legacy edit modal
+    setupTaskFormModal(); // New Jira-style task form modal
     
     // Load saved projects from localStorage
     loadProjects();
@@ -95,6 +97,9 @@ function init() {
     
     // Set up sidebar navigation
     setupSidebar();
+    
+    // Set up view toggle functionality
+    setupViewToggle();
     
     // Set up project modal
     setupProjectModal();
@@ -112,8 +117,6 @@ function init() {
     // Set today's date as minimum for date picker
     setDatePickerMin();
 
-    window.showEditModal = showEditModal;
-    
     // Initial render
     renderTasks();
     
@@ -254,98 +257,101 @@ function setDatePickerMin() {
 
 // UPDATED: Set up event listeners with project and date support
 function setupEventListeners() {
-    const addButton = document.getElementById('addTaskButton');
-    const taskInput = document.getElementById('taskInput');
-    const taskDate = document.getElementById('taskDate');
-    const projectSelect = document.getElementById('projectSelect');
-    
-    if (addButton) {
-        addButton.addEventListener('click', () => {
-            const input = document.getElementById('taskInput');
-            const dateInput = document.getElementById('taskDate');
-            const projectSelect = document.getElementById('projectSelect');
-            const taskText = input.value.trim();
-            const dueDate = dateInput ? dateInput.value : null;
-            const projectId = projectSelect ? projectSelect.value : null;
-            
-            if (taskText) {
-                // Pass task text, due date, and project ID
-                addTask(taskText, dueDate, projectId);
-                if (input) input.value = '';
-                if (dateInput) dateInput.value = ''; // Clear date picker
-                if (projectSelect) projectSelect.value = ''; // Clear project selection
-                // Reset dropdown trigger to show "Select Project"
-                const trigger = document.getElementById('projectDropdownTrigger');
-                if (trigger) {
-                    trigger.innerHTML = `
+  const addButton = document.getElementById("addTaskButton");
+  const taskInput = document.getElementById("taskInput");
+  const taskDate = document.getElementById("taskDate");
+  const projectSelect = document.getElementById("projectSelect");
+
+  if (addButton) {
+    addButton.addEventListener("click", () => {
+      const input = document.getElementById("taskInput");
+      const dateInput = document.getElementById("taskDate");
+      const projectSelect = document.getElementById("projectSelect");
+      const taskText = input.value.trim();
+      const dueDate = dateInput ? dateInput.value : null;
+      const projectId = projectSelect ? projectSelect.value : null;
+
+      if (taskText) {
+        // Pass task text, due date, and project ID
+        addTask(taskText, dueDate, projectId);
+        if (input) input.value = "";
+        if (dateInput) dateInput.value = ""; // Clear date picker
+        if (projectSelect) projectSelect.value = ""; // Clear project selection
+        // Reset dropdown trigger to show "Select Project"
+        const trigger = document.getElementById("projectDropdownTrigger");
+        if (trigger) {
+          trigger.innerHTML = `
                         <span class="trigger-text">Select Project</span>
                         <i class="fas fa-chevron-down dropdown-arrow"></i>
                     `;
-                    // Remove selected state from all dropdown items
-                    const items = document.querySelectorAll('.dropdown-item');
-                    items.forEach(item => item.classList.remove('selected'));
-                }
-                input.focus();
-            }
-        });
-    }
-    
-    if (taskInput) {
-        taskInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const dateInput = document.getElementById('taskDate');
-                const projectSelect = document.getElementById('projectSelect');
-                const taskText = e.target.value.trim();
-                const dueDate = dateInput ? dateInput.value : null;
-                const projectId = projectSelect ? projectSelect.value : null;
-                
-                if (taskText) {
-                    addTask(taskText, dueDate, projectId);
-                    e.target.value = '';
-                    if (dateInput) dateInput.value = '';
-                    if (projectSelect) projectSelect.value = '';
-                    // Reset dropdown trigger to show "Select Project"
-                    const trigger = document.getElementById('projectDropdownTrigger');
-                    if (trigger) {
-                        trigger.innerHTML = `
+          // Remove selected state from all dropdown items
+          const items = document.querySelectorAll(".dropdown-item");
+          items.forEach((item) => item.classList.remove("selected"));
+        }
+        input.focus();
+      }
+    });
+  }
+
+  if (taskInput) {
+    taskInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        const dateInput = document.getElementById("taskDate");
+        const projectSelect = document.getElementById("projectSelect");
+        const taskText = e.target.value.trim();
+        const dueDate = dateInput ? dateInput.value : null;
+        const projectId = projectSelect ? projectSelect.value : null;
+
+        if (taskText) {
+          addTask(taskText, dueDate, projectId);
+          e.target.value = "";
+          if (dateInput) dateInput.value = "";
+          if (projectSelect) projectSelect.value = "";
+          // Reset dropdown trigger to show "Select Project"
+          const trigger = document.getElementById("projectDropdownTrigger");
+          if (trigger) {
+            trigger.innerHTML = `
                             <span class="trigger-text">Select Project</span>
                             <i class="fas fa-chevron-down dropdown-arrow"></i>
                         `;
-                        // Remove selected state from all dropdown items
-                        const items = document.querySelectorAll('.dropdown-item');
-                        items.forEach(item => item.classList.remove('selected'));
-                    }
-                }
-            }
-        });
-    }
-    
-    // Update project dropdown when projects change
-    updateProjectDropdown();
+            // Remove selected state from all dropdown items
+            const items = document.querySelectorAll(".dropdown-item");
+            items.forEach((item) => item.classList.remove("selected"));
+          }
+        }
+      }
+    });
+  }
 
-    // Handle header "New Task" button - Smart behavior with Dashboard
-    const headerAddBtn = document.getElementById('addTaskBtn');
-    if (headerAddBtn) {
-        headerAddBtn.addEventListener('click', () => {
-            const currentView = window.getCurrentView ? window.getCurrentView() : 'dashboard';
-            
-            if (currentView === 'dashboard') {
-                // Switch to All Tasks view first
-                const allNavBtn = document.querySelector('.nav-item[data-view="all"]');
-                if (allNavBtn) {
-                    allNavBtn.click();   // This triggers switchView('all')
-                }
-            }
-            
-            // Focus the input after a tiny delay (so view has time to switch)
-            setTimeout(() => {
-                const taskInput = document.getElementById('taskInput');
-                if (taskInput) {
-                    taskInput.focus();
-                }
-            }, 80);
-        });
-    }
+  // Update project dropdown when projects change
+  updateProjectDropdown();
+
+  // Handle header "New Task" button - Smart behavior with Dashboard
+  const headerAddBtn = document.getElementById("addTaskBtn");
+  if (headerAddBtn) {
+    headerAddBtn.addEventListener("click", () => {
+      const currentView = window.getCurrentView
+        ? window.getCurrentView()
+        : "dashboard";
+
+      if (currentView === "dashboard") {
+        // Switch to All Tasks view first
+        const allNavBtn = document.querySelector('.nav-item[data-view="all"]');
+        if (allNavBtn) {
+          allNavBtn.click(); // This triggers switchView('all')
+        }
+      }
+
+      // Focus the input after a tiny delay (so view has time to switch)
+      setTimeout(() => {
+        const taskInput = document.getElementById("taskInput");
+        if (taskInput) {
+          taskInput.focus();
+        }
+      }, 80);
+    });
+  }
+
 }
 
 // Set up keyboard shortcuts
@@ -383,7 +389,7 @@ function setupKeyboardShortcuts() {
 // Make functions available globally for inline event handlers
 window.toggleTaskHandler = (id) => toggleTask(id);
 window.editTaskHandler = (id) => {
-    showEditModal(id);  // Opens the modal instead of prompt
+    window.showEditModal(id);
 };
 window.deleteTaskHandler = (id, taskText) => {
     window.showDeleteConfirmation(id, taskText, (confirmedId) => {

@@ -7,16 +7,24 @@ export function loadTasks() {
     try {
         const savedTasks = localStorage.getItem('tasks');
         if (savedTasks) {
-            tasks = JSON.parse(savedTasks);
+            const parsedTasks = JSON.parse(savedTasks);
             
-            // Backward compatibility: Add projectId if missing
-            tasks = tasks.map(task => ({
-                ...task,
-                projectId: task.projectId || "inbox",   // ← Important!
+            // Backward compatibility: Ensure all fields exist
+            tasks = parsedTasks.map(task => ({
+                id: task.id || crypto.randomUUID(),
+                title: task.title || task.text || 'Untitled',      // ← ADD THIS
+                text: task.text || task.title || 'Untitled',       // ← ADD THIS
+                description: task.description || '',               // ← ADD THIS (CRITICAL!)
+                completed: task.completed || false,
                 dueDate: task.dueDate || null,
+                projectId: task.projectId || "inbox",
+                priority: task.priority || 'medium',               // ← ADD THIS
+                status: task.status || 'todo',                     // ← ADD THIS
                 createdAt: task.createdAt || new Date().toISOString(),
                 createdDate: task.createdDate || new Date().toDateString()
             }));
+            
+            console.log('💾 storage.loadTasks() loaded:', tasks);
             return tasks;
         }
         return [];
@@ -30,14 +38,19 @@ export function saveTasks(tasksData) {
     try {
         const validatedTasks = tasksData.map(task => ({
             id: task.id,
-            text: task.text,
+            title: task.title || task.text || 'Untitled',  // ← ADD THIS
+            text: task.text || task.title || 'Untitled',   // ← ADD THIS
+            description: task.description || '',           // ← ADD THIS (CRITICAL!)
             completed: task.completed || false,
             dueDate: task.dueDate || null,
-            projectId: task.projectId || "inbox",     // ← Always ensure projectId
+            projectId: task.projectId || "inbox",
+            priority: task.priority || 'medium',           // ← ADD THIS
+            status: task.status || 'todo',                 // ← ADD THIS
             createdAt: task.createdAt || new Date().toISOString(),
             createdDate: task.createdDate || new Date().toDateString()
         }));
         
+        console.log('💾 storage.saveTasks() saving:', validatedTasks);
         localStorage.setItem('tasks', JSON.stringify(validatedTasks));
         tasks = validatedTasks;
         return true;
@@ -48,6 +61,10 @@ export function saveTasks(tasksData) {
 }
 
 export function getTasks() {
+    // If tasks is empty, try loading from localStorage
+    if (tasks.length === 0) {
+        return loadTasks();
+    }
     return tasks;
 }
 

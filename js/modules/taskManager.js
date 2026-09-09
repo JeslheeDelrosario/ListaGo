@@ -32,76 +32,129 @@ export function setCurrentFilter(filter) {
 
 export function getFilteredTasks() {
     const tasks = getTasks();
+    console.log('🔍 getFilteredTasks - all tasks:', tasks);
+    
+    let filtered;
     switch(currentFilter) {
         case 'active':
-            return tasks.filter(task => !task.completed);
+            filtered = tasks.filter(task => !task.completed);
+            break;
         case 'completed':
-            return tasks.filter(task => task.completed);
+            filtered = tasks.filter(task => task.completed);
+            break;
         default:
-            return tasks;
+            filtered = tasks;
     }
+    
+    console.log('🔍 getFilteredTasks - filtered:', filtered);
+    return filtered;
 }
 
-// UPDATED: Add task with due date and project assignment
-export function addTask(taskText, dueDate = null, projectId = null) {
-    if (debounceTimer) return false;
-    
-    // Validation
-    if (!taskText || taskText.trim() === '') {
-        showNotification('Please enter a task!', 'error');
-        return false;
-    }
-    
-    if (taskText.length > MAX_TASK_LENGTH) {
-        showNotification(`Task must be ${MAX_TASK_LENGTH} characters or less`, 'error');
-        return false;
-    }
-    
-    const tasks = getTasks();
-    if (tasks.some(task => task.text.toLowerCase() === taskText.toLowerCase())) {
-        showNotification('This task already exists!', 'error');
-        return false;
-    }
-    
-    // Create task with due date and project assignment
-    const task = {
-        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-        text: taskText.trim(),
-        completed: false,
-        createdAt: new Date().toISOString(),
-        dueDate: dueDate || null,  // Add due date in YYYY-MM-DD format
-        createdDate: new Date().toDateString(),
-        projectId: projectId || null  // Add project assignment
+// NEW: Enhanced addTask with full task properties (Jira-style)
+export function addTask(taskData) {
+  if (debounceTimer) return false;
+
+  // Validation
+  if (!taskData.title || taskData.title.trim() === "") {
+    showNotification("Please enter a task title!", "error");
+    return false;
+  }
+
+  if (taskData.title.length > MAX_TASK_LENGTH) {
+    showNotification(
+      `Task title must be ${MAX_TASK_LENGTH} characters or less`,
+      "error",
+    );
+    return false;
+  }
+
+  const tasks = getTasks();
+  if (
+    tasks.some(
+      (task) =>
+        task.title && task.title.toLowerCase() === taskData.title.toLowerCase(),
+    )
+  ) {
+    showNotification("This task already exists!", "error");
+    return false;
+  }
+
+  // Backward compatibility: handle old task format if needed
+  if (typeof taskData === "string") {
+    const legacyTask = {
+      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+      title: taskData.trim(),
+      text: taskData.trim(),
+      description: "", // ← ADD THIS
+      completed: false,
+      createdAt: new Date().toISOString(),
+      dueDate: null,
+      createdDate: new Date().toDateString(),
+      projectId: null,
+      priority: "medium",
+      status: "todo",
     };
-    
-    tasks.push(task);
+    tasks.push(legacyTask);
     setTasks(tasks);
+    return true;
+  }
+
+  // Create enhanced task with all properties
+  const task = {
+    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+    title: taskData.title.trim(),
+    text: taskData.title.trim(),
+    description: taskData.description || "", // ← MAKE SURE THIS IS HERE
+    completed: taskData.status === "done",
+    createdAt: new Date().toISOString(),
+    dueDate: taskData.dueDate || null,
+    createdDate: new Date().toDateString(),
+    projectId: taskData.projectId || null,
+    priority: taskData.priority || "medium",
+    status: taskData.status || "todo",
+  };
+
+  console.log("Saving task with description:", task); // ← ADD THIS FOR DEBUGGING
+
+  tasks.push(task);
+  setTasks(tasks);
+
+  if (renderCallback) renderCallback();
+
+  // ... rest of notification code
+
+  return true;
+}
+
+// NEW: Enhanced editTask that supports full task updates
+export function editTask(taskId, updates) {
+    const tasks = getTasks();
+    const taskIndex = tasks.findIndex(t => t.id == taskId);
     
+    if (taskIndex === -1) return false;
+    
+    // If updates is just a string (legacy support), convert to object
+    if (typeof updates === 'string') {
+        tasks[taskIndex].text = updates.trim();
+        tasks[taskIndex].title = updates.trim();
+    } else {
+        // Merge updates into existing task
+        tasks[taskIndex] = {
+            ...tasks[taskIndex],
+            ...updates,
+            // Keep text in sync with title for backward compatibility
+            text: updates.title ? updates.title.trim() : tasks[taskIndex].title,
+            // Sync completed status with status field
+            completed: updates.status ? updates.status === 'done' : tasks[taskIndex].completed
+        };
+    }
+    
+    setTasks(tasks);
     if (renderCallback) renderCallback();
-    
-    // Show notification with project and date info
-    let notificationMessage = 'Task added successfully!';
-    if (projectId) {
-        const project = getProjectById(projectId);
-        if (project) {
-            notificationMessage += ` Added to "${project.name}"`;
-        }
-    }
-    if (dueDate) {
-        const formattedDate = new Date(dueDate).toLocaleDateString();
-        notificationMessage += ` Due: ${formattedDate}`;
-    }
-    showNotification(notificationMessage, 'success');
-    
-    // Debounce
-    debounceTimer = setTimeout(() => {
-        debounceTimer = null;
-    }, 500);
-    
     return true;
 }
 
-// NEW: Update task due date
+// Legacy: Keep the old updateTaskDueDate function signature for backward compatibility
 export function updateTaskDueDate(id, newDueDate) {
     const tasks = getTasks();
     const task = tasks.find(task => task.id === id);
@@ -208,35 +261,7 @@ export function toggleTask(id) {
     }
 }
 
-// UPDATED: Edit task
-export function editTask(id, newText, newDueDate = null) {
-    if (!newText || newText.trim() === '') {
-        showNotification('Task cannot be empty!', 'error');
-        return false;
-    }
-    
-    const tasks = getTasks();
-    const task = tasks.find(task => task.id === id);
-    
-    if (task && (newText !== task.text || newDueDate !== task.dueDate)) {
-        // Check for duplicate text
-        if (tasks.some(t => t.text.toLowerCase() === newText.toLowerCase() && t.id !== id)) {
-            showNotification('This task already exists!', 'error');
-            return false;
-        }
-        
-        task.text = newText.trim();
-        if (newDueDate !== undefined) {
-            task.dueDate = newDueDate || null;
-        }
-        setTasks(tasks);
-        
-        if (renderCallback) renderCallback();
-        showNotification('Task updated!', 'success');
-        return true;
-    }
-    return false;
-}
+
 
 // UPDATED: Delete all completed tasks
 export function deleteAllCompletedTasks() {
