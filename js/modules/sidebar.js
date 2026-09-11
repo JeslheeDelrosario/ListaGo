@@ -1,317 +1,217 @@
-// js\modules\sidebar.js
-// sidebar.js - Handle sidebar navigation and view switching
-import { getTasks, setCurrentFilter, getCurrentFilter } from './taskManager.js';
-import { renderTasks, updateStats } from './uiRenderer.js';
-import { renderDashboard } from './views/dashboardView.js';
+/**
+ * sidebar.js - Sidebar navigation, project lists, live badge counts, and mobile menu handling
+ */
 
-let currentView = 'dashboard';
+import { Tasks } from "./taskManager.js";
+import { Projects } from "./projectManager.js";
+import { UI } from "./uiRenderer.js";
+import { ProjectModal } from "./projectModal.js";
+import { Modal } from "./modal.js";
+import { escapeHTML } from "./utils.js";
 
-// View configurations
-const viewConfigs = {
-    dashboard: {
-        title: 'Dashboard',
-        filter: 'all',
-        description: 'All your tasks at a glance'
-    },
-    today: {
-        title: 'Today',
-        filter: 'today',
-        description: 'Tasks due today'
-    },
-    upcoming: {
-        title: 'Upcoming',
-        filter: 'upcoming',
-        description: 'Tasks due in the next 7 days'
-    },
-    all: {
-        title: 'All Tasks',
-        filter: 'all',
-        description: 'Complete task list'
-    }
-};
+export const Sidebar = {
+  activeView: "dashboard",
+  activeProjectId: null,
 
-// Initialize sidebar functionality
-export function setupSidebar() {
-    console.log('Setting up sidebar...');
-    setupNavigationButtons();
-    setupSearchFunctionality();
-    updateSidebarStats();
-    
-    // Set initial view
-    console.log('Switching to dashboard view...');
-    switchView('dashboard');
-}
+  init() {
+    this.setupNavigation();
+    this.setupMobileToggle();
+    this.setupClearCompleted();
+    this.render();
 
-// Set up navigation button click handlers
-function setupNavigationButtons() {
-    const navButtons = document.querySelectorAll('.nav-item[data-view]');
-    
-    navButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            const view = e.currentTarget.getAttribute('data-view');
-            switchView(view);
-        });
+    // Listen to data changes
+    Tasks.onChange(() => {
+      this.updateCounts();
+      UI.renderCurrentView();
     });
-}
 
-// Prevent rapid view switching with a simple throttle
-let isSwitchingView = false;
-let viewSwitchTimeout = null;
-
-// Switch between different views
-export function switchView(viewName) {
-    if (!viewConfigs[viewName]) return;
-    
-    // If we're already switching views OR trying to switch to the same view, ignore
-    if (isSwitchingView || currentView === viewName) return;
-    
-    // Lock view switching
-    isSwitchingView = true;
-    
-    // Automatically unlock after 300ms to prevent permanent lock
-    viewSwitchTimeout = setTimeout(() => {
-        isSwitchingView = false;
-    }, 300);
-
-    currentView = viewName;
-    const config = viewConfigs[viewName];
-
-    // Update active state in sidebar
-    updateActiveNavItem(viewName);
-
-    // Update main header title
-    updateViewTitle(config.title);
-
-    // Check if we're currently in a project view and need to clean up
-    if (window.currentProject) {
-        // Restore original header
-        const headerActions = document.querySelector('.header-actions');
-        if (headerActions) {
-            headerActions.innerHTML = `
-                <button id="addTaskBtn" class="add-task-btn">
-                    <i class="fas fa-plus"></i> New Task
-                </button>
-            `;
-        }
-        
-        // Remove project-specific input area
-        const projectInputArea = document.querySelector('.project-input-area');
-        if (projectInputArea) {
-            projectInputArea.remove();
-        }
-        // Clear current project state
-        window.currentProject = null;
-        
-        // Remove active state from project items
-        document.querySelectorAll('.project-item').forEach(item => {
-            item.classList.remove('active');
-        });
-    }
-
-    // Get DOM elements once
-    const inputArea = document.querySelector('.input-area');
-    const taskList = document.getElementById('taskList');
-    const emptyState = document.getElementById('emptyState');
-    let dashboardContainer = document.getElementById('dashboardContainer');
-
-    if (viewName === 'dashboard') {
-        console.log('Rendering beautiful dashboard view...');
-
-        // Hide normal task UI
-        if (inputArea) inputArea.style.display = 'none';
-        if (taskList) taskList.style.display = 'none';
-        if (emptyState) emptyState.style.display = 'none';
-
-        console.log('Looking for dashboard container...');
-        // Create dashboard container ONLY if it doesn't exist
-        if (!dashboardContainer) {
-            console.log('Creating new dashboard container...');
-            dashboardContainer = document.createElement('div');
-            dashboardContainer.id = 'dashboardContainer';
-            dashboardContainer.className = 'dashboard-container glass';
-            const mainContent = document.querySelector('.main-content');
-            console.log('Main content found:', mainContent);
-            if (mainContent) {
-                mainContent.insertBefore(dashboardContainer, taskList);
-                console.log('Dashboard container created');
-            } else {
-                console.error('Main content not found!');
-            }
-        }
-
-        // Make sure container is visible and render
-        if (dashboardContainer) {
-            console.log('Dashboard container exists, rendering...');
-            dashboardContainer.style.display = 'block';
-            renderDashboard(dashboardContainer);
-        } else {
-            console.error('Dashboard container is null!');
-        }
-
-    } else {
-        // Normal task views
-        console.log(`Switching to ${viewName} task list view...`);
-
-        // Hide dashboard
-        if (dashboardContainer) dashboardContainer.style.display = 'none';
-
-        // Show normal task UI
-        if (inputArea) inputArea.style.display = 'flex';
-        if (taskList) taskList.style.display = '';
-        if (emptyState) emptyState.style.display = 'none';
-
-        // Apply filter
-        applyViewFilter(config.filter);
-    } 
-    updateViewDescription(config.description);
-    console.log(`Switched to ${viewName} view`);
-    
-    // Always unlock view switching when done
-    setTimeout(() => {
-        isSwitchingView = false;
-    }, 50);
-}
-
-// Update active navigation item
-function updateActiveNavItem(activeView) {
-    const navItems = document.querySelectorAll('.nav-item[data-view]');
-    navItems.forEach(item => {
-        if (item.getAttribute('data-view') === activeView) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
-        }
+    Projects.onChange(() => {
+      this.renderProjectsList();
+      this.updateCounts();
+      UI.renderCurrentView();
     });
-}
+  },
 
-// Update main view title
-function updateViewTitle(title) {
-    const titleElement = document.getElementById('viewTitle');
-    if (titleElement) {
-        titleElement.textContent = title;
-    }
-}
-
-// Update view description (if such element exists)
-function updateViewDescription(description) {
-    // This can be extended if you add a description element to your UI
-    console.log(`View description: ${description}`);
-}
-
-// Apply filter based on view
-function applyViewFilter(filterType) {
-    const tasks = getTasks();
-    let filteredTasks = [];
-    
-    switch(filterType) {
-        case 'today':
-            filteredTasks = filterTasksForToday(tasks);
-            break;
-        case 'upcoming':
-            filteredTasks = filterTasksForUpcoming(tasks);
-            break;
-        case 'all':
-        default:
-            filteredTasks = tasks;
-            break;
-    }
-    
-    // Render with the filtered tasks (pass custom tasks to renderTasks)
-    renderTasks(filteredTasks);
-}
-
-// Filter tasks due today
-function filterTasksForToday(tasks) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    return tasks.filter(task => {
-        if (!task.dueDate) return false;
-        const taskDate = new Date(task.dueDate);
-        taskDate.setHours(0, 0, 0, 0);
-        return taskDate.getTime() === today.getTime();
+  setupNavigation() {
+    document.querySelectorAll(".nav-item[data-view]").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        e.preventDefault();
+        const view = item.getAttribute("data-view");
+        this.setActive(view, null);
+        this.closeMobileSidebar();
+      });
     });
-}
+  },
 
-// Filter tasks due in the next 7 days
-function filterTasksForUpcoming(tasks) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const nextWeek = new Date(today);
-    nextWeek.setDate(nextWeek.getDate() + 7);
-    
-    return tasks.filter(task => {
-        if (!task.dueDate) return false;
-        const taskDate = new Date(task.dueDate);
-        taskDate.setHours(0, 0, 0, 0);
-        return taskDate >= today && taskDate <= nextWeek;
-    });
-}
+  setupMobileToggle() {
+    const toggleBtn = document.getElementById("mobile-menu-btn");
+    const sidebar = document.getElementById("sidebar");
+    const backdrop = document.getElementById("sidebar-backdrop");
 
-// Set up search functionality
-function setupSearchFunctionality() {
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', debounce(handleSearch, 300));
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                handleSearch(e);
-            }
-        });
+    if (toggleBtn && sidebar && backdrop) {
+      toggleBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+        backdrop.classList.toggle("open");
+      });
+
+      backdrop.addEventListener("click", () => {
+        this.closeMobileSidebar();
+      });
     }
-}
+  },
 
-// Handle search input
-function handleSearch(event) {
-    const searchTerm = event.target.value.toLowerCase().trim();
-    const tasks = getTasks();
-    
-    if (searchTerm === '') {
-        // If search is empty, show current view
-        applyViewFilter(viewConfigs[currentView].filter);
-    } else {
-        // Filter tasks based on search term
-        const filteredTasks = tasks.filter(task => 
-            task.text.toLowerCase().includes(searchTerm)
+  closeMobileSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const backdrop = document.getElementById("sidebar-backdrop");
+    if (sidebar) sidebar.classList.remove("open");
+    if (backdrop) backdrop.classList.remove("open");
+  },
+
+  setupClearCompleted() {
+    const clearBtn = document.getElementById("sidebar-clear-completed-btn");
+    if (clearBtn) {
+      clearBtn.addEventListener("click", () => {
+        Modal.confirmClearCompleted();
+      });
+    }
+  },
+
+  setActive(view, projectId = null) {
+    this.activeView = view;
+    this.activeProjectId = projectId;
+
+    // Update nav items
+    document.querySelectorAll(".nav-item").forEach((item) => {
+      item.classList.remove("active");
+      if (item.getAttribute("data-view") === view && !projectId) {
+        item.classList.add("active");
+      }
+    });
+
+    // Update project items
+    document.querySelectorAll(".project-item").forEach((item) => {
+      item.classList.remove("active");
+      if (
+        view === "project" &&
+        item.getAttribute("data-project-id") === projectId
+      ) {
+        item.classList.add("active");
+      }
+    });
+
+    UI.setView(view, projectId);
+  },
+
+  render() {
+    this.renderProjectsList();
+    this.updateCounts();
+  },
+
+  updateCounts() {
+    const stats = Tasks.getStats();
+
+    const elDashboard = document.getElementById("nav-badge-dashboard");
+    const elAll = document.getElementById("nav-badge-all");
+    const elToday = document.getElementById("nav-badge-today");
+    const elUpcoming = document.getElementById("nav-badge-upcoming");
+    const elCompleted = document.getElementById("nav-badge-completed");
+
+    if (elDashboard) elDashboard.textContent = stats.total;
+    if (elAll) elAll.textContent = stats.pending;
+    if (elToday) elToday.textContent = stats.today;
+    if (elUpcoming) elUpcoming.textContent = stats.upcoming;
+    if (elCompleted) elCompleted.textContent = stats.completed;
+
+    // Highlight overdue in nav if any
+    if (elToday && stats.overdue > 0) {
+      elToday.classList.add("danger");
+    } else if (elToday) {
+      elToday.classList.remove("danger");
+    }
+
+    // Update counts on project list items
+    const tasks = Tasks.getTasks();
+    document.querySelectorAll(".project-item").forEach((item) => {
+      const pId = item.getAttribute("data-project-id");
+      const countBadge = item.querySelector(".project-task-count");
+      if (countBadge && pId) {
+        const pTasks = tasks.filter(
+          (t) => !t.completed && (t.projectId || "inbox") === pId,
         );
-        renderTasks(filteredTasks);
-    }
-}
+        countBadge.textContent = pTasks.length;
+      }
+    });
+  },
 
-// Update sidebar statistics
-export function updateSidebarStats() {
-    const tasks = getTasks();
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(task => task.completed).length;
-    const pendingTasks = totalTasks - completedTasks;
-    
-    const statsElement = document.getElementById('sidebarStats');
-    if (statsElement) {
-        statsElement.innerHTML = `
-            <span>${pendingTasks} pending</span>
-            <span>•</span>
-            <span>${completedTasks} completed</span>
-        `;
-    }
-}
+  renderProjectsList() {
+    const container = document.getElementById("projects-list");
+    if (!container) return;
 
-// Debounce helper function
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
+    const projects = Projects.getProjects();
+    const tasks = Tasks.getTasks();
 
-// Get current view
-export function getCurrentView() {
-    return currentView;
-}
+    // Default Inbox count
+    const inboxTasks = tasks.filter(
+      (t) => !t.completed && (!t.projectId || t.projectId === "inbox"),
+    );
 
-// Make current view accessible from app.js and other modules
-window.getCurrentView = getCurrentView;
+    let html = `
+      <div class="project-item ${this.activeView === "project" && this.activeProjectId === "inbox" ? "active" : ""}" data-project-id="inbox">
+        <div class="project-meta">
+          <div class="project-icon-badge" style="color: #6366f1;">
+            <i class="fas fa-inbox"></i>
+          </div>
+          <span class="project-name">Inbox</span>
+        </div>
+        <div class="project-actions">
+          <span class="nav-badge project-task-count">${inboxTasks.length}</span>
+        </div>
+      </div>
+    `;
+
+    projects.forEach((p) => {
+      const pTasks = tasks.filter((t) => !t.completed && t.projectId === p.id);
+      const isActive =
+        this.activeView === "project" && this.activeProjectId === p.id;
+
+      html += `
+        <div class="project-item ${isActive ? "active" : ""}" data-project-id="${p.id}">
+          <div class="project-meta">
+            <div class="project-color-dot" style="background-color: ${p.color};"></div>
+            <div class="project-icon-badge" style="color: ${p.color};">
+              <i class="${p.icon}"></i>
+            </div>
+            <span class="project-name" title="${escapeHTML(p.name)}">${escapeHTML(p.name)}</span>
+          </div>
+          <div class="project-actions">
+            <span class="nav-badge project-task-count">${pTasks.length}</span>
+            <button class="project-delete-btn" title="Delete Project" data-delete-project="${p.id}">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    // Attach click events
+    container.querySelectorAll(".project-item").forEach((item) => {
+      item.addEventListener("click", (e) => {
+        // Prevent if clicking delete button
+        if (e.target.closest(".project-delete-btn")) return;
+        const pId = item.getAttribute("data-project-id");
+        this.setActive("project", pId);
+        this.closeMobileSidebar();
+      });
+    });
+
+    container.querySelectorAll(".project-delete-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const pId = btn.getAttribute("data-delete-project");
+        ProjectModal.openDeleteDialog(pId);
+      });
+    });
+  },
+};

@@ -1,0 +1,6 @@
+{
+  "name": "ListaGo",
+  "description": "Modern ToDo List Application with Project Management and Glassmorphism UI",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

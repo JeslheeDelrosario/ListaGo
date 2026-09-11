@@ -1,300 +1,126 @@
-// storage.js - Handle all localStorage operations with due date support
+/**
+ * storage.js - Persistent localStorage management strictly for user data
+ */
 
-let tasks = [];
-let projects = [];
+const STORAGE_KEY_TASKS = "listago_tasks";
+const STORAGE_KEY_PROJECTS = "listago_projects";
 
-export function loadTasks() {
+/**
+ * Default sample projects to seed for first-time visitors
+ */
+const DEFAULT_PROJECTS = [
+  {
+    id: "proj-work-sprint",
+    name: "Work Sprint",
+    color: "#6366f1",
+    icon: "fas fa-rocket",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "proj-design-system",
+    name: "Design System",
+    color: "#ec4899",
+    icon: "fas fa-palette",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "proj-personal-goals",
+    name: "Personal Goals",
+    color: "#10b981",
+    icon: "fas fa-bullseye",
+    createdAt: new Date().toISOString(),
+  },
+];
+
+export const Storage = {
+  /**
+   * Loads tasks strictly from user localStorage.
+   * Defaults to an empty list without any hardcoded tasks.
+   * @returns {Array} Array of task objects
+   */
+  getTasks() {
     try {
-        const savedTasks = localStorage.getItem('tasks');
-        if (savedTasks) {
-            const parsedTasks = JSON.parse(savedTasks);
-            
-            // Backward compatibility: Ensure all fields exist
-            tasks = parsedTasks.map(task => ({
-                id: task.id || crypto.randomUUID(),
-                title: task.title || task.text || 'Untitled',      // ← ADD THIS
-                text: task.text || task.title || 'Untitled',       // ← ADD THIS
-                description: task.description || '',               // ← ADD THIS (CRITICAL!)
-                completed: task.completed || false,
-                dueDate: task.dueDate || null,
-                projectId: task.projectId || "inbox",
-                priority: task.priority || 'medium',               // ← ADD THIS
-                status: task.status || 'todo',                     // ← ADD THIS
-                createdAt: task.createdAt || new Date().toISOString(),
-                createdDate: task.createdDate || new Date().toDateString()
-            }));
-            
-            console.log('💾 storage.loadTasks() loaded:', tasks);
-            return tasks;
+      const raw = localStorage.getItem(STORAGE_KEY_TASKS);
+      if (raw !== null) {
+        const tasks = JSON.parse(raw);
+        if (Array.isArray(tasks)) {
+          // One-time cleanup of any legacy hardcoded sample tasks from earlier sessions
+          if (!localStorage.getItem("listago_hardcoded_cleaned_v2")) {
+            const sampleIdentifiers = [
+              "Review Q3 Security Audit",
+              "Design interactive Glassmorphism cards",
+              "Prepare presentation deck",
+              "Complete 5km morning run",
+              "Refactor state management",
+              "Weekly grocery shopping",
+            ];
+            const cleaned = tasks.filter(
+              (t) =>
+                !sampleIdentifiers.some(
+                  (sig) => t.title && t.title.includes(sig),
+                ),
+            );
+            this.saveTasks(cleaned);
+            localStorage.setItem("listago_hardcoded_cleaned_v2", "true");
+            return cleaned;
+          }
+          return tasks;
         }
-        return [];
-    } catch (error) {
-        console.warn('Failed to load tasks:', error);
-        return [];
+      }
+    } catch (e) {
+      console.warn("Failed to parse tasks from localStorage:", e);
     }
-}
 
-export function saveTasks(tasksData) {
+    // Pure user local storage: default is empty array
+    return [];
+  },
+
+  /**
+   * Saves tasks to localStorage.
+   * @param {Array} tasks
+   * @returns {boolean} Success status
+   */
+  saveTasks(tasks) {
     try {
-        const validatedTasks = tasksData.map(task => ({
-            id: task.id,
-            title: task.title || task.text || 'Untitled',  // ← ADD THIS
-            text: task.text || task.title || 'Untitled',   // ← ADD THIS
-            description: task.description || '',           // ← ADD THIS (CRITICAL!)
-            completed: task.completed || false,
-            dueDate: task.dueDate || null,
-            projectId: task.projectId || "inbox",
-            priority: task.priority || 'medium',           // ← ADD THIS
-            status: task.status || 'todo',                 // ← ADD THIS
-            createdAt: task.createdAt || new Date().toISOString(),
-            createdDate: task.createdDate || new Date().toDateString()
-        }));
-        
-        console.log('💾 storage.saveTasks() saving:', validatedTasks);
-        localStorage.setItem('tasks', JSON.stringify(validatedTasks));
-        tasks = validatedTasks;
-        return true;
-    } catch (error) {
-        console.warn('Failed to save tasks:', error);
-        return false;
+      localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+      return true;
+    } catch (e) {
+      console.error("Storage quota exceeded or unavailable:", e);
+      return false;
     }
-}
+  },
 
-export function getTasks() {
-    // If tasks is empty, try loading from localStorage
-    if (tasks.length === 0) {
-        return loadTasks();
-    }
-    return tasks;
-}
-
-export function setTasks(newTasks) {
-    tasks = newTasks;
-    saveTasks(tasks);
-}
-
-// ==================== PROJECTS STORAGE ====================
-
-export function loadProjects() {
+  /**
+   * Loads projects from localStorage or seeds defaults.
+   * @returns {Array} Array of project objects
+   */
+  getProjects() {
     try {
-        const savedProjects = localStorage.getItem('projects');
-        if (savedProjects) {
-            projects = JSON.parse(savedProjects);
-            return projects;
-        }
-        return [];
-    } catch (error) {
-        console.warn('Failed to load projects:', error);
-        return [];
+      const raw = localStorage.getItem(STORAGE_KEY_PROJECTS);
+      if (raw) {
+        return JSON.parse(raw);
+      }
+    } catch (e) {
+      console.warn("Failed to parse projects from localStorage:", e);
     }
-}
 
-export function saveProjects(projectsData) {
+    // Seed default projects if empty
+    this.saveProjects(DEFAULT_PROJECTS);
+    return DEFAULT_PROJECTS;
+  },
+
+  /**
+   * Saves projects to localStorage.
+   * @param {Array} projects
+   * @returns {boolean} Success status
+   */
+  saveProjects(projects) {
     try {
-        localStorage.setItem('projects', JSON.stringify(projectsData));
-        projects = projectsData;
-        return true;
-    } catch (error) {
-        console.warn('Failed to save projects:', error);
-        return false;
+      localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
+      return true;
+    } catch (e) {
+      console.error("Failed to save projects to localStorage:", e);
+      return false;
     }
-}
-
-export function getProjects() {
-    return projects;
-}
-
-export function setProjects(newProjects) {
-    projects = newProjects;
-    saveProjects(newProjects);
-}
-
-// NEW: Get tasks with due dates only
-export function getTasksWithDueDates() {
-    return tasks.filter(task => task.dueDate !== null);
-}
-
-// NEW: Get tasks without due dates
-export function getTasksWithoutDueDates() {
-    return tasks.filter(task => task.dueDate === null);
-}
-
-// NEW: Get tasks by specific date
-export function getTasksByDate(date) {
-    if (!date) return [];
-    return tasks.filter(task => task.dueDate === date);
-}
-
-// NEW: Get overdue tasks (date is in the past and not completed)
-export function getOverdueTasks() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    return tasks.filter(task => {
-        if (!task.dueDate || task.completed) return false;
-        const dueDate = new Date(task.dueDate);
-        dueDate.setHours(0, 0, 0, 0);
-        return dueDate < today;
-    });
-}
-
-// NEW: Get upcoming tasks (next 7 days)
-export function getUpcomingTasks(days = 7) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const futureDate = new Date(today);
-    futureDate.setDate(today.getDate() + days);
-    
-    return tasks.filter(task => {
-        if (!task.dueDate || task.completed) return false;
-        const dueDate = new Date(task.dueDate);
-        dueDate.setHours(0, 0, 0, 0);
-        return dueDate >= today && dueDate <= futureDate;
-    });
-}
-
-// NEW: Clear all tasks (with confirmation option)
-export function clearAllTasks() {
-    tasks = [];
-    localStorage.removeItem('tasks');
-    return true;
-}
-
-// NEW: Export tasks to JSON file (includes due dates)
-export function exportTasks() {
-    const exportData = {
-        version: '2.0',           // updated version
-        exportDate: new Date().toISOString(),
-        tasks: tasks,
-        projects: projects
-    };
-    
-    const dataStr = JSON.stringify(exportData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    const exportFileName = `todo_tasks_backup_${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileName);
-    linkElement.click();
-    
-    return true;
-}
-
-// NEW: Import tasks from JSON file (with validation)
-export function importTasks(jsonData) {
-    try {
-        const data = JSON.parse(jsonData);
-        let importedTasks = [];
-        
-        // Handle both old format (array) and new format (object with tasks property)
-        if (Array.isArray(data)) {
-            importedTasks = data;
-        } else if (data.tasks && Array.isArray(data.tasks)) {
-            importedTasks = data.tasks;
-        } else {
-            throw new Error('Invalid data format');
-        }
-        
-        // Validate and sanitize imported tasks
-        const sanitizedTasks = importedTasks.map(task => ({
-            id: task.id || crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-            text: task.text || 'Untitled Task',
-            completed: Boolean(task.completed),
-            dueDate: task.dueDate || null,
-            createdAt: task.createdAt || new Date().toISOString(),
-            createdDate: task.createdDate || new Date().toDateString()
-        }));
-        
-        tasks = sanitizedTasks;
-        saveTasks(tasks);
-        return true;
-    } catch (error) {
-        console.warn('Failed to import tasks:', error);
-        return false;
-    }
-}
-
-// NEW: Get task statistics (with date info)
-export function getStorageStats() {
-    const tasksWithDueDates = tasks.filter(t => t.dueDate).length;
-    const tasksWithoutDueDates = tasks.length - tasksWithDueDates;
-    const overdue = getOverdueTasks().length;
-    const upcoming = getUpcomingTasks(7).length;
-    
-    return {
-        total: tasks.length,
-        completed: tasks.filter(t => t.completed).length,
-        active: tasks.filter(t => !t.completed).length,
-        withDueDates: tasksWithDueDates,
-        withoutDueDates: tasksWithoutDueDates,
-        overdue: overdue,
-        upcoming7Days: upcoming,
-        storageUsed: JSON.stringify(tasks).length,
-        lastBackup: localStorage.getItem('lastBackup') || null
-    };
-}
-
-// NEW: Backup current state to localStorage (with timestamp)
-export function backupTasks() {
-    const backupKey = `tasks_backup_${new Date().toISOString().split('T')[0]}`;
-    const backup = {
-        timestamp: new Date().toISOString(),
-        tasks: tasks
-    };
-    
-    try {
-        localStorage.setItem(backupKey, JSON.stringify(backup));
-        localStorage.setItem('lastBackup', new Date().toISOString());
-        
-        // Keep only last 7 backups
-        const backups = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key && key.startsWith('tasks_backup_')) {
-                backups.push(key);
-            }
-        }
-        
-        if (backups.length > 7) {
-            backups.sort().reverse();
-            const toDelete = backups.slice(7);
-            toDelete.forEach(key => localStorage.removeItem(key));
-        }
-        
-        return true;
-    } catch (error) {
-        console.warn('Failed to create backup:', error);
-        return false;
-    }
-}
-
-// NEW: Restore from latest backup
-export function restoreLatestBackup() {
-    const backups = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('tasks_backup_')) {
-            backups.push(key);
-        }
-    }
-    
-    if (backups.length === 0) return false;
-    
-    backups.sort().reverse();
-    const latestBackup = backups[0];
-    
-    try {
-        const backupData = JSON.parse(localStorage.getItem(latestBackup));
-        if (backupData && backupData.tasks) {
-            tasks = backupData.tasks;
-            saveTasks(tasks);
-            return true;
-        }
-    } catch (error) {
-        console.warn('Failed to restore backup:', error);
-    }
-    
-    return false;
-}
+  },
+};

@@ -1,6 +1,7 @@
 # ListaGo - Modern ToDo List Application with Project Management
+**Current Version: 1.1** | Stable Release
 
-A beautiful, feature-rich task management application with a modern glassmorphism design, built with vanilla JavaScript and ES6 modules. Track your tasks, organize them into projects, manage priorities, and collaborate with a comprehensive dashboard that looks and feels professional.
+A beautiful, feature-rich task management application with a modern glassmorphism design, built with vanilla JavaScript and ES6 modules. Track your tasks, organize them into projects, manage priorities, and stay productive with a comprehensive dashboard that looks and feels professional.
 
 ![ListaGo App Screenshot](assets/screenshots/dashboard.png)
 
@@ -33,9 +34,11 @@ A beautiful, feature-rich task management application with a modern glassmorphis
 - **Today View**: See all tasks due today in a clean list
 - **Upcoming View**: Track tasks due in the next 7 days
 - **All Tasks View**: Complete list of every task in the system
+- **List & Grid Views**: Toggle between compact list view or card-based grid view for tasks
 - **Statistics Cards**: Visual metrics for total, pending, completed, and overdue tasks
 - **Overdue Tracking**: Automatic highlighting of overdue tasks with pulse animations
 - **Real-time Stats**: Sidebar displays live task counts that update automatically
+- **Project-Specific Filtering**: Tasks are properly filtered by active project even when switching views
 
 ### 🎨 Professional Modern Design
 - **Glassmorphism UI**: Beautiful frosted glass effect with backdrop blur
@@ -47,6 +50,7 @@ A beautiful, feature-rich task management application with a modern glassmorphis
 - **Collapsible Sidebar**: Hamburger menu for mobile with overlay backdrop
 - **Professional Modals**: Jira-inspired task creation modal with clean form design
 - **Priority Badges**: Color-coded priority indicators (Urgent: red, High: orange, Medium: yellow, Low: green)
+- **Centered Empty States**: Properly centered "no tasks" messages with flexbox layout for all screen sizes
 
 ### ⌨️ Keyboard Shortcuts
 - `Ctrl/Cmd + A` - Focus input field
@@ -67,6 +71,17 @@ A beautiful, feature-rich task management application with a modern glassmorphis
 - **Real-time Search**: Instant search across all task titles and descriptions
 - **Mobile-First Approach**: Fully responsive with touch-friendly interactions
 - **Rich Text Support**: CKEditor 5 integration for professional task descriptions
+
+## 🆕 Recent Improvements & Bug Fixes (v1.1)
+### Fixed Critical Issues
+- **Cross-Project Task Leak**: Fixed bug where tasks from other projects would appear in empty projects when switching between list and grid views
+- **Empty State Centering**: Resolved layout issue where "No tasks yet" message was not properly centered in empty project views
+- **Responsive Empty States**: Updated empty state CSS to use viewport-based heights (vh) instead of fixed pixels for perfect centering on all screen sizes
+
+### Improvements
+- **Enhanced Task Filtering Pipeline**: Project filtering now runs before status filtering to ensure proper task isolation
+- **Specific CSS Selectors**: Targeted `.task-list-view .empty-state` and `.task-grid-view .empty-state` to prevent style conflicts
+- **Mobile Optimization**: Updated mobile responsive styles to maintain proper centering on small screens
 
 ## 🚀 Quick Start
 
@@ -102,16 +117,14 @@ listaGo/
 │   └── modules/
 │       ├── storage.js                      # localStorage operations
 │       ├── taskManager.js                  # Enhanced task CRUD with priorities & statuses
-│       ├── projectManager.js               # Project management functionality
-│       ├── uiRenderer.js                   # UI rendering functions
+│       ├── projectModal.js                 # Project creation modal
+│       ├── taskFormModal.js                # Jira-style task creation modal
+│       ├── uiRenderer.js                   # UI rendering with priority badges and status indicators
 │       ├── sidebar.js                      # Sidebar navigation and view switching
 │       ├── notifications.js                # Toast notification system
 │       ├── modal.js                        # Delete confirmation modal
 │       ├── editModal.js                    # Legacy edit task modal (for backward compatibility)
-│       ├── projectModal.js                 # Project creation modal
-│       ├── taskFormModal.js                # NEW: Jira-style task creation modal
-│       ├── uiRenderer.js                   # UI rendering with priority badges and status indicators
-│       ├── utils.js                        # Helper functions including debouncing
+│       ├── utils.js                        # Helper functions including debouncing, XSS protection
 │       └── views/
 │           └── dashboardView.js            # Dashboard view rendering with statistics
 ├── LICENSE                # MIT License

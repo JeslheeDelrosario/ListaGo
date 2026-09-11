@@ -1,361 +1,310 @@
-// dashboardView.js - Compact Dashboard UI (No Scroll Needed)
-// js\modules\views\dashboardView.js
+/**
+ * dashboardView.js - Dashboard view rendering with statistics and organized task sections
+ */
 
-import { getTasks, toggleTask, deleteTask } from '../taskManager.js';
-import { showEditModal } from '../editModal.js';
-import { showNotification } from '../notifications.js';
+import { Tasks } from "../taskManager.js";
+import { Projects } from "../projectManager.js";
+import {
+  isOverdue,
+  isToday,
+  isUpcoming,
+  formatDate,
+  escapeHTML,
+  renderFormattedContent,
+} from "../utils.js";
+import { TaskFormModal } from "../taskFormModal.js";
+import { Modal } from "../modal.js";
 
-// Main function to render the dashboard
-export function renderDashboard(container) {
-    console.log('renderDashboard called with container:', container);
-    if (!container) {
-        console.error('Dashboard container not found');
-        return;
-    }
+export const DashboardView = {
+  render(container) {
+    const stats = Tasks.getStats();
+    const tasks = Tasks.getTasks();
 
-    const allTasks = getTasks();
-    const todayTasks = filterTodayTasks(allTasks);
-    const upcomingTasks = filterUpcomingTasks(allTasks);
-    const overdueTasks = filterOverdueTasks(allTasks);
-    
-    const stats = calculateStats(allTasks);
+    const overdueTasks = tasks.filter(
+      (t) => !t.completed && t.dueDate && isOverdue(t.dueDate),
+    );
+    const todayTasks = tasks.filter(
+      (t) => !t.completed && t.dueDate && isToday(t.dueDate),
+    );
+    const upcomingTasks = tasks.filter(
+      (t) => !t.completed && t.dueDate && isUpcoming(t.dueDate),
+    );
+    const recentTasks = [...tasks].slice(0, 5);
 
-    const html = `
-        <div class="dashboard-container">
-            <!-- Compact Stats Cards -->
-            <div class="stats-grid-compact">
-                <div class="stat-card-compact total">
-                    <div class="stat-icon-small">📋</div>
-                    <div class="stat-number-compact">${stats.total}</div>
-                    <div class="stat-label-compact">Total</div>
-                </div>
-                <div class="stat-card-compact pending">
-                    <div class="stat-icon-small">⏳</div>
-                    <div class="stat-number-compact">${stats.pending}</div>
-                    <div class="stat-label-compact">Pending</div>
-                </div>
-                <div class="stat-card-compact completed">
-                    <div class="stat-icon-small">✅</div>
-                    <div class="stat-number-compact">${stats.completed}</div>
-                    <div class="stat-label-compact">Done</div>
-                </div>
-                <div class="stat-card-compact overdue ${stats.overdue > 0 ? 'has-overdue' : ''}">
-                    <div class="stat-icon-small">⚠️</div>
-                    <div class="stat-number-compact">${stats.overdue}</div>
-                    <div class="stat-label-compact">Overdue</div>
-                </div>
+    const hasOverdueClass = stats.overdue > 0 ? "has-overdue" : "";
+
+    container.innerHTML = `
+      <div class="dashboard-container">
+        <!-- Statistics Grid -->
+        <div class="stats-grid">
+          <div class="stat-card-compact total">
+            <div class="stat-info">
+              <span class="stat-label">Total Tasks</span>
+              <span class="stat-number">${stats.total}</span>
             </div>
-
-            <!-- Three Column Layout -->
-            <div class="dashboard-grid-compact">
-                <!-- Today's Tasks -->
-                <div class="dashboard-section-compact today-section">
-                    <div class="section-header-compact">
-                        <h3 class="section-title-compact">
-                            <i class="fas fa-calendar-day"></i>
-                            Today
-                            <span class="task-count-compact">${todayTasks.length}</span>
-                        </h3>
-                        ${todayTasks.length > 0 ? '<button class="section-toggle-compact" data-section="today"><i class="fas fa-chevron-down"></i></button>' : ''}
-                    </div>
-                    <div class="task-list-compact" id="today-tasks">
-                        ${todayTasks.length > 0 
-                            ? renderCompactTaskItems(todayTasks) 
-                            : '<div class="empty-state-compact">✨ No tasks</div>'
-                        }
-                    </div>
-                </div>
-
-                <!-- Upcoming Tasks -->
-                <div class="dashboard-section-compact upcoming-section">
-                    <div class="section-header-compact">
-                        <h3 class="section-title-compact">
-                            <i class="fas fa-calendar-week"></i>
-                            Upcoming
-                            <span class="task-count-compact">${upcomingTasks.length}</span>
-                        </h3>
-                        ${upcomingTasks.length > 0 ? '<button class="section-toggle-compact" data-section="upcoming"><i class="fas fa-chevron-down"></i></button>' : ''}
-                    </div>
-                    <div class="task-list-compact" id="upcoming-tasks">
-                        ${upcomingTasks.length > 0 
-                            ? renderCompactTaskItems(upcomingTasks) 
-                            : '<div class="empty-state-compact">📅 None in 7 days</div>'
-                        }
-                    </div>
-                </div>
-
-                <!-- Overdue Tasks -->
-                <div class="dashboard-section-compact overdue-section ${overdueTasks.length === 0 ? 'empty-section' : ''}">
-                    <div class="section-header-compact">
-                        <h3 class="section-title-compact">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            Overdue
-                            <span class="task-count-compact overdue-count">${overdueTasks.length}</span>
-                        </h3>
-                        ${overdueTasks.length > 0 ? '<button class="section-toggle-compact" data-section="overdue"><i class="fas fa-chevron-down"></i></button>' : ''}
-                    </div>
-                    <div class="task-list-compact" id="overdue-tasks">
-                        ${overdueTasks.length > 0 
-                            ? renderCompactTaskItems(overdueTasks) 
-                            : '<div class="empty-state-compact">🎉 No overdue tasks</div>'
-                        }
-                    </div>
-                </div>
+            <div class="stat-icon-wrapper">
+              <i class="fas fa-tasks"></i>
             </div>
+          </div>
 
-            <!-- Compact Quick Actions -->
-            <div class="dashboard-actions-compact">
-                <button class="dashboard-btn-compact primary" id="addTaskBtn">
-                    <i class="fas fa-plus"></i> Add
-                </button>
-                <button class="dashboard-btn-compact" id="viewCompletedBtn">
-                    <i class="fas fa-tasks"></i> Completed
-                </button>
-                <button class="dashboard-btn-compact" id="exportTasksBtn">
-                    <i class="fas fa-download"></i> Export
-                </button>
+          <div class="stat-card-compact pending">
+            <div class="stat-info">
+              <span class="stat-label">Pending</span>
+              <span class="stat-number">${stats.pending}</span>
             </div>
+            <div class="stat-icon-wrapper">
+              <i class="fas fa-clock"></i>
+            </div>
+          </div>
+
+          <div class="stat-card-compact completed">
+            <div class="stat-info">
+              <span class="stat-label">Completed</span>
+              <span class="stat-number">${stats.completed}</span>
+            </div>
+            <div class="stat-icon-wrapper">
+              <i class="fas fa-check-double"></i>
+            </div>
+          </div>
+
+          <div class="stat-card-compact overdue ${hasOverdueClass}">
+            <div class="stat-info">
+              <span class="stat-label">Overdue</span>
+              <span class="stat-number">${stats.overdue}</span>
+            </div>
+            <div class="stat-icon-wrapper">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+          </div>
         </div>
-    `;
-    container.innerHTML = html;
-    
-    // Add event listeners after rendering
-    setupCompactEventListeners();
-    
-    // Quick entrance animation
-    animateCompactElements();
-}
 
-// Calculate statistics
-function calculateStats(tasks) {
-    const total = tasks.length;
-    const completed = tasks.filter(t => t.completed).length;
-    const pending = total - completed;
-    const overdue = tasks.filter(t => !t.completed && t.dueDate && new Date(t.dueDate) < new Date()).length;
-    
-    return { total, completed, pending, overdue };
-}
-
-// Filter tasks due today
-function filterTodayTasks(tasks) {
-    const todayStr = new Date().toISOString().split('T')[0];
-    return tasks.filter(t => t.dueDate === todayStr && !t.completed);
-}
-
-// Filter upcoming tasks (next 7 days, excluding today)
-function filterUpcomingTasks(tasks) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const nextWeek = new Date(today);
-    nextWeek.setDate(today.getDate() + 7);
-
-    return tasks.filter(t => {
-        if (!t.dueDate || t.completed) return false;
-        const due = new Date(t.dueDate);
-        due.setHours(0, 0, 0, 0);
-        return due > today && due <= nextWeek;
-    }).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-}
-
-// Filter overdue tasks
-function filterOverdueTasks(tasks) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    return tasks.filter(t => {
-        if (!t.dueDate || t.completed) return false;
-        const due = new Date(t.dueDate);
-        due.setHours(0, 0, 0, 0);
-        return due < today;
-    }).sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-}
-
-// Render compact task items
-function renderCompactTaskItems(tasks, containerId) {
-    const container = document.getElementById(containerId);
-
-    // Default fallback
-    let maxItems = 5;
-
-    if (container) {
-        const containerHeight = container.clientHeight;
-
-        // Approx height per task item (adjust if needed)
-        const itemHeight = 48;
-
-        maxItems = Math.floor(containerHeight / itemHeight);
-    }
-
-    return tasks.slice(0, maxItems).map(task => {
-        const dateStatus = getCompactDateStatus(task.dueDate, task.completed);
-
-        return `
-            <div class="task-item-compact ${task.completed ? 'completed' : ''}" data-task-id="${task.id}">
-                <input type="checkbox" 
-                       class="task-checkbox-compact" 
-                       ${task.completed ? 'checked' : ''} 
-                       onchange="toggleDashboardTask('${task.id}')">
-                <div class="task-content-compact">
-                    <div class="task-text-compact">${escapeHtml(task.text)}</div>
-                    ${task.dueDate ? `<div class="task-date-compact ${dateStatus.class}">${dateStatus.icon} ${dateStatus.text}</div>` : ''}
-                </div>
-                <div class="task-actions-compact">
-                    <button class="task-action-compact" onclick="editDashboardTask('${task.id}')">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="task-action-compact delete" onclick="deleteDashboardTask('${task.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+        <!-- Completion Progress Banner -->
+        <div class="completion-banner">
+          <div class="completion-header">
+            <div class="completion-title">
+              <i class="fas fa-chart-line" style="color: #818cf8;"></i>
+              Sprint Velocity & Progress
             </div>
-        `;
-    }).join('');
-}
+            <div class="completion-percentage">${stats.completionRate}% Done</div>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar-fill" style="width: ${stats.completionRate}%;"></div>
+          </div>
+        </div>
 
-// Get compact date status
-function getCompactDateStatus(dueDate, isCompleted) {
-    if (!dueDate || isCompleted) return { class: '', text: '', icon: '📅' };
-    
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const dueDateObj = new Date(dueDate);
-    dueDateObj.setHours(0, 0, 0, 0);
-    
-    if (dueDateObj < today) {
-        return { class: 'overdue', text: 'Overdue', icon: '⚠️' };
-    } else if (dueDateObj.getTime() === today.getTime()) {
-        return { class: 'today', text: 'Today', icon: '🔔' };
-    } else {
-        const daysDiff = Math.ceil((dueDateObj - today) / (1000 * 60 * 60 * 24));
-        return { class: 'upcoming', text: `${daysDiff}d`, icon: '📅' };
-    }
-}
-
-// Escape HTML to prevent XSS
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// Set up compact event listeners
-function setupCompactEventListeners() {
-    // Section toggle buttons
-    document.querySelectorAll('.section-toggle-compact').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const section = e.currentTarget.getAttribute('data-section');
-            toggleCompactSection(section);
-        });
-    });
-    
-    // Action buttons
-    const addBtn = document.getElementById('addTaskBtn');
-    if (addBtn) addBtn.addEventListener('click', () => window.addTaskFromDashboard());
-    
-    const completedBtn = document.getElementById('viewCompletedBtn');
-    if (completedBtn) completedBtn.addEventListener('click', () => window.showCompletedTasks());
-    
-    const exportBtn = document.getElementById('exportTasksBtn');
-    if (exportBtn) exportBtn.addEventListener('click', () => window.exportTasks());
-}
-
-// Toggle compact section
-function toggleCompactSection(sectionName) {
-    const section = document.querySelector(`.${sectionName}-section`);
-    const toggle = section.querySelector('.section-toggle-compact i');
-    const taskList = section.querySelector('.task-list-compact');
-    
-    if (taskList.style.display === 'none') {
-        taskList.style.display = 'block';
-        toggle.classList.remove('fa-chevron-right');
-        toggle.classList.add('fa-chevron-down');
-    } else {
-        taskList.style.display = 'none';
-        toggle.classList.remove('fa-chevron-down');
-        toggle.classList.add('fa-chevron-right');
-    }
-}
-
-// Animate compact elements
-function animateCompactElements() {
-    const elements = document.querySelectorAll('.stat-card-compact, .dashboard-section-compact');
-    elements.forEach((element, index) => {
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(10px)';
-        element.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
-        
-        setTimeout(() => {
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
-        }, index * 50);
-    });
-}
-
-// Dashboard task actions (global)
-window.toggleDashboardTask = function(taskId) {
-    toggleTask(taskId);
-    setTimeout(() => {
-        const container = document.querySelector('.main-content');
-        if (container) renderDashboard(container);
-    }, 100);
-};
-
-window.editDashboardTask = function(taskId) {
-    showEditModal(taskId);
-};
-
-window.deleteDashboardTask = function(taskId) {
-    if (confirm('Delete this task?')) {
-        deleteTask(taskId);
-        showNotification('Task deleted', 'success');
-        setTimeout(() => {
-            const container = document.querySelector('.main-content');
-            if (container) renderDashboard(container);
-        }, 100);
-    }
-};
-
-window.showCompletedTasks = function() {
-    const allBtn = document.querySelector('.nav-item[data-view="all"]');
-    if (allBtn) {
-        allBtn.click();
-        setTimeout(() => {
-            const completedBtn = document.querySelector('.filter-btn[data-filter="completed"]');
-            if (completedBtn) completedBtn.click();
-        }, 100);
-    }
-};
-
-window.exportTasks = function() {
-    const tasks = getTasks();
-    const dataStr = JSON.stringify(tasks, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `tasks-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-    showNotification('Tasks exported!', 'success');
-};
-
-window.addTaskFromDashboard = function() {
-    const allBtn = document.querySelector('.nav-item[data-view="all"]');
-    if (allBtn) {
-        allBtn.click();
-    }
-    
-    setTimeout(() => {
-        const input = document.getElementById('taskInput');
-        if (input) {
-            input.focus();
-            input.style.transition = 'box-shadow 0.4s ease';
-            input.style.boxShadow = '0 0 0 4px rgba(165, 180, 252, 0.6)';
-            setTimeout(() => {
-                input.style.boxShadow = '';
-            }, 1500);
+        ${
+          stats.overdue > 0
+            ? `
+          <!-- Overdue Warning Alert -->
+          <div class="overdue-alert-box">
+            <div class="overdue-alert-left">
+              <i class="fas fa-exclamation-circle"></i>
+              <div>
+                <strong>Attention Required:</strong> You have ${stats.overdue} overdue task${stats.overdue > 1 ? "s" : ""} past deadline.
+              </div>
+            </div>
+            <button class="btn-sm-danger" id="dashboard-resolve-overdue-btn">
+              View Overdue Tasks
+            </button>
+          </div>
+        `
+            : ""
         }
-    }, 180);
-};
 
-export { calculateStats, filterTodayTasks, filterUpcomingTasks, filterOverdueTasks };
+        <!-- Due Today Section -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-sun" style="color: #fbbf24;"></i>
+              Due Today
+              <span class="section-count-badge">${todayTasks.length}</span>
+            </div>
+            <button class="section-action-btn" data-switch-view="today">
+              View All <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <div class="tasks-list" id="dashboard-today-list">
+            ${
+              todayTasks.length > 0
+                ? todayTasks.map((t) => this.renderMiniTask(t)).join("")
+                : `
+              <div class="empty-state" style="padding: 2rem 1rem;">
+                <i class="fas fa-glass-cheers" style="font-size: 1.5rem; color: #10b981;"></i>
+                <div class="empty-state-title" style="font-size: 1rem;">No tasks due today</div>
+                <div class="empty-state-desc" style="font-size: 0.8rem;">You are completely caught up for today!</div>
+              </div>
+            `
+            }
+          </div>
+        </div>
+
+        <!-- Upcoming (Next 7 Days) Section -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-calendar-week" style="color: #818cf8;"></i>
+              Upcoming in Next 7 Days
+              <span class="section-count-badge">${upcomingTasks.length}</span>
+            </div>
+            <button class="section-action-btn" data-switch-view="upcoming">
+              View All <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <div class="tasks-list" id="dashboard-upcoming-list">
+            ${
+              upcomingTasks.length > 0
+                ? upcomingTasks.map((t) => this.renderMiniTask(t)).join("")
+                : `
+              <div class="empty-state" style="padding: 2rem 1rem;">
+                <i class="fas fa-calendar-check" style="font-size: 1.5rem; color: #818cf8;"></i>
+                <div class="empty-state-title" style="font-size: 1rem;">No upcoming tasks</div>
+                <div class="empty-state-desc" style="font-size: 0.8rem;">No tasks scheduled for the next 7 days.</div>
+              </div>
+            `
+            }
+          </div>
+        </div>
+
+        <!-- Recent Tasks Overview -->
+        <div class="dashboard-section">
+          <div class="section-header">
+            <div class="section-title">
+              <i class="fas fa-history" style="color: #a855f7;"></i>
+              Recent Tasks
+              <span class="section-count-badge">${recentTasks.length}</span>
+            </div>
+            <button class="section-action-btn" data-switch-view="all">
+              View All Tasks <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <div class="tasks-list" id="dashboard-recent-list">
+            ${
+              recentTasks.length > 0
+                ? recentTasks.map((t) => this.renderMiniTask(t)).join("")
+                : `
+              <div class="empty-state" style="padding: 2rem 1rem;">
+                <i class="fas fa-tasks" style="font-size: 1.5rem; color: #a855f7;"></i>
+                <div class="empty-state-title" style="font-size: 1rem;">No tasks yet</div>
+                <div class="empty-state-desc" style="font-size: 0.8rem;">Click '+ New Task' or use Quick Add to create your first task.</div>
+              </div>
+            `
+            }
+          </div>
+        </div>
+      </div>
+    `;
+
+    this.attachEvents(container);
+  },
+
+  renderMiniTask(task) {
+    const project = Projects.getProjectById(task.projectId);
+    const dateFormatted = task.dueDate ? formatDate(task.dueDate) : null;
+    const isTaskOverdue =
+      !task.completed && task.dueDate && isOverdue(task.dueDate);
+    const isTaskToday =
+      !task.completed && task.dueDate && isToday(task.dueDate);
+
+    let dateClass = "";
+    if (isTaskOverdue) dateClass = "overdue";
+    else if (isTaskToday) dateClass = "today";
+
+    const formattedTitle = renderFormattedContent(task.title);
+
+    return `
+      <div class="task-item ${task.completed ? "completed" : ""}" data-task-id="${task.id}">
+        <div class="task-left-section">
+          <div class="task-checkbox-wrapper">
+            <input type="checkbox" class="task-checkbox" ${task.completed ? "checked" : ""} data-action="toggle" data-id="${task.id}">
+          </div>
+          <div class="task-details" data-action="edit" data-id="${task.id}">
+            <div class="task-title-formatted">${formattedTitle}</div>
+            <div class="task-meta-row">
+              <span class="badge badge-priority-${task.priority}">
+                <i class="fas fa-flag"></i> ${task.priority}
+              </span>
+              <span class="badge badge-status ${task.status}">
+                ${task.status}
+              </span>
+              <span class="badge badge-project">
+                <i class="${project.icon}" style="color: ${project.color}"></i> ${escapeHTML(project.name)}
+              </span>
+              ${
+                dateFormatted
+                  ? `
+                <span class="badge-date ${dateClass}">
+                  <i class="fas fa-calendar-day"></i> ${dateFormatted}
+                </span>
+              `
+                  : ""
+              }
+            </div>
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="task-btn" title="Edit Task" data-action="edit" data-id="${task.id}">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="task-btn delete" title="Delete Task" data-action="delete" data-id="${task.id}">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
+  attachEvents(container) {
+    // Checkboxes toggle completion
+    container.querySelectorAll('[data-action="toggle"]').forEach((chk) => {
+      chk.addEventListener("change", () => {
+        const id = chk.getAttribute("data-id");
+        Tasks.toggleComplete(id);
+      });
+    });
+
+    // Edit task clicks
+    container.querySelectorAll('[data-action="edit"]').forEach((el) => {
+      el.addEventListener("click", () => {
+        const id = el.getAttribute("data-id");
+        TaskFormModal.openEdit(id);
+      });
+    });
+
+    // Delete task clicks
+    container.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        Modal.confirmDeleteTask(id);
+      });
+    });
+
+    // Switch view shortcut buttons
+    container.querySelectorAll("[data-switch-view]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const targetView = btn.getAttribute("data-switch-view");
+        const navItem = document.querySelector(
+          `.nav-item[data-view="${targetView}"]`,
+        );
+        if (navItem) navItem.click();
+      });
+    });
+
+    // Resolve overdue button
+    const resolveBtn = container.querySelector(
+      "#dashboard-resolve-overdue-btn",
+    );
+    if (resolveBtn) {
+      resolveBtn.addEventListener("click", () => {
+        const navItem = document.querySelector('.nav-item[data-view="all"]');
+        if (navItem) navItem.click();
+        const statusFilter = document.getElementById("view-filter-status");
+        if (statusFilter) {
+          statusFilter.value = "all";
+        }
+        const sortSelect = document.getElementById("view-sort-by");
+        if (sortSelect) sortSelect.value = "dueDate";
+      });
+    }
+  },
+};

@@ -1,278 +1,331 @@
-// taskFormModal.js - Jira-style task create/edit modal with rich text support
-import { addTask, editTask, getTasks } from './taskManager.js';
-import { getProjects, getProjectById } from './projectManager.js';
-import { showNotification } from './notifications.js';
-import { renderTasks } from './uiRenderer.js';
+/**
+ * taskFormModal.js - Jira-Style Task Creation and Editing Modal with Rich Text Formatting
+ */
 
-let currentTaskId = null; // null = create mode, has value = edit mode
-let ckEditorInitialized = false;
-let editorInstance = null;
-let currentTaskDescription = '';
+import { Tasks, MAX_TASK_LENGTH } from "./taskManager.js";
+import { Projects } from "./projectManager.js";
+import { Modal } from "./modal.js";
+import { getTodayDateString } from "./utils.js";
 
-// Initialize CKEditor 5 rich text editor
-async function initCKEditor() {
-    const textarea = document.getElementById('taskDescriptionInput');
-    if (!textarea) return;
-    
-    if (editorInstance) {
-        editorInstance.setData(currentTaskDescription || '');
-        return;
-    }
-    
-    try {
-        // Check if CKEditor is available
-        if (typeof window.ClassicEditor === 'undefined') {
-            console.warn('CKEditor not loaded, using fallback textarea');
-            textarea.style.display = 'block';
-            return;
-        }
-        
-        editorInstance = await window.ClassicEditor.create(textarea, {
-            toolbar: [
-                'bold', 'italic', '|',
-                'bulletedList', 'numberedList', '|',
-                'link', 'blockQuote'
-            ],
-            placeholder: 'Write your task description here...',
-        });
-        
-        // Apply dark theme
-        const editorElement = editorInstance.ui.view.editable.element;
-        editorElement.style.backgroundColor = '#1a1a2e';
-        editorElement.style.color = '#ffffff';
-        editorElement.style.border = '1px solid #334155';
-        editorElement.style.borderRadius = '0.5rem';
-        editorElement.style.padding = '12px';
-        editorElement.style.minHeight = '150px';
-        
-        ckEditorInitialized = true;
-        console.log('✅ CKEditor initialized');
-    } catch (error) {
-        console.error('CKEditor init error:', error);
-        // Fallback
-        if (textarea) {
-            textarea.style.display = 'block';
-            textarea.style.backgroundColor = '#1a1a2e';
-            textarea.style.color = '#ffffff';
-            textarea.style.border = '1px solid #334155';
-            textarea.style.borderRadius = '0.5rem';
-            textarea.style.padding = '12px';
-            textarea.style.minHeight = '150px';
-        }
-    }
-}
+export const TaskFormModal = {
+  mode: "create", // 'create' | 'edit'
+  editingTaskId: null,
 
-function getEditorContent() {
-    try {
-        if (editorInstance) {
-            return editorInstance.getData();
-        }
-    } catch (error) {
-        console.error('Error getting editor content:', error);
-    }
-    
-    // Fallback to textarea
-    const textarea = document.getElementById('taskDescriptionInput');
-    return textarea?.value || '';
-}
+  init() {
+    this.setupToolbar();
+    this.setupForm();
+    this.setupQuickDateButtons();
+  },
 
-function destroyEditor() {
-    if (editorInstance) {
-        editorInstance.destroy();
-        editorInstance = null;
-        ckEditorInitialized = false;
-    }
-}
+  setupToolbar() {
+    const editor = document.getElementById("task-description-editor");
+    if (!editor) return;
 
-// Populate project dropdown in the form
-function populateProjectDropdown() {
-    const projectSelect = document.getElementById('taskProjectSelect');
-    if (!projectSelect) return;
-    
-    // Clear existing options except first
-    projectSelect.innerHTML = '<option value="">No Project</option>';
-    
-    // Add all projects
-    const projects = getProjects();
-    projects.forEach(project => {
-        const option = document.createElement('option');
-        option.value = project.id;
-        option.textContent = project.name;
-        projectSelect.appendChild(option);
+    document.querySelectorAll(".toolbar-btn[data-command]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const command = btn.getAttribute("data-command");
+        const value = btn.getAttribute("data-value") || null;
+
+        editor.focus();
+        document.execCommand(command, false, value);
+        this.updateToolbarState();
+      });
     });
-}
 
-// Close the task form modal
-function closeTaskFormModal() {
-    const modal = document.getElementById('taskFormModal');
-    if (modal) {
-        modal.style.display = 'none';
-        currentTaskId = null;
-        
-        // Reset form
-        resetTaskForm();
-    }
-}
+    editor.addEventListener("keyup", () => this.updateToolbarState());
+    editor.addEventListener("mouseup", () => this.updateToolbarState());
+  },
 
-// Reset form to default state
-function resetTaskForm() {
-    const titleInput = document.getElementById('taskTitleInput');
-    const dueDateInput = document.getElementById('taskDueDateInput');
-    const projectSelect = document.getElementById('taskProjectSelect');
-    const prioritySelect = document.getElementById('taskPrioritySelect');
-    const statusSelect = document.getElementById('taskStatusSelect');
-    
-    if (titleInput) titleInput.value = '';
-    if (dueDateInput) dueDateInput.value = '';
-    if (projectSelect) projectSelect.value = '';
-    if (prioritySelect) prioritySelect.value = 'medium';
-    if (statusSelect) statusSelect.value = 'todo';
-    
-    // Clear rich text editor
-    if (editorInstance) {
-        editorInstance.setData('');
-    }
-    
-    // Update modal title and button text for create mode
-    const modalTitle = document.getElementById('taskFormModalTitle');
-    const confirmBtn = document.getElementById('confirmTaskFormBtn');
-    if (modalTitle) modalTitle.textContent = 'Create New Task';
-    if (confirmBtn) confirmBtn.textContent = 'Create Task';
-}
-
-// Open the task form modal
-export async function openTaskFormModal(taskId = null) {
-    const modal = document.getElementById('taskFormModal');
-    if (!modal) return;
-    
-    // Initialize everything
-    initCKEditor();
-    populateProjectDropdown();
-    
-    currentTaskId = taskId;
-    
-    // If we're in edit mode, populate with existing task data
-    if (taskId) {
-        const tasks = getTasks();
-        const task = tasks.find(t => t.id === taskId);
-        
-        if (task) {
-            // Update modal for edit mode
-            const modalTitle = document.getElementById('taskFormModalTitle');
-            const confirmBtn = document.getElementById('confirmTaskFormBtn');
-            if (modalTitle) modalTitle.textContent = 'Edit Task';
-            if (confirmBtn) confirmBtn.textContent = 'Save Changes';
-            
-            // Populate form fields
-            const titleInput = document.getElementById('taskTitleInput');
-            const dueDateInput = document.getElementById('taskDueDateInput');
-            const projectSelect = document.getElementById('taskProjectSelect');
-            const prioritySelect = document.getElementById('taskPrioritySelect');
-            const statusSelect = document.getElementById('taskStatusSelect');
-            
-            if (titleInput) titleInput.value = task.title || task.text || '';
-            if (dueDateInput) dueDateInput.value = task.dueDate || '';
-            if (projectSelect) projectSelect.value = task.projectId || '';
-            if (prioritySelect) prioritySelect.value = task.priority || 'medium';
-            if (statusSelect) statusSelect.value = task.status || 'todo';
-            
-            // Populate rich text editor
-            currentTaskDescription = task.description || '';
-            if (editorInstance) {
-                editorInstance.setData(currentTaskDescription);
-            }
+  updateToolbarState() {
+    document.querySelectorAll(".toolbar-btn[data-command]").forEach((btn) => {
+      const command = btn.getAttribute("data-command");
+      try {
+        if (document.queryCommandState(command)) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
         }
-    }
-    
-    // Show the modal
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    
-    // Focus on title input
-    setTimeout(() => {
-        const titleInput = document.getElementById('taskTitleInput');
-        if (titleInput) titleInput.focus();
-    }, 100);
-}
+      } catch (e) {
+        // Ignored for non-state commands like insertUnorderedList or formatBlock
+      }
+    });
+  },
 
-// Save the task from the form
-function saveTaskFromForm() {
-    const titleInput = document.getElementById('taskTitleInput');
-    const dueDateInput = document.getElementById('taskDueDateInput');
-    const projectSelect = document.getElementById('taskProjectSelect');
-    const prioritySelect = document.getElementById('taskPrioritySelect');
-    const statusSelect = document.getElementById('taskStatusSelect');
-    
-    // Get description from CKEditor
-    const description = getEditorContent();
-    
-    const title = titleInput?.value.trim();
-    
-    if (!title) {
-        showNotification('Please enter a task title!', 'error');
-        return;
-    }
-    
-    // Create task data object
-    const taskData = {
-        title: title,
-        description: description,
-        dueDate: dueDateInput?.value || null,
-        projectId: projectSelect?.value || null,
-        priority: prioritySelect?.value || 'medium',
-        status: statusSelect?.value || 'todo'
+  populateProjectSelect(selectedId = "inbox") {
+    const select = document.getElementById("task-form-project");
+    if (!select) return;
+
+    select.innerHTML = '<option value="inbox">📥 Inbox (General)</option>';
+    const projects = Projects.getProjects();
+    projects.forEach((p) => {
+      const opt = document.createElement("option");
+      opt.value = p.id;
+      opt.textContent = `${p.name}`;
+      if (p.id === selectedId) {
+        opt.selected = true;
+      }
+      select.appendChild(opt);
+    });
+  },
+
+  setupQuickDateButtons() {
+    const dateInput = document.getElementById("task-form-duedate");
+    if (!dateInput) return;
+
+    const setDateOffset = (offset) => {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      dateInput.value = `${year}-${month}-${day}`;
     };
-    
-    if (currentTaskId) {
-        // Edit existing task
-        const success = editTask(currentTaskId, taskData);
-        if (success) {
-            showNotification('Task updated successfully!', 'success');
-            renderTasks();
-        }
-    } else {
-        // Create new task
-        const success = addTask(taskData);
-        if (success) {
-            renderTasks();
-        }
-    }
-    
-    // Close the modal
-    closeTaskFormModal();
-}
 
-// Setup the task form modal event listeners
-export function setupTaskFormModal() {
-    // Expose openTaskFormModal globally so the button can call it directly
-    window.openTaskFormModal = openTaskFormModal;
-    const modal = document.getElementById('taskFormModal');
-    const closeBtn = document.getElementById('closeTaskFormModal');
-    const cancelBtn = document.getElementById('cancelTaskFormBtn');
-    const confirmBtn = document.getElementById('confirmTaskFormBtn');
-    const openBtn = document.getElementById('openTaskFormBtn');
-    const taskInput = document.getElementById('taskInput'); // The readonly input that opens the modal
-    
-    // Close modal events
-    if (closeBtn) closeBtn.addEventListener('click', closeTaskFormModal);
-    if (cancelBtn) cancelBtn.addEventListener('click', closeTaskFormModal);
-    
-    // Click outside to close
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeTaskFormModal();
-        });
-    }
-    
-    // Confirm/save button
-    if (confirmBtn) confirmBtn.addEventListener('click', saveTaskFromForm);
-    
-    // Open modal when clicking the create button or the readonly input
-    if (openBtn) openBtn.addEventListener('click', () => openTaskFormModal());
-    if (taskInput) taskInput.addEventListener('click', () => openTaskFormModal());
-    
-    // Also make the global showEditModal function use our new form instead of the old edit modal
-    window.showEditModal = (taskId) => {
-        openTaskFormModal(taskId);
+    const btnToday = document.getElementById("date-btn-today");
+    const btnTomorrow = document.getElementById("date-btn-tomorrow");
+    const btnNextWeek = document.getElementById("date-btn-next-week");
+    const btnClear = document.getElementById("date-btn-clear");
+
+    if (btnToday) btnToday.addEventListener("click", () => setDateOffset(0));
+    if (btnTomorrow)
+      btnTomorrow.addEventListener("click", () => setDateOffset(1));
+    if (btnNextWeek)
+      btnNextWeek.addEventListener("click", () => setDateOffset(7));
+    if (btnClear)
+      btnClear.addEventListener("click", () => (dateInput.value = ""));
+  },
+
+  setupForm() {
+    const form = document.getElementById("task-form");
+    const titleInput = document.getElementById("task-form-title");
+    const charCounter = document.getElementById("task-form-counter");
+    const editor = document.getElementById("task-description-editor");
+    const modalTitle = document.getElementById("task-modal-title");
+    const submitBtnText = document.getElementById("task-submit-btn-text");
+
+    const modalBulletBtn = document.getElementById("modal-add-bullet-btn");
+    const modalNumberBtn = document.getElementById("modal-add-number-btn");
+
+    const insertPrefixAtCursor = (prefix) => {
+      if (!titleInput) return;
+      titleInput.focus();
+      const start = titleInput.selectionStart;
+      const end = titleInput.selectionEnd;
+      const val = titleInput.value;
+      const needsNewline = start > 0 && val[start - 1] !== "\n";
+      const toInsert = needsNewline ? `\n${prefix}` : prefix;
+      titleInput.value =
+        val.substring(0, start) + toInsert + val.substring(end);
+      titleInput.selectionStart = titleInput.selectionEnd =
+        start + toInsert.length;
+      if (charCounter)
+        charCounter.textContent = `${titleInput.value.length}/${MAX_TASK_LENGTH}`;
     };
-}
+
+    if (modalBulletBtn) {
+      modalBulletBtn.addEventListener("click", () =>
+        insertPrefixAtCursor("- "),
+      );
+    }
+    if (modalNumberBtn) {
+      modalNumberBtn.addEventListener("click", () =>
+        insertPrefixAtCursor("1. "),
+      );
+    }
+
+    if (titleInput) {
+      titleInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          // Auto-continue bullet or numbered list
+          const cursorPos = titleInput.selectionStart;
+          const textBefore = titleInput.value.substring(0, cursorPos);
+          const currentLine = textBefore.split("\n").pop();
+          const bulletMatch = currentLine.match(/^([*\-•+])\s+(.*)$/);
+          const numberMatch = currentLine.match(/^(\d+)[\.\)]\s+(.*)$/);
+
+          if (bulletMatch && bulletMatch[2].trim()) {
+            e.preventDefault();
+            const insertion = `\n${bulletMatch[1]} `;
+            const textAfter = titleInput.value.substring(cursorPos);
+            titleInput.value = textBefore + insertion + textAfter;
+            titleInput.selectionStart = titleInput.selectionEnd =
+              cursorPos + insertion.length;
+            if (charCounter)
+              charCounter.textContent = `${titleInput.value.length}/${MAX_TASK_LENGTH}`;
+          } else if (numberMatch && numberMatch[2].trim()) {
+            e.preventDefault();
+            const nextNum = parseInt(numberMatch[1], 10) + 1;
+            const insertion = `\n${nextNum}. `;
+            const textAfter = titleInput.value.substring(cursorPos);
+            titleInput.value = textBefore + insertion + textAfter;
+            titleInput.selectionStart = titleInput.selectionEnd =
+              cursorPos + insertion.length;
+            if (charCounter)
+              charCounter.textContent = `${titleInput.value.length}/${MAX_TASK_LENGTH}`;
+          }
+        }
+      });
+    }
+
+    if (titleInput && charCounter) {
+      titleInput.addEventListener("input", () => {
+        charCounter.textContent = `${titleInput.value.length}/${MAX_TASK_LENGTH}`;
+        if (titleInput.value.length > MAX_TASK_LENGTH) {
+          charCounter.style.color = "#ef4444";
+        } else {
+          charCounter.style.color = "";
+        }
+      });
+    }
+
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const title = titleInput.value.trim();
+        const description = editor.innerHTML === "<br>" ? "" : editor.innerHTML;
+        const projectId = document.getElementById("task-form-project").value;
+        const status = document.getElementById("task-form-status").value;
+        const dueDate =
+          document.getElementById("task-form-duedate").value || null;
+
+        const priorityRadio = document.querySelector(
+          'input[name="task-priority"]:checked',
+        );
+        const priority = priorityRadio ? priorityRadio.value : "medium";
+
+        if (!title) {
+          titleInput.focus();
+          return;
+        }
+
+        if (this.mode === "create") {
+          const newTask = Tasks.addTask({
+            title,
+            description,
+            projectId,
+            status,
+            priority,
+            dueDate,
+          });
+          if (newTask) {
+            Modal.close("task-modal");
+            form.reset();
+            editor.innerHTML = "";
+          }
+        } else if (this.mode === "edit" && this.editingTaskId) {
+          const updated = Tasks.updateTask(this.editingTaskId, {
+            title,
+            description,
+            projectId,
+            status,
+            priority,
+            dueDate,
+          });
+          if (updated) {
+            Modal.close("task-modal");
+            form.reset();
+            editor.innerHTML = "";
+          }
+        }
+      });
+    }
+
+    // Connect top header "New Task" button
+    const openBtn = document.getElementById("btn-header-new-task");
+    if (openBtn) {
+      openBtn.addEventListener("click", () => this.openCreate());
+    }
+  },
+
+  openCreate(defaultValues = {}) {
+    this.mode = "create";
+    this.editingTaskId = null;
+
+    const modalTitle = document.getElementById("task-modal-title");
+    const submitBtnText = document.getElementById("task-submit-btn-text");
+    const form = document.getElementById("task-form");
+    const editor = document.getElementById("task-description-editor");
+    const charCounter = document.getElementById("task-form-counter");
+    const titleInput = document.getElementById("task-form-title");
+
+    if (modalTitle)
+      modalTitle.innerHTML =
+        '<i class="fas fa-plus-circle"></i> Create Jira-Style Task';
+    if (submitBtnText) submitBtnText.textContent = "Create Task";
+
+    if (form) form.reset();
+    if (editor) editor.innerHTML = "";
+    if (charCounter) charCounter.textContent = `0/${MAX_TASK_LENGTH}`;
+
+    this.populateProjectSelect(defaultValues.projectId || "inbox");
+
+    if (defaultValues.dueDate) {
+      const dateInput = document.getElementById("task-form-duedate");
+      if (dateInput) dateInput.value = defaultValues.dueDate;
+    }
+
+    if (defaultValues.status) {
+      const statusSelect = document.getElementById("task-form-status");
+      if (statusSelect) statusSelect.value = defaultValues.status;
+    }
+
+    // Default priority 'medium'
+    const mediumRadio = document.querySelector(
+      'input[name="task-priority"][value="medium"]',
+    );
+    if (mediumRadio) mediumRadio.checked = true;
+
+    Modal.open("task-modal");
+    setTimeout(() => titleInput && titleInput.focus(), 100);
+  },
+
+  openEdit(taskId) {
+    const task = Tasks.getTaskById(taskId);
+    if (!task) return;
+
+    this.mode = "edit";
+    this.editingTaskId = taskId;
+
+    const modalTitle = document.getElementById("task-modal-title");
+    const submitBtnText = document.getElementById("task-submit-btn-text");
+    const titleInput = document.getElementById("task-form-title");
+    const editor = document.getElementById("task-description-editor");
+    const charCounter = document.getElementById("task-form-counter");
+    const statusSelect = document.getElementById("task-form-status");
+    const dateInput = document.getElementById("task-form-duedate");
+
+    if (modalTitle)
+      modalTitle.innerHTML = '<i class="fas fa-edit"></i> Edit Task Details';
+    if (submitBtnText) submitBtnText.textContent = "Save Changes";
+
+    if (titleInput) {
+      titleInput.value = task.title;
+      if (charCounter)
+        charCounter.textContent = `${task.title.length}/${MAX_TASK_LENGTH}`;
+    }
+
+    if (editor) {
+      editor.innerHTML = task.description || "";
+    }
+
+    this.populateProjectSelect(task.projectId || "inbox");
+
+    if (statusSelect) {
+      statusSelect.value = task.status || (task.completed ? "done" : "todo");
+    }
+
+    if (dateInput) {
+      dateInput.value = task.dueDate || "";
+    }
+
+    const priorityRadio = document.querySelector(
+      `input[name="task-priority"][value="${task.priority || "medium"}"]`,
+    );
+    if (priorityRadio) priorityRadio.checked = true;
+
+    Modal.open("task-modal");
+    setTimeout(() => titleInput && titleInput.focus(), 100);
+  },
+};

@@ -1,582 +1,550 @@
-    // uiRenderer.js - Handle all UI rendering with date support
-    import { getFilteredTasks, getCurrentFilter, toggleTaskSelection, getSelectedTaskIds, clearSelectedTasks } from './taskManager.js';
-    import { escapeHtml } from './utils.js';
-    import { getProjectById } from './projectManager.js';
+/**
+ * uiRenderer.js - Main UI rendering with priority badges, status indicators, multi-select, and quick add
+ */
 
-    // Helper function to get tasks from localStorage
-    function getTasks() {
-        return JSON.parse(localStorage.getItem('tasks')) || [];
-    }
+import { Tasks, MAX_TASK_LENGTH } from "./taskManager.js";
+import { Projects } from "./projectManager.js";
+import {
+  isOverdue,
+  isToday,
+  formatDate,
+  escapeHTML,
+  renderFormattedContent,
+  isLongTask,
+} from "./utils.js";
+import { TaskFormModal } from "./taskFormModal.js";
+import { Modal } from "./modal.js";
+import { DashboardView } from "./views/dashboardView.js";
 
-    // Strip HTML tags to display plain text description preview
-    function stripHtml(html) {
-        if (!html) return '';
-        const tmp = document.createElement('div');
-        tmp.innerHTML = html;
-        return tmp.textContent || tmp.innerText || '';
-    }
+class UIRenderer {
+  constructor() {
+    this.currentView = "dashboard"; // 'dashboard' | 'all' | 'today' | 'upcoming' | 'completed' | 'project'
+    this.currentProjectId = null;
+    this.currentStatusFilter = "all";
+    this.currentPriorityFilter = "all";
+    this.currentSortBy = "dueDate";
+    this.searchQuery = "";
+    this.selectedTaskIds = new Set();
+    this.expandedTaskIds = new Set();
+  }
 
-    // Helper function to format date nicely
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { 
-            month: 'short', 
-            day: 'numeric',
-            year: 'numeric'
+  init() {
+    this.setupViewControls();
+    this.setupQuickAdd();
+    this.setupBulkActions();
+    this.setupSearch();
+  }
+
+  setupSearch() {
+    const searchInputs = [
+      document.getElementById("header-search-input"),
+      document.getElementById("content-search-input"),
+    ];
+
+    searchInputs.forEach((input) => {
+      if (!input) return;
+      input.addEventListener("input", (e) => {
+        this.searchQuery = e.target.value;
+        // Keep both search inputs in sync if both exist
+        searchInputs.forEach((other) => {
+          if (other && other !== input) other.value = this.searchQuery;
         });
+        this.renderCurrentView();
+      });
+    });
+  }
+
+  setupViewControls() {
+    // Status Tabs (All, To Do, In Progress, Review, Done)
+    document.querySelectorAll(".status-tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document
+          .querySelectorAll(".status-tab")
+          .forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        this.currentStatusFilter = tab.getAttribute("data-status");
+        this.renderCurrentView();
+      });
+    });
+
+    // Priority filter dropdown
+    const prioritySelect = document.getElementById("view-filter-priority");
+    if (prioritySelect) {
+      prioritySelect.addEventListener("change", (e) => {
+        this.currentPriorityFilter = e.target.value;
+        this.renderCurrentView();
+      });
     }
 
-    // Helper function to get date status and styling
-    function getDateStatus(dueDate, isCompleted) {
-        if (!dueDate || isCompleted) return { class: '', text: '', icon: '📅' };
-        
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const dueDateObj = new Date(dueDate);
-        dueDateObj.setHours(0, 0, 0, 0);
-        
-        // Overdue
-        if (dueDateObj < today) {
-            return { 
-                class: 'overdue', 
-                text: ' (Overdue!)', 
-                icon: '⚠️' 
-            };
-        }
-        // Due today
-        else if (dueDateObj.getTime() === today.getTime()) {
-            return { 
-                class: 'today', 
-                text: ' (Today)', 
-                icon: '🔔' 
-            };
-        }
-        // Due tomorrow
-        else if (dueDateObj.getTime() === today.getTime() + (24 * 60 * 60 * 1000)) {
-            return { 
-                class: 'tomorrow', 
-                text: ' (Tomorrow)', 
-                icon: '⏰' 
-            };
-        }
-        // Due this week
-        else if (dueDateObj < new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000))) {
-            const daysDiff = Math.ceil((dueDateObj - today) / (1000 * 60 * 60 * 24));
-            return { 
-                class: 'upcoming', 
-                text: ` (In ${daysDiff} day${daysDiff !== 1 ? 's' : ''})`, 
-                icon: '📅' 
-            };
-        }
-        
-        return { class: 'future', text: '', icon: '📅' };
+    // Sort by dropdown
+    const sortSelect = document.getElementById("view-sort-by");
+    if (sortSelect) {
+      sortSelect.addEventListener("change", (e) => {
+        this.currentSortBy = e.target.value;
+        this.renderCurrentView();
+      });
     }
+  }
 
-    export function renderTasks(customTasks = null) {
-        const taskList = document.getElementById('taskList');
-        if (!taskList) return;
-        
-        // Apply view class
-        taskList.classList.add(`task-${currentView}-view`);
-    
-    // Get all tasks directly
-    const allTasks = getTasks();
-    
-    // If customTasks is provided, use it; otherwise use all tasks
-    const tasks = customTasks || allTasks;
-    
-    // Apply filtering
-    const currentFilter = getCurrentFilter();
-    let filteredTasks = tasks;
-    if (!customTasks) {
-        switch(currentFilter) {
-            case 'active':
-                filteredTasks = tasks.filter(task => !task.completed);
-                break;
-            case 'completed':
-                filteredTasks = tasks.filter(task => task.completed);
-                break;
-            default:
-                filteredTasks = tasks;
-        }
-    }
-    
-    const selectedIds = getSelectedTaskIds();
-    
-    // Show bulk delete toolbar if tasks are selected
-    updateBulkDeleteToolbar(selectedIds);
-        
-        if (filteredTasks.length === 0) {
-            let emptyMessage = '';
-            if (currentFilter === 'active') {
-                emptyMessage = 'No active tasks! 🎉';
-            } else if (currentFilter === 'completed') {
-                emptyMessage = 'No completed tasks yet. Complete some tasks! ✅';
-            } else {
-                emptyMessage = 'No tasks yet. Add your first task above! 📝';
-            }
-            
-            taskList.innerHTML = `
-                <div class="empty-state">
-                    <div style="font-size: 48px;">📭</div>
-                    <p>${emptyMessage}</p>
-                </div>
-            `;
-        } else {
-            taskList.innerHTML = filteredTasks.map(task => {
-                // Generate project label HTML if task belongs to a project
-                let projectHTML = '';
-                if (task.projectId && task.projectId !== 'inbox') {
-                    const project = getProjectById(task.projectId);
-                    if (project) {
-                        projectHTML = `
-                            <span class="task-project-label" style="background-color: ${project.color}20; color: ${project.color}; border: 1px solid ${project.color}40;">
-                                <i class="${project.icon}" style="font-size: 0.7rem; margin-right: 4px;"></i>
-                                ${escapeHtml(project.name)}
-                            </span>
-                        `;
-                    }
-                }
-                
-                // Generate date HTML if task has due date
-                let dateHTML = '';
-                if (task.dueDate) {
-                    const status = getDateStatus(task.dueDate, task.completed);
-                    const formattedDate = formatDate(task.dueDate);
-                    dateHTML = `
-                        <div class="task-date ${status.class}">
-                            ${status.icon} ${formattedDate}${status.text}
-                        </div>
-                    `;
-                } else {
-                    dateHTML = `
-                        <div class="task-date no-date">
-                            📅 No due date
-                        </div>
-                    `;
-                }
-                
-                // Generate priority and status badges
-                const priorityConfig = {
-                    low: { label: 'Low', class: 'priority-low', color: '#22c55e' },
-                    medium: { label: 'Medium', class: 'priority-medium', color: '#eab308' },
-                    high: { label: 'High', class: 'priority-high', color: '#f97316' },
-                    urgent: { label: 'Urgent', class: 'priority-urgent', color: '#ef4444' }
-                };
-                
-                const statusConfig = {
-                    todo: { label: 'To Do', class: 'status-todo', color: '#6b7280' },
-                    inprogress: { label: 'In Progress', class: 'status-inprogress', color: '#3b82f6' },
-                    review: { label: 'Review', class: 'status-review', color: '#8b5cf6' },
-                    done: { label: 'Done', class: 'status-done', color: '#22c55e' }
-                };
-                
-                const priority = task.priority || 'medium';
-                const status = task.status || 'todo';
-                const priorityData = priorityConfig[priority];
-                const statusData = statusConfig[status];
-                
-                const priorityBadge = `
-                    <span class="task-badge ${priorityData.class}" style="background-color: ${priorityData.color}20; color: ${priorityData.color}; border: 1px solid ${priorityData.color}40;">
-                        ${priorityData.label}
-                    </span>
-                `;
-                
-                const statusBadge = `
-                    <span class="task-badge ${statusData.class}" style="background-color: ${statusData.color}20; color: ${statusData.color}; border: 1px solid ${statusData.color}40;">
-                        ${statusData.label}
-                    </span>
-                `;
-                
-                const isSelected = selectedIds.includes(task.id);
-                const taskTitle = task.title || task.text || 'Untitled';
-                const taskDescription = task.description || '';
-                const descPlain = stripHtml(taskDescription);
+  setupQuickAdd() {
+    const textarea = document.getElementById("quick-add-input");
+    const prioritySelect = document.getElementById("quick-add-priority");
+    const projectSelect = document.getElementById("quick-add-project");
+    const submitBtn = document.getElementById("quick-add-btn");
+    const expandBtn = document.getElementById("quick-add-expand-btn");
+    const bulletBtn = document.getElementById("quick-add-bullet-btn");
 
-                if (currentView === 'grid') {
-                    return `
-                        <li class="task-item ${isSelected ? 'selected' : ''}"
-                            data-task-id="${task.id}"
-                            data-priority="${task.priority || 'medium'}"
-                            onclick="window.handleTaskClick(event, '${task.id}')"
-                            ondblclick="window.showTaskDetail('${task.id}')">
-                            <div class="task-card-inner">
-                                <div class="task-card-top">
-                                    <input type="checkbox" class="task-checkbox"
-                                        ${task.completed ? 'checked' : ''}
-                                        onclick="event.stopPropagation(); window.toggleTaskHandler('${task.id}')">
-                                    <span class="task-text ${task.completed ? 'completed' : ''}">${escapeHtml(taskTitle)}</span>
-                                    <div class="task-card-menu" onclick="event.stopPropagation()">
-                                        <button class="edit-card-btn" onclick="window.editTaskHandler('${task.id}')" title="Edit"><i class="fas fa-pen"></i></button>
-                                        <button class="delete-card-btn" onclick="window.deleteTaskHandler('${task.id}', '${escapeHtml(taskTitle)}')" title="Delete"><i class="fas fa-trash"></i></button>
-                                    </div>
-                                </div>
-                                ${descPlain
-                                    ? `<div class="task-full-description">${escapeHtml(descPlain)}</div>`
-                                    : `<div class="task-no-description">No description</div>`
-                                }
-                                <div class="task-badges">
-                                    ${priorityBadge}
-                                    ${statusBadge}
-                                </div>
-                            </div>
-                            <div class="task-card-footer">
-                                <div class="task-date ${getDateStatus(task.dueDate, task.completed).class}">
-                                    ${task.dueDate
-                                        ? `<i class="fas fa-calendar-alt"></i> ${formatDate(task.dueDate)}${getDateStatus(task.dueDate, task.completed).text}`
-                                        : `<i class="fas fa-calendar-alt"></i> No due date`
-                                    }
-                                </div>
-                                ${projectHTML}
-                            </div>
-                        </li>
-                    `;
-                }
-
-                const dateStatus = getDateStatus(task.dueDate, task.completed);
-                const inlineDateHTML = task.dueDate
-                    ? `<div class="task-date ${dateStatus.class}"><i class="fas fa-calendar-alt"></i> ${formatDate(task.dueDate)}${dateStatus.text}</div>`
-                    : '';
-
-                return `
-                    <li class="task-item ${isSelected ? 'selected' : ''}"
-                        data-task-id="${task.id}"
-                        data-priority="${task.priority || 'medium'}"
-                        onclick="window.handleTaskClick(event, '${task.id}')"
-                        ondblclick="window.showTaskDetail('${task.id}')">
-                        <input type="checkbox" class="task-checkbox"
-                            ${task.completed ? 'checked' : ''}
-                            onclick="event.stopPropagation(); window.toggleTaskHandler('${task.id}')">
-                        <div class="task-content" onclick="event.stopPropagation(); window.showTaskDetail('${task.id}')">
-                            <div class="task-header">
-                                <span class="task-text ${task.completed ? 'completed' : ''}">${escapeHtml(taskTitle)}</span>
-                                <div class="task-badges">
-                                    ${projectHTML}
-                                    ${priorityBadge}
-                                    ${statusBadge}
-                                </div>
-                                ${inlineDateHTML}
-                            </div>
-                        </div>
-                        <div class="task-actions" onclick="event.stopPropagation();">
-                            <button class="edit-btn" onclick="window.editTaskHandler('${task.id}')" title="Edit">✏️</button>
-                            <button class="delete-btn" onclick="window.deleteTaskHandler('${task.id}', '${escapeHtml(taskTitle)}')" title="Delete">🗑️</button>
-                        </div>
-                    </li>
-                `;
-            }).join('');
-        }
-        
-        updateStats();
-    }
-
-
-
-    // Make bulk selection functions globally available
-    window.handleTaskClick = (event, taskId) => {
-        // Don't select if clicking on buttons or links
-        if (event.target.closest('button') || event.target.tagName === 'INPUT') return;
-        
-        // Toggle selection
-        toggleTaskSelection(taskId);
-        renderTasks();
+    // Auto-resizing textarea as user types long tasks or lists
+    const autoResize = () => {
+      if (!textarea) return;
+      textarea.style.height = "auto";
+      const newHeight = Math.min(Math.max(textarea.scrollHeight, 28), 160);
+      textarea.style.height = `${newHeight}px`;
     };
 
-    // Function to view full task description in a modal
-    window.viewTaskDescription = (taskId, taskTitle) => {
-        const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        const task = tasks.find(t => t.id === taskId);
-        
-        if (!task || !task.description) {
-            import('./notifications.js').then(module => {
-                module.showNotification('No description available', 'warning');
-            });
-            return;
-        }
+    if (textarea) {
+      textarea.addEventListener("input", autoResize);
+    }
 
-        // Create and show description modal
-        const descriptionModal = document.createElement('div');
-        descriptionModal.className = 'modal description-modal';
-        descriptionModal.innerHTML = `
-            <div class="modal-content description-modal-content">
-                <div class="modal-header">
-                    <i class="fa-solid fa-file-lines modal-icon" style="color: var(--color-info);"></i>
-                    <h3>Task Description</h3>
-                    <button class="modal-close" onclick="this.closest('.modal').remove()">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <h4 style="margin: 0 0 16px 0; color: #fff; font-size: 1.1rem;">${taskTitle}</h4>
-                    <div class="description-content" style="background: var(--glass-bg-base); padding: 16px; border-radius: var(--radius-lg); color: #e2e8f0; line-height: 1.6;">
-                        ${task.description}
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="modal-btn cancel-btn" onclick="this.closest('.modal').remove()">Close</button>
-                </div>
+    // Bullet insert helper button
+    if (bulletBtn && textarea) {
+      bulletBtn.addEventListener("click", () => {
+        textarea.focus();
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const value = textarea.value;
+        const needsNewline = start > 0 && value[start - 1] !== "\n";
+        const prefix = needsNewline ? "\n- " : "- ";
+        textarea.value =
+          value.substring(0, start) + prefix + value.substring(end);
+        textarea.selectionStart = textarea.selectionEnd = start + prefix.length;
+        autoResize();
+      });
+    }
+
+    const handleAdd = () => {
+      if (!textarea) return;
+      const title = textarea.value.trim();
+      if (!title) {
+        textarea.focus();
+        return;
+      }
+
+      const priority = prioritySelect ? prioritySelect.value : "medium";
+      const projectId = projectSelect
+        ? projectSelect.value
+        : this.currentProjectId || "inbox";
+
+      // Default due date: if in today view, set to today
+      let dueDate = null;
+      if (this.currentView === "today") {
+        const now = new Date();
+        dueDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+      }
+
+      const task = Tasks.addTask({
+        title,
+        priority,
+        projectId,
+        dueDate,
+        status: "todo",
+      });
+
+      if (task) {
+        textarea.value = "";
+        textarea.style.height = "auto";
+        textarea.focus();
+      }
+    };
+
+    if (submitBtn) {
+      submitBtn.addEventListener("click", handleAdd);
+    }
+
+    if (textarea) {
+      textarea.addEventListener("keydown", (e) => {
+        // Enter without Shift submits; Shift+Enter creates a new line or auto-continues bullet
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          handleAdd();
+        } else if (e.key === "Enter" && e.shiftKey) {
+          // Check if current line starts with bullet (- or * or 1.)
+          const cursorPos = textarea.selectionStart;
+          const textBefore = textarea.value.substring(0, cursorPos);
+          const currentLine = textBefore.split("\n").pop();
+          const bulletMatch = currentLine.match(/^([*\-•+])\s+(.*)$/);
+          const numberMatch = currentLine.match(/^(\d+)[\.\)]\s+(.*)$/);
+
+          if (bulletMatch && bulletMatch[2].trim()) {
+            e.preventDefault();
+            const insertion = `\n${bulletMatch[1]} `;
+            const textAfter = textarea.value.substring(cursorPos);
+            textarea.value = textBefore + insertion + textAfter;
+            textarea.selectionStart = textarea.selectionEnd =
+              cursorPos + insertion.length;
+            autoResize();
+          } else if (numberMatch && numberMatch[2].trim()) {
+            e.preventDefault();
+            const nextNum = parseInt(numberMatch[1], 10) + 1;
+            const insertion = `\n${nextNum}. `;
+            const textAfter = textarea.value.substring(cursorPos);
+            textarea.value = textBefore + insertion + textAfter;
+            textarea.selectionStart = textarea.selectionEnd =
+              cursorPos + insertion.length;
+            autoResize();
+          }
+        }
+      });
+    }
+
+    if (expandBtn) {
+      expandBtn.addEventListener("click", () => {
+        const title = textarea ? textarea.value.trim() : "";
+        TaskFormModal.openCreate({
+          title,
+          projectId: this.currentProjectId || "inbox",
+        });
+      });
+    }
+  }
+
+  setupBulkActions() {
+    const deleteBtn = document.getElementById("bulk-delete-btn");
+    const cancelBtn = document.getElementById("bulk-cancel-btn");
+    const selectAllBtn = document.getElementById("bulk-select-all-btn");
+
+    if (deleteBtn) {
+      deleteBtn.addEventListener("click", () => {
+        const ids = Array.from(this.selectedTaskIds);
+        Modal.confirmBulkDelete(ids, () => {
+          this.selectedTaskIds.clear();
+          this.updateBulkActionBar();
+        });
+      });
+    }
+
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", () => {
+        this.selectedTaskIds.clear();
+        this.updateBulkActionBar();
+        this.renderTaskListOnly();
+      });
+    }
+
+    if (selectAllBtn) {
+      selectAllBtn.addEventListener("click", () => {
+        const tasks = this.getFilteredTasks();
+        tasks.forEach((t) => this.selectedTaskIds.add(t.id));
+        this.updateBulkActionBar();
+        this.renderTaskListOnly();
+      });
+    }
+  }
+
+  updateBulkActionBar() {
+    const bar = document.getElementById("bulk-actions-bar");
+    const countEl = document.getElementById("bulk-selection-count");
+    if (!bar || !countEl) return;
+
+    const count = this.selectedTaskIds.size;
+    if (count > 0) {
+      bar.classList.add("show");
+      countEl.textContent = `${count} task${count > 1 ? "s" : ""} selected`;
+    } else {
+      bar.classList.remove("show");
+    }
+  }
+
+  setView(view, projectId = null) {
+    this.currentView = view;
+    this.currentProjectId = projectId;
+    this.selectedTaskIds.clear();
+    this.updateBulkActionBar();
+    this.renderCurrentView();
+  }
+
+  getFilteredTasks() {
+    return Tasks.filterTasks({
+      view: this.currentView,
+      projectId: this.currentProjectId,
+      status: this.currentStatusFilter,
+      priority: this.currentPriorityFilter,
+      search: this.searchQuery,
+      sortBy: this.currentSortBy,
+    });
+  }
+
+  renderCurrentView() {
+    const dashboardContainer = document.getElementById("dashboard-view");
+    const tasksContainer = document.getElementById("tasks-view");
+    const viewHeader = document.getElementById("view-header");
+    const controlsBar = document.getElementById("view-controls-bar");
+    const quickAddContainer = document.getElementById("quick-add-container");
+
+    if (this.currentView === "dashboard") {
+      if (dashboardContainer) dashboardContainer.style.display = "block";
+      if (tasksContainer) tasksContainer.style.display = "none";
+      if (viewHeader) viewHeader.style.display = "none";
+      if (controlsBar) controlsBar.style.display = "none";
+      if (quickAddContainer) quickAddContainer.style.display = "none";
+      DashboardView.render(dashboardContainer);
+      return;
+    }
+
+    // Task list views (all, today, upcoming, completed, project)
+    if (dashboardContainer) dashboardContainer.style.display = "none";
+    if (tasksContainer) tasksContainer.style.display = "block";
+    if (viewHeader) viewHeader.style.display = "flex";
+    if (controlsBar) controlsBar.style.display = "flex";
+    if (quickAddContainer) quickAddContainer.style.display = "flex";
+
+    this.renderViewHeader();
+    this.populateQuickAddProjects();
+    this.renderTaskListOnly();
+  }
+
+  populateQuickAddProjects() {
+    const select = document.getElementById("quick-add-project");
+    if (!select) return;
+
+    select.innerHTML = '<option value="inbox">📥 Inbox</option>';
+    const projects = Projects.getProjects();
+    projects.forEach((p) => {
+      const opt = document.createElement("option");
+      opt.value = p.id;
+      opt.textContent = `${p.name}`;
+      if (this.currentProjectId === p.id) {
+        opt.selected = true;
+      }
+      select.appendChild(opt);
+    });
+  }
+
+  renderViewHeader() {
+    const titleEl = document.getElementById("view-title");
+    const subtitleEl = document.getElementById("view-subtitle");
+    if (!titleEl || !subtitleEl) return;
+
+    if (this.currentView === "all") {
+      titleEl.innerHTML =
+        '<i class="fas fa-list-check" style="color: #6366f1;"></i> All Tasks';
+      subtitleEl.textContent =
+        "Complete inventory of all scheduled and active tasks";
+    } else if (this.currentView === "today") {
+      titleEl.innerHTML =
+        '<i class="fas fa-sun" style="color: #fbbf24;"></i> Today';
+      subtitleEl.textContent = "Tasks scheduled for completion today";
+    } else if (this.currentView === "upcoming") {
+      titleEl.innerHTML =
+        '<i class="fas fa-calendar-alt" style="color: #818cf8;"></i> Upcoming (7 Days)';
+      subtitleEl.textContent = "Tasks due within the next week";
+    } else if (this.currentView === "completed") {
+      titleEl.innerHTML =
+        '<i class="fas fa-check-circle" style="color: #10b981;"></i> Completed';
+      subtitleEl.textContent = "Finished tasks and archived items";
+    } else if (this.currentView === "project" && this.currentProjectId) {
+      const project = Projects.getProjectById(this.currentProjectId);
+      titleEl.innerHTML = `<i class="${project.icon}" style="color: ${project.color}"></i> ${escapeHTML(project.name)}`;
+      subtitleEl.textContent = `Tasks organized under ${escapeHTML(project.name)}`;
+    }
+  }
+
+  renderTaskListOnly() {
+    const container = document.getElementById("tasks-list-container");
+    if (!container) return;
+
+    const tasks = this.getFilteredTasks();
+
+    if (tasks.length === 0) {
+      let emptyTitle = "No tasks found";
+      let emptyDesc = "No tasks match your current view or filter criteria.";
+
+      if (this.searchQuery) {
+        emptyTitle = "No matching tasks";
+        emptyDesc = `No tasks found matching "${escapeHTML(this.searchQuery)}".`;
+      } else if (this.currentView === "today") {
+        emptyTitle = "Nothing due today";
+        emptyDesc =
+          "You have no tasks scheduled for today. Take a break or plan ahead!";
+      } else if (this.currentView === "upcoming") {
+        emptyTitle = "No upcoming tasks";
+        emptyDesc = "You have a clear horizon for the next 7 days.";
+      } else if (this.currentView === "completed") {
+        emptyTitle = "No completed tasks yet";
+        emptyDesc = "Tasks you complete will be neatly logged here.";
+      }
+
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <i class="fas fa-clipboard-check"></i>
+          </div>
+          <div class="empty-state-title">${emptyTitle}</div>
+          <div class="empty-state-desc">${emptyDesc}</div>
+          <button class="btn-primary" id="empty-state-add-btn" style="margin-top: 0.5rem;">
+            <i class="fas fa-plus"></i> Create First Task
+          </button>
+        </div>
+      `;
+
+      const emptyAddBtn = container.querySelector("#empty-state-add-btn");
+      if (emptyAddBtn) {
+        emptyAddBtn.addEventListener("click", () => {
+          TaskFormModal.openCreate({
+            projectId: this.currentProjectId || "inbox",
+          });
+        });
+      }
+      return;
+    }
+
+    container.innerHTML = tasks
+      .map((task) => this.renderTaskCard(task))
+      .join("");
+    this.attachTaskEvents(container);
+  }
+
+  renderTaskCard(task) {
+    const project = Projects.getProjectById(task.projectId);
+    const dateFormatted = task.dueDate ? formatDate(task.dueDate) : null;
+    const isTaskOverdue =
+      !task.completed && task.dueDate && isOverdue(task.dueDate);
+    const isTaskToday =
+      !task.completed && task.dueDate && isToday(task.dueDate);
+
+    let dateClass = "";
+    if (isTaskOverdue) dateClass = "overdue";
+    else if (isTaskToday) dateClass = "today";
+
+    const isSelected = this.selectedTaskIds.has(task.id);
+    const isExpanded = this.expandedTaskIds.has(task.id);
+    const hasLongContent = isLongTask(task.title, task.description);
+
+    // Format title and description (supports bullet points -, *, 1. and rich formatting)
+    const formattedTitle = renderFormattedContent(task.title);
+    const formattedDescription = task.description
+      ? renderFormattedContent(task.description)
+      : "";
+
+    return `
+      <div class="task-item ${task.completed ? "completed" : ""} ${hasLongContent ? "has-long-content" : ""} ${isExpanded ? "expanded" : ""}" data-task-id="${task.id}">
+        <div class="task-left-section">
+          <input type="checkbox" class="task-select-checkbox" ${isSelected ? "checked" : ""} data-action="select" data-id="${task.id}" title="Select for bulk action">
+          <div class="task-checkbox-wrapper">
+            <input type="checkbox" class="task-checkbox" ${task.completed ? "checked" : ""} data-action="toggle" data-id="${task.id}" title="${task.completed ? "Mark incomplete" : "Mark complete"}">
+          </div>
+          <div class="task-details" data-action="edit" data-id="${task.id}">
+            <div class="task-title-formatted ${!isExpanded && hasLongContent ? "collapsed" : ""}">${formattedTitle}</div>
+            ${
+              formattedDescription
+                ? `
+              <div class="task-description-formatted ${!isExpanded ? "collapsed" : ""}">
+                <div class="description-header"><i class="fas fa-align-left"></i> Notes / Acceptance Criteria:</div>
+                <div class="description-body">${formattedDescription}</div>
+              </div>
+            `
+                : ""
+            }
+            <div class="task-meta-row">
+              <span class="badge badge-priority-${task.priority}" title="Priority: ${task.priority}">
+                <i class="fas fa-flag"></i> ${task.priority}
+              </span>
+              <span class="badge badge-status ${task.status}" title="Status: ${task.status}">
+                ${task.status}
+              </span>
+              <span class="badge badge-project" title="Project: ${escapeHTML(project.name)}">
+                <i class="${project.icon}" style="color: ${project.color}"></i> ${escapeHTML(project.name)}
+              </span>
+              ${
+                dateFormatted
+                  ? `
+                <span class="badge-date ${dateClass}" title="Due: ${task.dueDate}">
+                  <i class="fas fa-calendar-day"></i> ${dateFormatted}
+                </span>
+              `
+                  : ""
+              }
+              ${
+                hasLongContent
+                  ? `
+                <button type="button" class="btn-task-expand" data-action="toggle-expand" data-id="${task.id}" title="${isExpanded ? "Collapse task" : "Expand full task & bullets"}">
+                  <i class="fas ${isExpanded ? "fa-chevron-up" : "fa-chevron-down"}"></i>
+                  <span>${isExpanded ? "Show less" : "Show full task"}</span>
+                </button>
+              `
+                  : ""
+              }
             </div>
-        `;
-        
-        document.body.appendChild(descriptionModal);
-        descriptionModal.style.display = 'flex';
-        document.body.classList.add('modal-open');
-        
-        // Close when clicking outside
-        descriptionModal.addEventListener('click', (e) => {
-            if (e.target === descriptionModal) {
-                descriptionModal.remove();
-                document.body.classList.remove('modal-open');
-            }
-        });
-    };
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="task-btn" title="Edit Task" data-action="edit" data-id="${task.id}">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="task-btn delete" title="Delete Task" data-action="delete" data-id="${task.id}">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }
 
-    window.cancelBulkSelection = () => {
-        clearSelectedTasks();
-        renderTasks();
-    };
+  attachTaskEvents(container) {
+    // Completion toggle
+    container.querySelectorAll('[data-action="toggle"]').forEach((chk) => {
+      chk.addEventListener("change", () => {
+        const id = chk.getAttribute("data-id");
+        Tasks.toggleComplete(id);
+      });
+    });
 
-    window.confirmBulkDelete = () => {
-        const selectedIds = getSelectedTaskIds();
-        if (selectedIds.length === 0) return;
-        
-        // Show custom bulk delete modal
-        window.showBulkDeleteConfirmation(selectedIds, selectedIds.length, (ids) => {
-            import('./taskManager.js').then(module => {
-                module.deleteMultipleTasks(ids);
-                clearSelectedTasks();
-            });
-        });
-    }
-
-    export function updateBulkDeleteToolbar(selectedIds) {
-        const headerActions = document.querySelector('.header-actions');
-        if (!headerActions) return;
-        
-        // Save original header content if not already saved
-        if (!window.originalHeaderContent) {
-            window.originalHeaderContent = headerActions.innerHTML;
-        }
-        
-        if (selectedIds.length > 0) {
-            // Show bulk delete controls in header
-            headerActions.innerHTML = `
-                <span class="selected-count" id="selectedCount">${selectedIds.length} selected</span>
-                <button class="cancel-bulk-btn" onclick="window.cancelBulkSelection()">Cancel</button>
-                <button class="delete-selected-btn" onclick="window.confirmBulkDelete()">Delete Selected</button>
-            `;
+    // Multi-select checkbox
+    container.querySelectorAll('[data-action="select"]').forEach((chk) => {
+      chk.addEventListener("change", (e) => {
+        const id = chk.getAttribute("data-id");
+        if (chk.checked) {
+          this.selectedTaskIds.add(id);
         } else {
-            // Restore original header content
-            headerActions.innerHTML = window.originalHeaderContent;
+          this.selectedTaskIds.delete(id);
         }
-    }
+        this.updateBulkActionBar();
+      });
+    });
 
-    export function updateStats() {
-        const tasks = getTasks();
-        const total = tasks.length;
-        const completed = tasks.filter(task => task.completed).length;
-        const active = total - completed;
-        const overdue = tasks.filter(task => task.dueDate && !task.completed && new Date(task.dueDate) < new Date()).length;
-        
-        const taskCountEl = document.getElementById('taskCount');
-        const completedCountEl = document.getElementById('completedCount');
-        
-        if (taskCountEl) {
-            let taskText = `${total} task${total !== 1 ? 's' : ''}`;
-            if (overdue > 0) {
-                taskText += ` (${overdue} overdue)`;
-            }
-            taskCountEl.textContent = taskText;
-        }
-        if (completedCountEl) completedCountEl.textContent = `${completed} completed, ${active} active`;
-    }
-
-    export function setupFilters() {
-        const filterBtns = document.querySelectorAll('.filter-btn');
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const filter = btn.dataset.filter;
-                window.setFilterHandler(filter);
-            });
+    // Expand/collapse long task toggle
+    container
+      .querySelectorAll('[data-action="toggle-expand"]')
+      .forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute("data-id");
+          if (this.expandedTaskIds.has(id)) {
+            this.expandedTaskIds.delete(id);
+          } else {
+            this.expandedTaskIds.add(id);
+          }
+          this.renderTaskListOnly();
         });
-    }
+      });
 
-    // ========== VIEW MANAGEMENT ==========
-    let currentView = 'grid';
+    // Edit modal trigger
+    container.querySelectorAll('[data-action="edit"]').forEach((el) => {
+      el.addEventListener("click", (e) => {
+        if (e.target.closest('[data-action="toggle-expand"]')) return;
+        const id = el.getAttribute("data-id");
+        TaskFormModal.openEdit(id);
+      });
+    });
 
-    export function setupViewToggle() {
-        const viewBtns = document.querySelectorAll('.view-btn');
-        const taskList = document.getElementById('taskList');
-        
-        if (!viewBtns.length || !taskList) return;
-        
-        // Load saved view preference from localStorage
-        const savedView = localStorage.getItem('preferredView') || 'grid';
-        currentView = savedView;
-        applyView(taskList);
-        
-        // Set initial active button state
-        viewBtns.forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.view === savedView) {
-                btn.classList.add('active');
-            }
-        });
-        
-        viewBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Update active state
-                viewBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Update view
-                currentView = btn.dataset.view;
-                applyView(taskList);
-                
-                // Re-render tasks with new view
-                renderTasks();
-                
-                // Save preference to localStorage
-                localStorage.setItem('preferredView', currentView);
-            });
-        });
-    }
+    // Delete trigger
+    container.querySelectorAll('[data-action="delete"]').forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        Modal.confirmDeleteTask(id);
+      });
+    });
+  }
+}
 
-    function applyView(taskList) {
-        if (!taskList) return;
-        taskList.classList.remove('task-list-view', 'task-grid-view', 'task-compact-view');
-        taskList.classList.add(`task-${currentView}-view`);
-        // Let CSS control display — remove any inline override
-        taskList.style.display = '';
-    }
-
-    // ========== TASK DETAIL MODAL ==========
-    export function showTaskDetail(taskId) {
-        const tasks = getTasks();
-        const task = tasks.find(t => t.id === taskId);
-        
-        if (!task) return;
-        
-        const taskTitle = task.title || task.text || 'Untitled';
-        const taskDescription = task.description || '';
-        const priorityLabels = {
-            low: 'Low',
-            medium: 'Medium',
-            high: 'High',
-            urgent: 'Urgent'
-        };
-        const statusLabels = {
-            todo: 'To Do',
-            inprogress: 'In Progress',
-            review: 'Review',
-            done: 'Done'
-        };
-        
-        const priority = task.priority || 'medium';
-        const status = task.status || 'todo';
-        
-        // Get priority and status colors from existing code
-        const priorityColors = {
-            low: '#22c55e',
-            medium: '#eab308', 
-            high: '#f97316',
-            urgent: '#ef4444'
-        };
-        
-        const statusColors = {
-            todo: '#64748b',
-            inprogress: '#3b82f6',
-            review: '#a855f7',
-            done: '#22c55e'
-        };
-        
-        // Create modal
-        const modal = document.createElement('div');
-        modal.className = 'modal task-detail-modal';
-        modal.style.display = 'flex';
-        modal.style.position = 'fixed';
-        modal.style.top = '0';
-        modal.style.left = '0';
-        modal.style.width = '100%';
-        modal.style.height = '100%';
-        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-        modal.style.zIndex = '10000';
-        modal.style.alignItems = 'center';
-        modal.style.justifyContent = 'center';
-        modal.style.backdropFilter = 'blur(4px)';
-        
-        modal.innerHTML = `
-            <div class="modal-content task-detail-modal-content" style="max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; background: linear-gradient(135deg, #1a1a2e, #16213e); border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); padding: 0;">
-                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <i class="fas fa-tasks" style="color: var(--color-primary);"></i>
-                        <h3 style="color: #fff; margin: 0; font-size: 1rem;">Task Details</h3>
-                    </div>
-                    <button class="modal-close" onclick="this.closest('.modal').remove()" style="background: none; border: none; color: #94a3b8; font-size: 24px; cursor: pointer;">&times;</button>
-                </div>
-                <div class="modal-body" style="padding: 24px;">
-                    <div class="task-detail-content">
-                        <h2 class="task-detail-title" style="font-size: 1.3rem; font-weight: 600; color: #fff; margin: 0 0 12px 0;">${escapeHtml(taskTitle)}</h2>
-                        
-                        <div class="task-detail-meta" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-                            <span style="padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; background: ${priorityColors[priority]}20; color: ${priorityColors[priority]}; border: 1px solid ${priorityColors[priority]}40;">
-                                ${priorityLabels[priority]}
-                            </span>
-                            <span style="padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; background: ${statusColors[status]}20; color: ${statusColors[status]}; border: 1px solid ${statusColors[status]}40;">
-                                ${statusLabels[status]}
-                            </span>
-                            ${task.dueDate ? `
-                                <span style="padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.25);">
-                                    📅 ${formatDate(task.dueDate)}
-                                </span>
-                            ` : ''}
-                            ${task.projectId ? `
-                                <span style="padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; background: rgba(99,102,241,0.1); color: #94a3b8; border: 1px solid rgba(255,255,255,0.05);">
-                                    📁 ${getProjectName(task.projectId)}
-                                </span>
-                            ` : ''}
-                        </div>
-                        
-                        ${taskDescription ? `
-                            <div class="task-detail-description" style="color: #cbd5e1; line-height: 1.8; font-size: 0.95rem; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid var(--color-primary); max-height: 350px; overflow-y: auto;">
-                                ${taskDescription}
-                            </div>
-                        ` : `
-                            <div style="color: #64748b; font-style: italic; padding: 16px; text-align: center;">
-                                No description provided
-                            </div>
-                        `}
-                    </div>
-                </div>
-                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 8px; padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.06);">
-                    <button onclick="this.closest('.modal').remove()" style="padding: 8px 16px; border: none; border-radius: 6px; background: rgba(255,255,255,0.08); color: #e2e8f0; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease;">Close</button>
-                    <button onclick="window.editTaskHandler('${taskId}'); this.closest('.modal').remove();" style="padding: 8px 16px; border: none; border-radius: 6px; background: var(--color-primary); color: #fff; cursor: pointer; font-size: 0.85rem; transition: all 0.2s ease;">
-                        <i class="fas fa-edit"></i> Edit
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        document.body.classList.add('modal-open');
-        
-        // Close on outside click
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.remove();
-                document.body.classList.remove('modal-open');
-            }
-        });
-    }
-
-    // Helper function to get project name
-    function getProjectName(projectId) {
-        if (!projectId) return '';
-        const projects = JSON.parse(localStorage.getItem('projects')) || [];
-        const project = projects.find(p => p.id === projectId);
-        return project ? project.name : 'Unknown';
-    }
-
-    // Make it globally available
-    window.showTaskDetail = showTaskDetail;
+export const UI = new UIRenderer();

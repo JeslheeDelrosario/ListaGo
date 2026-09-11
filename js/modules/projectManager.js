@@ -1,127 +1,122 @@
-// modules/projectManager.js
-// OOP + Clean Project Management
+/**
+ * projectManager.js - Project CRUD, color palette, and icons
+ */
 
-import { getTasks, setTasks } from './taskManager.js';
-import { saveTasks } from './storage.js';
-import { showNotification } from './notifications.js';
+import { Storage } from "./storage.js";
+import { generateUUID } from "./utils.js";
+import { Notifications } from "./notifications.js";
 
-let projects = [];
-let currentProjectFilter = null; // null = all projects / Inbox
-
-// Default Inbox project (for backward compatibility)
-const DEFAULT_INBOX = {
-    id: "inbox",
-    name: "Inbox",
-    color: "#64748b",
-    icon: "fas fa-inbox",
-    createdAt: new Date().toISOString()
+export const DEFAULT_INBOX_PROJECT = {
+  id: "inbox",
+  name: "Inbox",
+  color: "#6366f1",
+  icon: "fas fa-inbox",
+  isDefault: true,
 };
 
-// Load projects from storage
-export function loadProjects() {
-    try {
-        const saved = localStorage.getItem('projects');
-        if (saved) {
-            projects = JSON.parse(saved);
-        } else {
-            projects = [DEFAULT_INBOX];
-            saveProjects();
-        }
-        return projects;
-    } catch (e) {
-        console.warn("Failed to load projects", e);
-        projects = [DEFAULT_INBOX];
-        return projects;
+export const AVAILABLE_PROJECT_COLORS = [
+  "#6366f1", // Indigo
+  "#8b5cf6", // Purple
+  "#ec4899", // Pink
+  "#ef4444", // Red
+  "#f97316", // Orange
+  "#eab308", // Amber
+  "#10b981", // Emerald
+  "#06b6d4", // Cyan
+  "#3b82f6", // Blue
+  "#84cc16", // Lime
+];
+
+export const AVAILABLE_PROJECT_ICONS = [
+  "fas fa-folder",
+  "fas fa-rocket",
+  "fas fa-briefcase",
+  "fas fa-code",
+  "fas fa-palette",
+  "fas fa-bullseye",
+  "fas fa-star",
+  "fas fa-heart",
+  "fas fa-bookmark",
+  "fas fa-graduation-cap",
+  "fas fa-layer-group",
+  "fas fa-lightbulb",
+];
+
+class ProjectManager {
+  constructor() {
+    this.projects = [];
+    this.listeners = [];
+  }
+
+  init() {
+    this.projects = Storage.getProjects();
+  }
+
+  onChange(callback) {
+    this.listeners.push(callback);
+  }
+
+  notify() {
+    Storage.saveProjects(this.projects);
+    this.listeners.forEach((cb) => cb(this.getProjects()));
+  }
+
+  getProjects() {
+    return this.projects;
+  }
+
+  getProjectById(id) {
+    if (!id || id === "inbox") {
+      return DEFAULT_INBOX_PROJECT;
     }
-}
+    return this.projects.find((p) => p.id === id) || DEFAULT_INBOX_PROJECT;
+  }
 
-export function saveProjects() {
-    localStorage.setItem('projects', JSON.stringify(projects));
-    return true;
-}
-
-export function getProjects() {
-    return [...projects];
-}
-
-export function getProjectById(id) {
-    return projects.find(p => p.id === id);
-}
-
-// Create new project (OOP style)
-export function createProject(name, color, icon) {
-    if (!name || name.trim() === '') {
-        showNotification('Project name is required!', 'error');
-        return null;
+  addProject({ name, color, icon }) {
+    const trimmed = (name || "").trim();
+    if (!trimmed) {
+      Notifications.error("Project name cannot be empty");
+      return null;
     }
 
-    // Check duplicate name
-    if (projects.some(p => p.name.toLowerCase() === name.trim().toLowerCase())) {
-        showNotification('Project with this name already exists!', 'error');
-        return null;
+    if (trimmed.length > 50) {
+      Notifications.error("Project name cannot exceed 50 characters");
+      return null;
     }
 
-    const project = {
-        id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-        name: name.trim(),
-        color: color || '#6366f1',
-        icon: icon || 'fas fa-folder',
-        createdAt: new Date().toISOString()
+    // Check duplicate
+    const exists =
+      this.projects.some(
+        (p) => p.name.toLowerCase() === trimmed.toLowerCase(),
+      ) || trimmed.toLowerCase() === "inbox";
+    if (exists) {
+      Notifications.error(`Project "${trimmed}" already exists`);
+      return null;
+    }
+
+    const newProject = {
+      id: generateUUID(),
+      name: trimmed,
+      color: color || AVAILABLE_PROJECT_COLORS[0],
+      icon: icon || AVAILABLE_PROJECT_ICONS[0],
+      createdAt: new Date().toISOString(),
     };
 
-    projects.push(project);
-    saveProjects();
-    showNotification(`Project "${project.name}" created!`, 'success');
-    return project;
-}
+    this.projects.push(newProject);
+    this.notify();
+    Notifications.success(`Project "${newProject.name}" created`);
+    return newProject;
+  }
 
-// Delete project
-export function deleteProject(id) {
-    if (id === "inbox") {
-        showNotification("Cannot delete Inbox project!", 'error');
-        return false;
-    }
+  deleteProject(id) {
+    const project = this.projects.find((p) => p.id === id);
+    if (!project) return false;
 
-    const index = projects.findIndex(p => p.id === id);
-    if (index === -1) return false;
-
-    const projectName = projects[index].name;
-    projects.splice(index, 1);
-    saveProjects();
-
-    // Move tasks from deleted project back to Inbox
-    const tasks = getTasks();
-    let movedCount = 0;
-    tasks.forEach(task => {
-        if (task.projectId === id) {
-            task.projectId = "inbox";
-            movedCount++;
-        }
-    });
-    setTasks(tasks);
-
-    if (movedCount > 0) {
-        showNotification(`${movedCount} tasks moved to Inbox`, 'info');
-    }
-    showNotification(`Project "${projectName}" deleted`, 'success');
+    this.projects = this.projects.filter((p) => p.id !== id);
+    this.notify();
+    Notifications.info(`Project "${project.name}" deleted`);
     return true;
+  }
 }
 
-// Get tasks for a specific project
-export function getTasksByProject(projectId) {
-    const allTasks = getTasks();
-    if (projectId === "inbox") {
-        return allTasks.filter(t => !t.projectId || t.projectId === "inbox");
-    }
-    return allTasks.filter(t => t.projectId === projectId);
-}
-
-// Set current active project filter
-export function setCurrentProjectFilter(projectId) {
-    currentProjectFilter = projectId;
-}
-
-// Get current project filter
-export function getCurrentProjectFilter() {
-    return currentProjectFilter;
-}
+export const Projects = new ProjectManager();

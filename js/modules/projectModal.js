@@ -1,461 +1,162 @@
-// modules/projectModal.js - Project creation modal functionality
+/**
+ * projectModal.js - Project creation and deletion modals
+ */
 
-import { createProject, getProjects, loadProjects, getProjectById, deleteProject, getTasksByProject } from './projectManager.js';
-import { showNotification } from './notifications.js';
-import { getTasks, addTask } from './taskManager.js';
-import { renderTasks } from './uiRenderer.js';
+import {
+  Projects,
+  AVAILABLE_PROJECT_COLORS,
+  AVAILABLE_PROJECT_ICONS,
+} from "./projectManager.js";
+import { Tasks } from "./taskManager.js";
+import { Modal } from "./modal.js";
+import { escapeHTML } from "./utils.js";
 
-let selectedIcon = 'fas fa-folder';
-let selectedColor = '#6366f1';
-let isProjectModalOpen = false;
+export const ProjectModal = {
+  selectedColor: AVAILABLE_PROJECT_COLORS[0],
+  selectedIcon: AVAILABLE_PROJECT_ICONS[0],
 
-// Available icons for projects
-const PROJECT_ICONS = [
-    'fas fa-code', 'fas fa-laptop', 'fas fa-mobile-alt', 'fas fa-globe',
-    'fas fa-paint-brush', 'fas fa-palette', 'fas fa-music', 'fas fa-camera',
-    'fas fa-book', 'fas fa-graduation-cap', 'fas fa-school', 'fas fa-chalkboard',
-    'fas fa-briefcase', 'fas fa-chart-line', 'fas fa-coins', 'fas fa-shopping-cart',
-    'fas fa-heart', 'fas fa-star', 'fas fa-gem', 'fas fa-crown',
-    'fas fa-home', 'fas fa-car', 'fas fa-plane', 'fas fa-map',
-    'fas fa-gamepad', 'fas fa-dumbbell', 'fas fa-utensils', 'fas fa-coffee',
-    'fas fa-leaf', 'fas fa-tree', 'fas fa-sun', 'fas fa-moon',
-    'fas fa-folder', 'fas fa-folder-open', 'fas fa-archive', 'fas fa-box'
-];
+  init() {
+    this.setupColorPicker();
+    this.setupIconPicker();
+    this.setupForm();
+    this.setupDeleteModal();
+  },
 
-// Available colors for projects
-const PROJECT_COLORS = [
-    '#6366f1', '#8b5cf6', '#a855f7', '#c084fc',
-    '#ec4899', '#f43f5e', '#ef4444', '#f97316',
-    '#f59e0b', '#eab308', '#84cc16', '#22c55e',
-    '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9',
-    '#3b82f6', '#6366f1', '#8b5cf6', '#a855f7'
-];
+  setupColorPicker() {
+    const container = document.getElementById("project-color-picker");
+    if (!container) return;
 
-export function setupProjectModal() {
-    const newProjectBtn = document.getElementById('newProjectBtn');
-    const projectModal = document.getElementById('createProjectModal');
-    const closeBtn = document.getElementById('closeCreateProjectModal');
-    const cancelBtn = document.getElementById('cancelCreateProjectBtn');
-    const createBtn = document.getElementById('createProjectBtn');
-    const projectNameInput = document.getElementById('createProjectNameInput');
+    container.innerHTML = "";
+    AVAILABLE_PROJECT_COLORS.forEach((color, idx) => {
+      const el = document.createElement("div");
+      el.className = `color-option ${idx === 0 ? "selected" : ""}`;
+      el.style.backgroundColor = color;
+      el.setAttribute("data-color", color);
 
-    if (!newProjectBtn || !projectModal) {
-        console.error('Project modal elements not found');
-        return;
+      el.addEventListener("click", () => {
+        container
+          .querySelectorAll(".color-option")
+          .forEach((o) => o.classList.remove("selected"));
+        el.classList.add("selected");
+        this.selectedColor = color;
+      });
+
+      container.appendChild(el);
+    });
+  },
+
+  setupIconPicker() {
+    const container = document.getElementById("project-icon-picker");
+    if (!container) return;
+
+    container.innerHTML = "";
+    AVAILABLE_PROJECT_ICONS.forEach((iconClass, idx) => {
+      const el = document.createElement("div");
+      el.className = `icon-option ${idx === 0 ? "selected" : ""}`;
+      el.innerHTML = `<i class="${iconClass}"></i>`;
+      el.setAttribute("data-icon", iconClass);
+
+      el.addEventListener("click", () => {
+        container
+          .querySelectorAll(".icon-option")
+          .forEach((o) => o.classList.remove("selected"));
+        el.classList.add("selected");
+        this.selectedIcon = iconClass;
+      });
+
+      container.appendChild(el);
+    });
+  },
+
+  setupForm() {
+    const form = document.getElementById("project-create-form");
+    const nameInput = document.getElementById("project-name-input");
+    const charCounter = document.getElementById("project-name-counter");
+
+    if (nameInput && charCounter) {
+      nameInput.addEventListener("input", () => {
+        charCounter.textContent = `${nameInput.value.length}/50`;
+      });
     }
 
-    // Event listeners
-    newProjectBtn.addEventListener('click', openProjectModal);
-    closeBtn.addEventListener('click', closeProjectModal);
-    cancelBtn.addEventListener('click', closeProjectModal);
-    createBtn.addEventListener('click', handleCreateProject);
-    projectNameInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            handleCreateProject();
-        }
-    });
-
-    // Close modal on outside click
-    projectModal.addEventListener('click', (e) => {
-        if (e.target === projectModal) {
-            closeProjectModal();
-        }
-    });
-
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && isProjectModalOpen) {
-            closeProjectModal();
-        }
-    });
-
-    // Initialize icon and color pickers
-    setupIconPicker();
-    setupColorPicker();
-}
-
-function openProjectModal() {
-    const projectModal = document.getElementById('createProjectModal');
-    const projectNameInput = document.getElementById('createProjectNameInput');
-    
-    if (projectModal) {
-        projectModal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
-        document.body.classList.add('modal-open');
-        isProjectModalOpen = true;
-        
-        // Reset form
-        projectNameInput.value = '';
-        selectedIcon = 'fas fa-folder';
-        selectedColor = '#6366f1';
-        updateIconPicker();
-        updateColorPicker();
-        
-        // Focus name input
-        setTimeout(() => projectNameInput.focus(), 100);
-    }
-}
-
-function closeProjectModal() {
-    const projectModal = document.getElementById('createProjectModal');
-    
-    if (projectModal) {
-        projectModal.style.display = 'none';
-        document.body.style.overflow = '';
-        document.body.classList.remove('modal-open');
-        isProjectModalOpen = false;
-    }
-}
-
-function setupIconPicker() {
-    const iconPicker = document.getElementById('createProjectIconPicker');
-    if (!iconPicker) return;
-
-    iconPicker.innerHTML = '';
-    PROJECT_ICONS.forEach(icon => {
-        const iconElement = document.createElement('div');
-        iconElement.className = 'icon-option';
-        iconElement.innerHTML = `<i class="${icon}"></i>`;
-        iconElement.addEventListener('click', () => {
-            selectedIcon = icon;
-            updateIconPicker();
+    if (form) {
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = nameInput.value;
+        const project = Projects.addProject({
+          name,
+          color: this.selectedColor,
+          icon: this.selectedIcon,
         });
-        iconPicker.appendChild(iconElement);
-    });
-}
 
-function setupColorPicker() {
-    const colorPicker = document.getElementById('createProjectColorPicker');
-    if (!colorPicker) return;
+        if (project) {
+          form.reset();
+          if (charCounter) charCounter.textContent = "0/50";
+          Modal.close("project-modal");
+        }
+      });
+    }
 
-    colorPicker.innerHTML = '';
-    PROJECT_COLORS.forEach(color => {
-        const colorElement = document.createElement('div');
-        colorElement.className = 'color-option';
-        colorElement.style.backgroundColor = color;
-        colorElement.addEventListener('click', () => {
-            selectedColor = color;
-            updateColorPicker();
-        });
-        colorPicker.appendChild(colorElement);
-    });
-}
+    // Open project modal button
+    const openBtn = document.getElementById("btn-new-project");
+    if (openBtn) {
+      openBtn.addEventListener("click", () => {
+        if (form) form.reset();
+        this.selectedColor = AVAILABLE_PROJECT_COLORS[0];
+        this.selectedIcon = AVAILABLE_PROJECT_ICONS[0];
+        this.setupColorPicker();
+        this.setupIconPicker();
+        if (charCounter) charCounter.textContent = "0/50";
+        Modal.open("project-modal");
+        setTimeout(() => nameInput && nameInput.focus(), 100);
+      });
+    }
+  },
 
-function updateIconPicker() {
-    const iconOptions = document.querySelectorAll('.icon-option');
-    iconOptions.forEach(option => {
-        const icon = option.querySelector('i').className;
-        if (icon === selectedIcon) {
-            option.classList.add('selected');
+  openDeleteDialog(projectId) {
+    const project = Projects.getProjectById(projectId);
+    if (!project || project.isDefault) return;
+
+    const modal = document.getElementById("delete-project-modal");
+    const namePreview = document.getElementById("delete-project-name-preview");
+    const countPreview = document.getElementById("delete-project-task-count");
+    const confirmBtn = document.getElementById("delete-project-confirm-btn");
+    const actionSelect = document.getElementById(
+      "delete-project-action-select",
+    );
+
+    const projectTasks = Tasks.getTasks().filter(
+      (t) => t.projectId === projectId,
+    );
+
+    if (namePreview) {
+      namePreview.textContent = project.name;
+    }
+    if (countPreview) {
+      countPreview.textContent = `${projectTasks.length} task${projectTasks.length !== 1 ? "s" : ""}`;
+    }
+
+    if (confirmBtn) {
+      const newBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newBtn, confirmBtn);
+
+      newBtn.addEventListener("click", () => {
+        const action = actionSelect ? actionSelect.value : "move";
+        if (action === "move") {
+          Tasks.moveTasksToInbox(projectId);
         } else {
-            option.classList.remove('selected');
+          Tasks.deleteTasksByProject(projectId);
         }
-    });
-}
 
-function updateColorPicker() {
-    const colorOptions = document.querySelectorAll('.color-option');
-    colorOptions.forEach(option => {
-        if (option.style.backgroundColor === selectedColor) {
-            option.classList.add('selected');
-        } else {
-            option.classList.remove('selected');
-        }
-    });
-}
-
-function handleCreateProject() {
-    const projectNameInput = document.getElementById('createProjectNameInput');
-    const projectName = projectNameInput.value.trim();
-
-    if (!projectName) {
-        showNotification('Please enter a project name!', 'error');
-        projectNameInput.focus();
-        return;
+        Projects.deleteProject(projectId);
+        Modal.close("delete-project-modal");
+      });
     }
 
-    const newProject = createProject(projectName, selectedColor, selectedIcon);
-    
-    if (newProject) {
-        closeProjectModal();
-        renderProjectsList();
-        
-        // Show success notification
-        showNotification(`Project "${projectName}" created successfully!`, 'success');
-    }
-}
+    Modal.open("delete-project-modal");
+  },
 
-export function renderProjectsList() {
-    const projectsList = document.getElementById('projectsList');
-    if (!projectsList) return;
-
-    const projects = getProjects();
-    projectsList.innerHTML = '';
-
-    projects.forEach(project => {
-        const projectElement = createProjectElement(project);
-        projectsList.appendChild(projectElement);
-    });
-}
-
-function createProjectElement(project) {
-    const projectDiv = document.createElement('div');
-    projectDiv.className = 'project-item';
-    projectDiv.setAttribute('data-project-id', project.id);
-    
-    const taskCount = getProjectTaskCount(project.id);
-    
-    projectDiv.innerHTML = `
-        <div class="project-icon" style="background-color: ${project.color}">
-            <i class="${project.icon}"></i>
-        </div>
-        <div class="project-info">
-            <span class="project-name">${project.name}</span>
-            <span class="project-count">${taskCount} tasks</span>
-        </div>
-        <button class="project-delete-btn" onclick="deleteProjectHandler('${project.id}')" title="Delete project">
-            <i class="fas fa-trash"></i>
-        </button>
-    `;
-
-    // Add click event to filter tasks by project
-    projectDiv.addEventListener('click', (e) => {
-        if (!e.target.closest('.project-delete-btn')) {
-            filterTasksByProject(project.id);
-        }
-    });
-
-    return projectDiv;
-}
-
-function getProjectTaskCount(projectId) {
-    const tasks = getTasks();
-    if (projectId === 'inbox') {
-        return tasks.filter(t => !t.projectId || t.projectId === 'inbox').length;
-    }
-    return tasks.filter(t => t.projectId === projectId).length;
-}
-
-function filterTasksByProject(projectId) {
-    const project = getProjectById(projectId);
-    if (!project) return;
-
-    // Update active state
-    document.querySelectorAll('.project-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    document.querySelector(`[data-project-id="${projectId}"]`)?.classList.add('active');
-
-    // Update view title and add "New Task" button to header
-    const viewTitle = document.getElementById('viewTitle');
-    const headerActions = document.querySelector('.header-actions');
-    
-    if (viewTitle) {
-        viewTitle.innerHTML = `
-            <div class="project-view-header">
-                <div class="project-icon-small" style="background-color: ${project.color}">
-                    <i class="${project.icon}"></i>
-                </div>
-                ${project.name}
-            </div>
-        `;
-    }
-
-    // Remove add button from header for project views
-    if (headerActions) {
-        headerActions.innerHTML = '';
-    }
-
-    // Show project page with dedicated task input
-    showProjectPage(project);
-}
-
-function showProjectPage(project) {
-    // Hide global task input
-    const globalInputArea = document.querySelector('.input-area');
-    if (globalInputArea) {
-        globalInputArea.style.display = 'none';
-    }
-    
-    // Remove any existing project input area
-    const existingProjectInput = document.querySelector('.project-input-area');
-    if (existingProjectInput) {
-        existingProjectInput.remove();
-    }
-    
-    // Create project-specific input area with two buttons
-    const projectInputArea = document.createElement('div');
-    projectInputArea.className = 'input-area glass project-input-area';
-    projectInputArea.innerHTML = `
-        <div class="project-input-header" style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-            <div class="project-input-icon" style="background-color: ${project.color}; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                <i class="${project.icon}" style="color: #fff;"></i>
-            </div>
-            <span class="project-input-title" style="font-weight: 600; font-size: 1rem; color: #e2e8f0;">${project.name}</span>
-        </div>
-        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <input type="text" id="projectTaskInput" class="project-task-input" placeholder="Add task..." style="flex: 1; min-width: 200px; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 0.95rem;">
-            <button id="addProjectTaskBtn" class="project-add-btn" style="padding: 10px 16px; background: transparent; border: 1px solid var(--color-primary); border-radius: 6px; color: var(--color-primary); cursor: pointer; font-weight: 400; transition: all 0.15s ease; font-size: 0.9rem;">Add</button>
-            <button id="createFullProjectTaskBtn" class="project-add-btn" style="padding: 10px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #a0aec0; cursor: pointer; font-weight: 400; transition: all 0.15s ease; font-size: 0.9rem;">New Task</button>
-        </div>
-    `;
-    
-    // Insert after the main header
-    const mainHeader = document.querySelector('.main-header');
-    const mainContent = document.querySelector('.main-content');
-    if (mainHeader && mainContent) {
-        mainContent.insertBefore(projectInputArea, mainHeader.nextSibling);
-    }
-
-    // Hide dashboard and show task list
-    const dashboardContainer = document.getElementById('dashboardContainer');
-    const taskList = document.getElementById('taskList');
-    if (dashboardContainer) dashboardContainer.style.display = 'none';
-    if (taskList) taskList.style.display = '';
-    
-    // Filter and render project tasks
-    const projectTasks = getTasksByProject(project.id);
-    renderTasks(projectTasks);
-    
-    // Set up event listeners
-    setupProjectTaskInput(project.id);
-    
-    // Store current project for navigation
-    window.currentProject = project;
-}
-
-function setupProjectTaskInput(projectId) {
-    const taskInput = document.getElementById('projectTaskInput');
-    const addButton = document.getElementById('addProjectTaskBtn');
-    const fullTaskBtn = document.getElementById('createFullProjectTaskBtn');
-    
-    if (!taskInput) return;
-    
-    // Quick add handler
-    const addTaskHandler = () => {
-        const taskText = taskInput.value.trim();
-        if (taskText) {
-            import('./taskManager.js').then(module => {
-                module.addTask({
-                    title: taskText,
-                    projectId: projectId,
-                    description: '',
-                    priority: 'medium',
-                    status: 'todo',
-                    dueDate: null
-                });
-                taskInput.value = '';
-                taskInput.focus();
-                
-                const projectTasks = getTasksByProject(projectId);
-                renderTasks(projectTasks);
-                renderProjectsList();
-            });
-        }
-    };
-    
-    if (addButton) {
-        addButton.addEventListener('click', addTaskHandler);
-    }
-    
-    taskInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addTaskHandler();
-        }
-    });
-    
-    // Full task button - opens the full modal
-    if (fullTaskBtn) {
-        fullTaskBtn.addEventListener('click', () => {
-            import('./taskFormModal.js').then(module => {
-                module.openTaskFormModal(null, projectId);
-            });
-        });
-    }
-    
-    setTimeout(() => taskInput.focus(), 100);
-}
-
-
-// Global function to scroll to project input when New Task button is clicked
-window.scrollToProjectInput = function() {
-    const projectInput = document.getElementById('projectTaskInput');
-    if (projectInput) {
-        projectInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        projectInput.focus();
-    }
-}
-
-// Function to show global input (when not viewing a project)
-function showGlobalInput() {
-    const globalInputArea = document.querySelector('.input-area');
-    const projectInputArea = document.querySelector('.project-input-area');
-    
-    if (globalInputArea) {
-        globalInputArea.style.display = 'flex';
-    }
-    
-    if (projectInputArea) {
-        projectInputArea.remove();
-    }
-    
-    // Clear current project
-    window.currentProject = null;
-}
-
-// Function to return to dashboard from project view
-function returnToDashboard() {
-    // Clear active project state
-    document.querySelectorAll('.project-item').forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    // Reset view title to Dashboard
-    const viewTitle = document.getElementById('viewTitle');
-    if (viewTitle) {
-        viewTitle.textContent = 'Dashboard';
-    }
-    
-    // Show global input and hide project input
-    showGlobalInput();
-    
-    // Switch to dashboard view using the existing navigation system
-    // Import switchView from sidebar module
-    import('./sidebar.js').then(module => {
-        module.switchView('dashboard');
-    }).catch(error => {
-        console.error('Error loading sidebar module:', error);
-        // Fallback: just render all tasks
-        const tasks = getTasks();
-        renderTasks(tasks);
-    });
-}
-
-// Global function for project deletion
-window.deleteProjectHandler = function(projectId) {
-    const project = getProjectById(projectId);
-    if (!project) return;
-    
-    // Get number of tasks in this project
-    const taskCount = getProjectTaskCount(projectId);
-
-    // Show custom project delete modal
-    window.showProjectDeleteConfirmation(projectId, project.name, taskCount, (id) => {
-        if (deleteProject(id)) {
-            renderProjectsList();
-            showNotification(`Project "${project.name}" deleted`, 'success');
-            
-            // If we're currently viewing this project, go back to dashboard
-            if (window.currentProject && window.currentProject.id === id) {
-                showDashboard();
-            }
-        }
-    });
+  setupDeleteModal() {
+    // Handled via openDeleteDialog
+  },
 };
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    setupProjectModal();
-    renderProjectsList();
-});

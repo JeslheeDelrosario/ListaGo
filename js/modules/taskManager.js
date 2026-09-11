@@ -1,353 +1,345 @@
-// taskManager.js - Handle task CRUD operations with due dates
-import { getTasks as getTasksFromStorage, setTasks as setTasksInStorage, saveTasks } from './storage.js';
-import { showNotification } from './notifications.js';
-import { getProjectById } from './projectManager.js';
+/**
+ * taskManager.js - Task CRUD, statuses, priorities, filtering, and stats
+ */
 
-const MAX_TASK_LENGTH = 200;
-let debounceTimer = null;
-let currentFilter = 'all';
-let renderCallback = null;
+import { Storage } from "./storage.js";
+import {
+  generateUUID,
+  isOverdue,
+  isToday,
+  isUpcoming,
+  getTodayDateString,
+} from "./utils.js";
+import { Notifications } from "./notifications.js";
 
-// Re-export getTasks and setTasks for other modules
-export function getTasks() {
-    return getTasksFromStorage();
-}
+export const MAX_TASK_LENGTH = 5000;
 
-export function setTasks(newTasks) {
-    setTasksInStorage(newTasks);
-}
-
-export function setRenderCallback(callback) {
-    renderCallback = callback;
-}
-
-export function getCurrentFilter() {
-    return currentFilter;
-}
-
-export function setCurrentFilter(filter) {
-    currentFilter = filter;
-    if (renderCallback) renderCallback();
-}
-
-export function getFilteredTasks() {
-    const tasks = getTasks();
-    console.log('🔍 getFilteredTasks - all tasks:', tasks);
-    
-    let filtered;
-    switch(currentFilter) {
-        case 'active':
-            filtered = tasks.filter(task => !task.completed);
-            break;
-        case 'completed':
-            filtered = tasks.filter(task => task.completed);
-            break;
-        default:
-            filtered = tasks;
-    }
-    
-    console.log('🔍 getFilteredTasks - filtered:', filtered);
-    return filtered;
-}
-
-// NEW: Enhanced addTask with full task properties (Jira-style)
-export function addTask(taskData) {
-  if (debounceTimer) return false;
-
-  // Validation
-  if (!taskData.title || taskData.title.trim() === "") {
-    showNotification("Please enter a task title!", "error");
-    return false;
+class TaskManager {
+  constructor() {
+    this.tasks = [];
+    this.listeners = [];
   }
 
-  if (taskData.title.length > MAX_TASK_LENGTH) {
-    showNotification(
-      `Task title must be ${MAX_TASK_LENGTH} characters or less`,
-      "error",
+  init() {
+    this.tasks = Storage.getTasks();
+  }
+
+  onChange(callback) {
+    this.listeners.push(callback);
+  }
+
+  notify() {
+    Storage.saveTasks(this.tasks);
+    this.listeners.forEach((cb) => cb(this.tasks));
+  }
+
+  getTasks() {
+    return this.tasks;
+  }
+
+  getTaskById(id) {
+    return this.tasks.find((t) => t.id === id);
+  }
+
+  /**
+   * Adds a new task with validation and duplicate prevention.
+   */
+  addTask({
+    title,
+    description = "",
+    projectId = "inbox",
+    priority = "medium",
+    status = "todo",
+    dueDate = null,
+  }) {
+    const cleanTitle = (title || "").trim();
+
+    if (!cleanTitle) {
+      Notifications.error("Task title cannot be empty");
+      return null;
+    }
+
+    if (cleanTitle.length > MAX_TASK_LENGTH) {
+      Notifications.error(
+        `Task title cannot exceed ${MAX_TASK_LENGTH} characters`,
+      );
+      return null;
+    }
+
+    // Duplicate check in active tasks (case insensitive)
+    const duplicate = this.tasks.find(
+      (t) =>
+        !t.completed &&
+        t.title.toLowerCase() === cleanTitle.toLowerCase() &&
+        (t.projectId || "inbox") === (projectId || "inbox"),
     );
-    return false;
-  }
+    if (duplicate) {
+      Notifications.warning(
+        "A task with this title already exists in this project",
+      );
+    }
 
-  const tasks = getTasks();
-  if (
-    tasks.some(
-      (task) =>
-        task.title && task.title.toLowerCase() === taskData.title.toLowerCase(),
-    )
-  ) {
-    showNotification("This task already exists!", "error");
-    return false;
-  }
+    const isCompleted = status === "done";
 
-  // Backward compatibility: handle old task format if needed
-  if (typeof taskData === "string") {
-    const legacyTask = {
-      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-      title: taskData.trim(),
-      text: taskData.trim(),
-      description: "", // ← ADD THIS
-      completed: false,
+    const newTask = {
+      id: generateUUID(),
+      title: cleanTitle,
+      text: cleanTitle,
+      description: description.trim(),
+      completed: isCompleted,
       createdAt: new Date().toISOString(),
-      dueDate: null,
+      dueDate: dueDate || null,
       createdDate: new Date().toDateString(),
-      projectId: null,
-      priority: "medium",
-      status: "todo",
+      projectId: projectId || "inbox",
+      priority: priority || "medium",
+      status: status || "todo",
     };
-    tasks.push(legacyTask);
-    setTasks(tasks);
+
+    this.tasks.unshift(newTask);
+    this.notify();
+    Notifications.success("Task created successfully");
+    return newTask;
+  }
+
+  /**
+   * Updates an existing task.
+   */
+  updateTask(id, updates) {
+    const index = this.tasks.findIndex((t) => t.id === id);
+    if (index === -1) return null;
+
+    if (updates.title) {
+      const cleanTitle = updates.title.trim();
+      if (!cleanTitle) {
+        Notifications.error("Task title cannot be empty");
+        return null;
+      }
+      if (cleanTitle.length > MAX_TASK_LENGTH) {
+        Notifications.error(
+          `Task title cannot exceed ${MAX_TASK_LENGTH} characters`,
+        );
+        return null;
+      }
+      updates.title = cleanTitle;
+      updates.text = cleanTitle;
+    }
+
+    // Sync status and completed flag
+    if (updates.status !== undefined) {
+      updates.completed = updates.status === "done";
+    } else if (updates.completed !== undefined) {
+      updates.status = updates.completed ? "done" : "todo";
+    }
+
+    this.tasks[index] = {
+      ...this.tasks[index],
+      ...updates,
+    };
+
+    this.notify();
+    Notifications.success("Task updated");
+    return this.tasks[index];
+  }
+
+  /**
+   * Toggles task completion with status synchronization.
+   */
+  toggleComplete(id) {
+    const task = this.getTaskById(id);
+    if (!task) return;
+
+    const newCompleted = !task.completed;
+    const newStatus = newCompleted ? "done" : "todo";
+
+    this.updateTask(id, {
+      completed: newCompleted,
+      status: newStatus,
+    });
+
+    if (newCompleted) {
+      Notifications.success("Task marked as completed");
+    }
+  }
+
+  /**
+   * Deletes a single task.
+   */
+  deleteTask(id) {
+    const task = this.getTaskById(id);
+    if (!task) return false;
+
+    this.tasks = this.tasks.filter((t) => t.id !== id);
+    this.notify();
+    Notifications.info("Task deleted");
     return true;
   }
 
-  // Create enhanced task with all properties
-  const task = {
-    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
-    title: taskData.title.trim(),
-    text: taskData.title.trim(),
-    description: taskData.description || "", // ← MAKE SURE THIS IS HERE
-    completed: taskData.status === "done",
-    createdAt: new Date().toISOString(),
-    dueDate: taskData.dueDate || null,
-    createdDate: new Date().toDateString(),
-    projectId: taskData.projectId || null,
-    priority: taskData.priority || "medium",
-    status: taskData.status || "todo",
-  };
+  /**
+   * Bulk deletes multiple tasks.
+   */
+  deleteTasks(ids) {
+    if (!ids || !ids.length) return 0;
+    const initialCount = this.tasks.length;
+    const idSet = new Set(ids);
+    this.tasks = this.tasks.filter((t) => !idSet.has(t.id));
+    const deletedCount = initialCount - this.tasks.length;
+    this.notify();
+    Notifications.info(`Deleted ${deletedCount} tasks`);
+    return deletedCount;
+  }
 
-  console.log("Saving task with description:", task); // ← ADD THIS FOR DEBUGGING
-
-  tasks.push(task);
-  setTasks(tasks);
-
-  if (renderCallback) renderCallback();
-
-  // ... rest of notification code
-
-  return true;
-}
-
-// NEW: Enhanced editTask that supports full task updates
-export function editTask(taskId, updates) {
-    const tasks = getTasks();
-    const taskIndex = tasks.findIndex(t => t.id == taskId);
-    
-    if (taskIndex === -1) return false;
-    
-    // If updates is just a string (legacy support), convert to object
-    if (typeof updates === 'string') {
-        tasks[taskIndex].text = updates.trim();
-        tasks[taskIndex].title = updates.trim();
-    } else {
-        // Merge updates into existing task
-        tasks[taskIndex] = {
-            ...tasks[taskIndex],
-            ...updates,
-            // Keep text in sync with title for backward compatibility
-            text: updates.title ? updates.title.trim() : tasks[taskIndex].title,
-            // Sync completed status with status field
-            completed: updates.status ? updates.status === 'done' : tasks[taskIndex].completed
-        };
+  /**
+   * Clears all completed tasks.
+   */
+  clearCompleted() {
+    const completedCount = this.tasks.filter((t) => t.completed).length;
+    if (completedCount === 0) {
+      Notifications.info("No completed tasks to clear");
+      return 0;
     }
-    
-    setTasks(tasks);
-    if (renderCallback) renderCallback();
-    return true;
-}
+    this.tasks = this.tasks.filter((t) => !t.completed);
+    this.notify();
+    Notifications.info(`Cleared ${completedCount} completed tasks`);
+    return completedCount;
+  }
 
-// Legacy: Keep the old updateTaskDueDate function signature for backward compatibility
-export function updateTaskDueDate(id, newDueDate) {
-    const tasks = getTasks();
-    const task = tasks.find(task => task.id === id);
-    
-    if (task) {
-        task.dueDate = newDueDate || null;
-        setTasks(tasks);
-        
-        if (renderCallback) renderCallback();
-        
-        if (newDueDate) {
-            const formattedDate = new Date(newDueDate).toLocaleDateString();
-            showNotification(`Due date updated to ${formattedDate}`, 'success');
-        } else {
-            showNotification('Due date removed', 'info');
-        }
-        return true;
+  /**
+   * Move tasks from a deleted project into Inbox.
+   */
+  moveTasksToInbox(projectId) {
+    let count = 0;
+    this.tasks = this.tasks.map((t) => {
+      if (t.projectId === projectId) {
+        count++;
+        return { ...t, projectId: "inbox" };
+      }
+      return t;
+    });
+    this.notify();
+    return count;
+  }
+
+  /**
+   * Delete all tasks associated with a project.
+   */
+  deleteTasksByProject(projectId) {
+    const initialCount = this.tasks.length;
+    this.tasks = this.tasks.filter((t) => t.projectId !== projectId);
+    const count = initialCount - this.tasks.length;
+    this.notify();
+    return count;
+  }
+
+  /**
+   * Computes statistics for dashboard and badges.
+   */
+  getStats() {
+    const total = this.tasks.length;
+    const completed = this.tasks.filter((t) => t.completed).length;
+    const pending = total - completed;
+    const overdue = this.tasks.filter(
+      (t) => !t.completed && t.dueDate && isOverdue(t.dueDate),
+    ).length;
+    const today = this.tasks.filter(
+      (t) => !t.completed && t.dueDate && isToday(t.dueDate),
+    ).length;
+    const upcoming = this.tasks.filter(
+      (t) => !t.completed && t.dueDate && isUpcoming(t.dueDate),
+    ).length;
+
+    return {
+      total,
+      pending,
+      completed,
+      overdue,
+      today,
+      upcoming,
+      completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
+    };
+  }
+
+  /**
+   * Filter and sort tasks based on view context, filters, search, and sort criteria.
+   */
+  filterTasks({
+    view = "all",
+    projectId = null,
+    status = "all",
+    priority = "all",
+    search = "",
+    sortBy = "dueDate",
+  } = {}) {
+    let result = [...this.tasks];
+
+    // Filter by view
+    if (view === "today") {
+      result = result.filter((t) => t.dueDate && isToday(t.dueDate));
+    } else if (view === "upcoming") {
+      result = result.filter((t) => t.dueDate && isUpcoming(t.dueDate));
+    } else if (view === "overdue") {
+      result = result.filter(
+        (t) => !t.completed && t.dueDate && isOverdue(t.dueDate),
+      );
+    } else if (view === "completed") {
+      result = result.filter((t) => t.completed);
+    } else if (view === "project" && projectId) {
+      result = result.filter((t) => (t.projectId || "inbox") === projectId);
     }
-    return false;
-}
 
-// NEW: Get tasks sorted by due date
-export function getTasksSortedByDueDate() {
-    const tasks = getTasks();
-    return [...tasks].sort((a, b) => {
-        // Tasks without due date go to bottom
+    // Filter by status tab
+    if (status && status !== "all") {
+      if (status === "active") {
+        result = result.filter((t) => !t.completed);
+      } else if (status === "completed") {
+        result = result.filter((t) => t.completed);
+      } else {
+        result = result.filter((t) => t.status === status);
+      }
+    }
+
+    // Filter by priority
+    if (priority && priority !== "all") {
+      result = result.filter((t) => t.priority === priority);
+    }
+
+    // Filter by search query (title and description)
+    if (search && search.trim()) {
+      const q = search.toLowerCase().trim();
+      result = result.filter((t) => {
+        const titleMatch = t.title.toLowerCase().includes(q);
+        const descMatch = (t.description || "").toLowerCase().includes(q);
+        return titleMatch || descMatch;
+      });
+    }
+
+    // Sorting
+    const priorityWeight = { urgent: 4, high: 3, medium: 2, low: 1 };
+
+    result.sort((a, b) => {
+      // Completed tasks sink to bottom
+      if (a.completed !== b.completed) {
+        return a.completed ? 1 : -1;
+      }
+
+      if (sortBy === "dueDate") {
         if (!a.dueDate && !b.dueDate) return 0;
         if (!a.dueDate) return 1;
         if (!b.dueDate) return -1;
-        return new Date(a.dueDate) - new Date(b.dueDate);
+        return a.dueDate.localeCompare(b.dueDate);
+      } else if (sortBy === "priority") {
+        return (
+          (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0)
+        );
+      } else if (sortBy === "title") {
+        return a.title.localeCompare(b.title);
+      } else if (sortBy === "created") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+      return 0;
     });
+
+    return result;
+  }
 }
 
-// NEW: Get tasks sorted by creation date
-export function getTasksSortedByCreated() {
-    const tasks = getTasks();
-    return [...tasks].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-}
-
-// NEW: Get overdue tasks
-export function getOverdueTasks() {
-    const tasks = getTasks();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    return tasks.filter(task => {
-        if (!task.dueDate || task.completed) return false;
-        const dueDate = new Date(task.dueDate);
-        dueDate.setHours(0, 0, 0, 0);
-        return dueDate < today;
-    });
-}
-
-// NEW: Get tasks due today
-export function getTasksDueToday() {
-    const tasks = getTasks();
-    const today = new Date().toISOString().split('T')[0];
-    
-    return tasks.filter(task => task.dueDate === today && !task.completed);
-}
-
-// UPDATED: Delete task
-export function deleteTask(id) {
-    const tasks = getTasks();
-    const taskToDelete = tasks.find(task => task.id === id);
-    const updatedTasks = tasks.filter(task => task.id !== id);
-    setTasks(updatedTasks);
-    
-    if (renderCallback) renderCallback();
-    
-    if (taskToDelete && taskToDelete.dueDate) {
-        showNotification(`Task "${taskToDelete.text}" deleted!`, 'success');
-    } else {
-        showNotification('Task deleted successfully!', 'success');
-    }
-}
-
-// UPDATED: Toggle task completion
-export function toggleTask(id) {
-    const tasks = getTasks();
-    const task = tasks.find(task => task.id === id);
-    
-    if (task) {
-        task.completed = !task.completed;
-        setTasks(tasks);
-        
-        if (renderCallback) renderCallback();
-        const status = task.completed ? 'completed ✅' : 'uncompleted 🔄';
-        
-        // Add special message for overdue tasks being completed
-        if (task.completed && task.dueDate) {
-            const dueDate = new Date(task.dueDate);
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            dueDate.setHours(0, 0, 0, 0);
-            
-            if (dueDate < today) {
-                showNotification(`Great job completing an overdue task! 🎉`, 'success');
-                return;
-            }
-        }
-        
-        showNotification(`Task marked as ${status}`, 'success');
-    }
-}
-
-
-
-// UPDATED: Delete all completed tasks
-export function deleteAllCompletedTasks() {
-    const tasks = getTasks();
-    const completedCount = tasks.filter(task => task.completed).length;
-    
-    if (completedCount === 0) {
-        showNotification('No completed tasks to delete!', 'info');
-        return false;
-    }
-    
-    const updatedTasks = tasks.filter(task => !task.completed);
-    setTasks(updatedTasks);
-    
-    if (renderCallback) renderCallback();
-    showNotification(`Deleted ${completedCount} completed tasks!`, 'success');
-    return true;
-}
-
-// NEW: Delete multiple selected tasks
-export function deleteMultipleTasks(taskIds) {
-    const tasks = getTasks();
-    const deleteCount = taskIds.length;
-    
-    if (deleteCount === 0) {
-        showNotification('No tasks selected!', 'info');
-        return false;
-    }
-    
-    const updatedTasks = tasks.filter(task => !taskIds.includes(task.id));
-    setTasks(updatedTasks);
-    
-    if (renderCallback) renderCallback();
-    showNotification(`Deleted ${deleteCount} task${deleteCount > 1 ? 's' : ''}!`, 'success');
-    return true;
-}
-
-// Track selected tasks for bulk operations
-let selectedTaskIds = [];
-
-export function toggleTaskSelection(taskId) {
-    const index = selectedTaskIds.indexOf(taskId);
-    if (index > -1) {
-        selectedTaskIds.splice(index, 1);
-    } else {
-        selectedTaskIds.push(taskId);
-    }
-    
-    // Update bulk delete toolbar to show/hide delete button
-    import('./uiRenderer.js').then(module => {
-        module.updateBulkDeleteToolbar([...selectedTaskIds]);
-    });
-    
-    return selectedTaskIds;
-}
-
-export function getSelectedTaskIds() {
-    return [...selectedTaskIds];
-}
-
-export function clearSelectedTasks() {
-    selectedTaskIds = [];
-    
-    // Update bulk delete toolbar to hide delete button
-    import('./uiRenderer.js').then(module => {
-        module.updateBulkDeleteToolbar([]);
-    });
-}
-
-// NEW: Get task statistics with dates
-export function getTaskStatistics() {
-    const tasks = getTasks();
-    const total = tasks.length;
-    const completed = tasks.filter(t => t.completed).length;
-    const active = total - completed;
-    const overdue = getOverdueTasks().length;
-    const dueToday = getTasksDueToday().length;
-    const withDueDates = tasks.filter(t => t.dueDate).length;
-    
-    return {
-        total,
-        completed,
-        active,
-        overdue,
-        dueToday,
-        withDueDates,
-        completionRate: total > 0 ? ((completed / total) * 100).toFixed(1) : 0
-    };
-}
+export const Tasks = new TaskManager();
