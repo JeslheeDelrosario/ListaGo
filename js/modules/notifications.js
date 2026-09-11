@@ -1,7 +1,4 @@
-/**
- * notifications.js - Toast notification system
- */
-
+// js\modules\notifications\notifications.js
 class NotificationManager {
   constructor() {
     this.container = null;

@@ -1,7 +1,4 @@
-/**
- * modal.js - Confirmation and modal controller (Delete task, Bulk delete, Shortcuts)
- */
-
+// js\modules\modal.js
 import { Tasks } from "./taskManager.js";
 import { escapeHTML } from "./utils.js";
 

@@ -1,4 +1,4 @@
-// editModal.js - Handle edit modal functionality
+// js\modules\editModal.js
 import { getTasks, editTask, updateTaskDueDate } from './taskManager.js';
 import { showNotification } from './notifications.js';
 import { renderTasks } from './uiRenderer.js';

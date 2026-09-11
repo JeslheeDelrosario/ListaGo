@@ -1,7 +1,4 @@
-/**
- * dashboardView.js - Dashboard view rendering with statistics and organized task sections
- */
-
+// js\modules\views\dashboardView.js
 import { Tasks } from "../taskManager.js";
 import { Projects } from "../projectManager.js";
 import {
