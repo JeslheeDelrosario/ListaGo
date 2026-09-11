@@ -26,6 +26,7 @@ class UIRenderer {
     this.searchQuery = "";
     this.selectedTaskIds = new Set();
     this.expandedTaskIds = new Set();
+    this.currentLayout = localStorage.getItem("listago_task_layout") || "list"; // 'list' | 'grid'
   }
 
   init() {
@@ -52,6 +53,27 @@ class UIRenderer {
         this.renderCurrentView();
       });
     });
+
+    // Mobile Search Bar Toggle
+    const searchToggleBtn = document.getElementById("mobile-search-toggle-btn");
+    const searchCloseBtn = document.getElementById("mobile-search-close-btn");
+    const headerSearch = document.getElementById("header-search");
+    const headerSearchInput = document.getElementById("header-search-input");
+
+    if (searchToggleBtn && headerSearch) {
+      searchToggleBtn.addEventListener("click", () => {
+        const isOpen = headerSearch.classList.toggle("mobile-open");
+        if (isOpen && headerSearchInput) {
+          setTimeout(() => headerSearchInput.focus(), 50);
+        }
+      });
+    }
+
+    if (searchCloseBtn && headerSearch) {
+      searchCloseBtn.addEventListener("click", () => {
+        headerSearch.classList.remove("mobile-open");
+      });
+    }
   }
 
   setupViewControls() {
@@ -84,6 +106,43 @@ class UIRenderer {
         this.renderCurrentView();
       });
     }
+
+    // Layout Toggle Buttons (List View vs Grid View)
+    const listBtn = document.getElementById("layout-btn-list");
+    const gridBtn = document.getElementById("layout-btn-grid");
+
+    if (listBtn) {
+      listBtn.addEventListener("click", () => {
+        if (this.currentLayout !== "list") {
+          this.currentLayout = "list";
+          localStorage.setItem("listago_task_layout", "list");
+          this.updateLayoutToggleButtons();
+          this.renderTaskListOnly();
+        }
+      });
+    }
+
+    if (gridBtn) {
+      gridBtn.addEventListener("click", () => {
+        if (this.currentLayout !== "grid") {
+          this.currentLayout = "grid";
+          localStorage.setItem("listago_task_layout", "grid");
+          this.updateLayoutToggleButtons();
+          this.renderTaskListOnly();
+        }
+      });
+    }
+
+    this.updateLayoutToggleButtons();
+  }
+
+  updateLayoutToggleButtons() {
+    const listBtn = document.getElementById("layout-btn-list");
+    const gridBtn = document.getElementById("layout-btn-grid");
+    if (listBtn)
+      listBtn.classList.toggle("active", this.currentLayout === "list");
+    if (gridBtn)
+      gridBtn.classList.toggle("active", this.currentLayout === "grid");
   }
 
   setupQuickAdd() {
@@ -352,6 +411,13 @@ class UIRenderer {
   renderTaskListOnly() {
     const container = document.getElementById("tasks-list-container");
     if (!container) return;
+
+    if (this.currentLayout === "grid") {
+      container.classList.add("grid-view");
+    } else {
+      container.classList.remove("grid-view");
+    }
+    this.updateLayoutToggleButtons();
 
     const tasks = this.getFilteredTasks();
 

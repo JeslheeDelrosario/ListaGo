@@ -1,6 +1,4 @@
-/**
- * sidebar.js - Sidebar navigation, project lists, live badge counts, and mobile menu handling
- */
+// js\modules\sidebar.js/
 
 import { Tasks } from "./taskManager.js";
 import { Projects } from "./projectManager.js";
@@ -41,6 +39,15 @@ export const Sidebar = {
         this.closeMobileSidebar();
       });
     });
+
+    const brandLogo = document.getElementById("brand-logo");
+    if (brandLogo) {
+      brandLogo.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.setActive("dashboard", null);
+        this.closeMobileSidebar();
+      });
+    }
   },
 
   setupMobileToggle() {

@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>ListaGo</title>
     <meta name="description" content="A feature-rich modern task management application with glassmorphism design, projects, priorities, and dashboard." />
     <meta property="og:title" content="ListaGo - Modern ToDo List & Project Manager" />
@@ -24,8 +24,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <!-- Application Stylesheets -->
-    <script type="module" crossorigin src="/assets/index-RGlvmy8C.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Dhk8U-1q.css">
+    <script type="module" crossorigin src="/assets/index-CfLpD-Ty.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BzIl8qBf.css">
   </head>
   <body>
     <div id="app">
@@ -45,7 +45,7 @@
         </div>
 
         <!-- Global Search Bar -->
-        <div class="header-search">
+        <div class="header-search" id="header-search">
           <div class="search-input-wrapper">
             <i class="fas fa-search search-icon"></i>
             <input 
@@ -56,17 +56,20 @@
               autocomplete="off"
             />
             <span class="search-shortcut-badge" title="Press '/' anywhere to search">/</span>
+            <button class="mobile-search-close-btn" id="mobile-search-close-btn" aria-label="Close search">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
         </div>
 
         <!-- Header Action Controls -->
         <div class="header-actions">
-          <button class="btn-icon" id="btn-shortcuts-help" title="Keyboard Shortcuts (?)">
-            <i class="fas fa-keyboard"></i>
+          <button class="btn-icon mobile-search-btn" id="mobile-search-toggle-btn" aria-label="Toggle Search" title="Search tasks">
+            <i class="fas fa-search"></i>
           </button>
           <button class="btn-primary" id="btn-header-new-task">
             <i class="fas fa-plus"></i>
-            <span>New Task</span>
+            <span class="btn-new-task-text">New Task</span>
           </button>
         </div>
       </header>

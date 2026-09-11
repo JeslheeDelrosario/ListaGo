@@ -15,10 +15,74 @@
 @media (max-width: 1024px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
   }
 }
 
-@media (max-width: 580px) {
+@media (max-width: 600px) {
+  .dashboard-container {
+    gap: 1.25rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+
+  .stat-card-compact {
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  .stat-number {
+    font-size: 1.55rem;
+  }
+
+  .stat-label {
+    font-size: 0.72rem;
+  }
+
+  .stat-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .completion-banner {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  .completion-title {
+    font-size: 0.88rem;
+  }
+
+  .completion-percentage {
+    font-size: 1rem;
+  }
+
+  .overdue-alert-box {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-md);
+  }
+
+  .overdue-alert-left {
+    font-size: 0.85rem;
+  }
+
+  .btn-sm-danger {
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.82rem;
+  }
+}
+
+@media (max-width: 340px) {
   .stats-grid {
     grid-template-columns: 1fr;
   }
