@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* Load the JavaScript config file (Tailwind v4 config compatibility). */
+@config "../../tailwind.config.ts";
+
+/* -------------------------------------------------------------------------- */
+/*                            Design system tokens                            */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Dark glassmorphism palette from the original ListaGo app */
+  --app-background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg-hover: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --accent-indigo: #6366f1;
+  --accent-purple: #8b5cf6;
+  --text-heading: rgba(255, 255, 255, 0.9);
+  --text-body: rgba(255, 255, 255, 0.6);
+  --text-muted: rgba(255, 255, 255, 0.4);
+
+  color-scheme: dark;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                 Base styles                                */
+/* -------------------------------------------------------------------------- */
+
+body {
+  min-height: 100vh;
+  background-color: #0f0c29;
+  background-image: var(--app-background);
+  background-attachment: fixed;
+  color: var(--text-heading);
+}
+
+::selection {
+  background-color: rgba(99, 102, 241, 0.45);
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(129, 140, 248, 0.8);
+  outline-offset: 2px;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                            Glassmorphism utility                           */
+/* -------------------------------------------------------------------------- */
+
+/** Frosted-glass surface: translucent white bg, blur, hairline border. */
+@utility glass {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                              Dark theme scrollbars                         */
+/* -------------------------------------------------------------------------- */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}

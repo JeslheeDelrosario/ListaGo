@@ -1,0 +1,2373 @@
+
+> listago-kanban@0.1.0 dev
+> next dev -p 3000
+
+▲ Next.js 16.4.2 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.197:3000
+✓ Ready in 720ms
+⚠ Warning: Next.js inferred your workspace root, but it may not be correct.
+ We detected multiple lockfiles and selected the directory of C:\Users\John Jeslhee\Projects\To-do List\package-lock.json as the root directory.
+ To silence this warning, set `turbopack.root` in your Next.js config, or consider removing one of the lockfiles if it's not needed.
+   See https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#root-directory for more information.
+ Detected additional lockfiles: 
+   * C:\Users\John Jeslhee\Projects\To-do List\listago-kanban\package-lock.json
+
+✓ Running next.config.ts took 50ms
+⨯ Another next dev server is already running.
+
+- L GET / 200 in 663ms (next.js: 430ms, application-code: 233ms)
+ GET / 200 in 56ms (next.js: 3ms, application-code: 52ms)
+ GET / 200 in 65ms (next.js: 3ms, application-code: 61ms)
+ GET / 200 in 73ms (next.js: 3ms, application-code: 70ms)
+ GET / 200 in 96ms (next.js: 6ms, application-code: 90ms)
+ GET / 200 in 60ms (next.js: 4ms, application-code: 57ms)
+ GET / 200 in 99ms (next.js: 2ms, application-code: 96ms)
+✓ Compiled in 50ms
+ GET / 200 in 105ms (next.js: 11ms, application-code: 94ms)
+ GET / 200 in 99ms (next.js: 25ms, application-code: 74ms)
+✓ Compiled in 33ms
+ GET / 200 in 62ms (next.js: 3ms, application-code: 59ms)
+ GET / 200 in 31ms (next.js: 2ms, application-code: 29ms)
+✓ Compiled in 184ms
+ GET / 200 in 68ms (next.js: 13ms, application-code: 54ms)
+ GET / 200 in 58ms (next.js: 12ms, application-code: 46ms)
+ GET / 200 in 86ms (next.js: 2ms, application-code: 83ms)
+ GET / 200 in 48ms (next.js: 1.9ms, application-code: 46ms)
+ GET / 200 in 52ms (next.js: 2ms, application-code: 50ms)
+ GET / 200 in 131ms (next.js: 5ms, application-code: 126ms)
+ GET / 200 in 44ms (next.js: 1.3ms, application-code: 43ms)
+  Turbopack has seen frequent file updates and is waiting for the filesystem to settle (0.5s elapsed so far; last modified: "\\\\?\\C:\\Users\\John Jeslhee\\Projects\\To-do List\\listago-kanban\\node_modules\\lucide-react\\dist\\esm\\icons\\aperture.mjs.map").
+  Turbopack has seen frequent file updates and is waiting for the filesystem to settle (1.5s elapsed so far; last modified: "\\\\?\\C:\\Users\\John Jeslhee\\Projects\\To-do List\\listago-kanban\\node_modules\\lucide-react\\dist\\esm\\icons\\chess-bishop.mjs.map").
+  Turbopack has seen frequent file updates and is waiting for the filesystem to settle (3.5s elapsed so far; last modified: "\\\\?\\C:\\Users\\John Jeslhee\\Projects\\To-do List\\listago-kanban\\node_modules\\lucide-react\\dist\\esm\\icons\\notebook-dot.mjs.map").
+  Turbopack has seen frequent file updates and is waiting for the filesystem to settle (7.5s elapsed so far; last modified: "\\\\?\\C:\\Users\\John Jeslhee\\Projects\\To-do List\\listago-kanban\\node_modules\\.package-lock.json").
+✓ Compiled in 35ms
+✓ Compiled in 56ms
+✓ Compiled in 53ms
+✓ Compiled in 46ms
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+✓ Compiled in 38ms
+✓ Compiled in 92ms
+✓ Compiled in 90ms
+ GET / 200 in 106ms (next.js: 4ms, application-code: 102ms)
+ GET / 200 in 57ms (next.js: 4ms, application-code: 54ms)
+✓ Compiled in 311ms
+ GET / 200 in 97ms (next.js: 8ms, application-code: 89ms)
+ GET / 200 in 55ms (next.js: 3ms, application-code: 52ms)
+Error: Route "/": Next.js encountered the unstable value `new Date()` in a Client Component.
+
+This value would be evaluated during the prerender, instead of recomputed on each visit.
+
+Ways to fix this:
+  - [stream] Wrap the Client Component in `<Suspense fallback={...}>`
+  - [defer] Move the read into a `useEffect` or event handler
+  - [measure] If the value is for telemetry, use a timing API such as `performance.now()`
+
+Learn more: https://nextjs.org/docs/messages/blocking-prerender-current-time-client
+    at todayISO (src\lib\filters.ts:20:20)
+    at isOverdue (src\lib\filters.ts:32:68)
+    at getTaskCounts (src\lib\filters.ts:114:11)
+    at eval (src\components\layout\Sidebar.tsx:40:45)
+    at Sidebar (src\components\layout\Sidebar.tsx:40:25)
+    at AppShell (src\components\layout\AppShell.tsx:28:7)
+    at RootLayout (src\app\layout.tsx:38:9)
+  18 | /** Returns today's date as `YYYY-MM-DD`. */
+  19 | export function todayISO(): string {
+> 20 |   return toISODate(new Date());
+     |                    ^
+  21 | }
+  22 |
+  23 | /** Returns a `YYYY-MM-DD` string `days` from today (negative = past). */
+Error: Route "/": Next.js encountered the unstable value `new Date()` in a Client Component.
+
+This value would be evaluated during the prerender, instead of recomputed on each visit.
+
+Ways to fix this:
+  - [stream] Wrap the Client Component in `<Suspense fallback={...}>`
+  - [defer] Move the read into a `useEffect` or event handler
+  - [measure] If the value is for telemetry, use a timing API such as `performance.now()`
+
+Learn more: https://nextjs.org/docs/messages/blocking-prerender-current-time-client
+    at todayISO (src\lib\filters.ts:20:20)
+    at isOverdue (src\lib\filters.ts:32:68)
+    at getTaskCounts (src\lib\filters.ts:114:11)
+    at eval (src\components\layout\Sidebar.tsx:40:45)
+    at Sidebar (src\components\layout\Sidebar.tsx:40:25)
+    at AppShell (src\components\layout\AppShell.tsx:28:7)
+    at RootLayout (src\app\layout.tsx:38:9)
+  18 | /** Returns today's date as `YYYY-MM-DD`. */
+  19 | export function todayISO(): string {
+> 20 |   return toISODate(new Date());
+     |                    ^
+  21 | }
+  22 |
+  23 | /** Returns a `YYYY-MM-DD` string `days` from today (negative = past). */
+✓ Compiled in 52ms
+ GET / 200 in 64ms (next.js: 7ms, application-code: 56ms)
+ GET / 200 in 60ms (next.js: 13ms, application-code: 47ms)
+Error: Route "/": Next.js encountered the unstable value `new Date()` in a Client Component.
+
+This value would be evaluated during the prerender, instead of recomputed on each visit.
+
+Ways to fix this:
+  - [stream] Wrap the Client Component in `<Suspense fallback={...}>`
+  - [defer] Move the read into a `useEffect` or event handler
+  - [measure] If the value is for telemetry, use a timing API such as `performance.now()`
+
+Learn more: https://nextjs.org/docs/messages/blocking-prerender-current-time-client
+    at todayISO (src\lib\filters.ts:20:20)
+    at isOverdue (src\lib\filters.ts:32:68)
+    at getTaskCounts (src\lib\filters.ts:114:11)
+    at eval (src\components\layout\Sidebar.tsx:40:45)
+    at Sidebar (src\components\layout\Sidebar.tsx:40:25)
+    at AppShell (src\components\layout\AppShell.tsx:28:7)
+    at RootLayout (src\app\layout.tsx:38:9)
+  18 | /** Returns today's date as `YYYY-MM-DD`. */
+  19 | export function todayISO(): string {
+> 20 |   return toISODate(new Date());
+     |                    ^
+  21 | }
+  22 |
+  23 | /** Returns a `YYYY-MM-DD` string `days` from today (negative = past). */
+Error: Route "/": Next.js encountered the unstable value `new Date()` in a Client Component.
+
+This value would be evaluated during the prerender, instead of recomputed on each visit.
+
+Ways to fix this:
+  - [stream] Wrap the Client Component in `<Suspense fallback={...}>`
+  - [defer] Move the read into a `useEffect` or event handler
+  - [measure] If the value is for telemetry, use a timing API such as `performance.now()`
+
+Learn more: https://nextjs.org/docs/messages/blocking-prerender-current-time-client
+    at todayISO (src\lib\filters.ts:20:20)
+    at isOverdue (src\lib\filters.ts:32:68)
+    at getTaskCounts (src\lib\filters.ts:114:11)
+    at eval (src\components\layout\Sidebar.tsx:40:45)
+    at Sidebar (src\components\layout\Sidebar.tsx:40:25)
+    at AppShell (src\components\layout\AppShell.tsx:28:7)
+    at RootLayout (src\app\layout.tsx:38:9)
+  18 | /** Returns today's date as `YYYY-MM-DD`. */
+  19 | export function todayISO(): string {
+> 20 |   return toISODate(new Date());
+     |                    ^
+  21 | }
+  22 |
+  23 | /** Returns a `YYYY-MM-DD` string `days` from today (negative = past). */
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+✓ Compiled in 37ms
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-client] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/kanban/KanbanCard.tsx:8:1
+Error: Export isTaskOverdue doesn't exist in target module
+   6 |
+   7 | import { PRIORITY_BADGE_CLASSES, type Task } from "@/types";
+>  8 | import { isTaskOverdue } from "@/store/useTaskStore";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 |
+  10 | /** Small inline calendar icon (no icon dependency needed). */
+  11 | function CalendarIcon({ className }: { className?: string }) {
+
+The export isTaskOverdue was not found in module [project]/listago-kanban/src/store/useTaskStore.ts [app-ssr] (ecmascript).
+Did you mean to import useTaskStore?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component Browser]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/kanban/KanbanCard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Client Component SSR]
+    ./listago-kanban/src/components/kanban/KanbanBoard.tsx [Server Component]
+    ./listago-kanban/src/app/page.tsx [Server Component] 
+✓ Compiled in 37ms
+ GET / 200 in 95ms (next.js: 3ms, application-code: 92ms)
+✓ Compiled in 34ms
+ GET /?clean=1 200 in 67ms (next.js: 4ms, application-code: 63ms)
+✓ Compiled in 87ms
+✓ Compiled in 43ms
+ GET /?clean=2 200 in 58ms (next.js: 3ms, application-code: 55ms)
+ GET /?clean=3 200 in 53ms (next.js: 2ms, application-code: 51ms)
+  Turbopack has seen frequent file updates and is waiting for the filesystem to settle (0.5s elapsed so far; last modified: "\\\\?\\C:\\Users\\John Jeslhee\\Projects\\To-do List\\listago-kanban\\node_modules\\react-icons\\gi\\index.js").
+  Turbopack has seen frequent file updates and is waiting for the filesystem to settle (1.5s elapsed so far; last modified: "\\\\?\\C:\\Users\\John Jeslhee\\Projects\\To-do List\\listago-kanban\\node_modules\\react-icons\\im\\index.mjs").
+✓ Compiled in 80ms
+✓ Compiled in 36ms
+✓ Compiled in 97ms
+✓ Compiled in 39ms
+[browser] Uncaught TypeError: Cannot destructure property 'open' of '(0 , __TURBOPACK__imported__module__$5b$project$5d2f$listago$2d$kanban$2f$src$2f$store$2f$useUIStore$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__.useUIStore)(...)' as it is undefined.
+    at ProjectModal (src/components/modals/ProjectModal.tsx:39:11)
+    at Set.forEach (<anonymous>)
+    at AppShell (src/components/layout/AppShell.tsx:39:7)
+    at RootLayout (src\app\layout.tsx:38:9)
+  37 |  */
+  38 | export function ProjectModal() {
+> 39 |   const { open, mode, projectId } = useUIStore((state) => state.projectModal);
+     |           ^
+  40 |   const closeProjectModal = useUIStore((state) => state.closeProjectModal);
+  41 |   const openDeleteProject = useUIStore((state) => state.openDeleteProject);
+  42 |   const projects = useProjectStore((state) => state.projects);
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-client] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-ssr] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-client] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-ssr] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-client] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-ssr] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-client] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-ssr] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-client] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-ssr] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-client] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+[browser] ./listago-kanban/src/components/modals/ProjectModal.tsx:19:1
+Error: Export PROJECT_ICON_OPTIONS doesn't exist in target module
+  17 | } from "@/types";
+  18 | import type { ProjectIconName } from "@/types";
+> 19 | import {
+     | ^^^^^^^
+> 20 |   PROJECT_ICON_OPTIONS,
+     | ^^^^^^^^^^^^^^^^^^^^^^^
+> 21 |   ProjectIcon,
+     | ^^^^^^^^^^^^^^
+> 22 | } from "@/components/ui/ProjectIcon";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  23 | import {
+  24 |   MODAL_BUTTON_DANGER_CLASSES,
+  25 |   MODAL_BUTTON_GHOST_CLASSES,
+
+The export PROJECT_ICON_OPTIONS was not found in module [project]/listago-kanban/src/components/ui/ProjectIcon.tsx [app-ssr] (ecmascript).
+Did you mean to import PROJECT_ICON_CHOICES?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component Browser]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component]
+
+  Client Component SSR:
+    ./listago-kanban/src/components/modals/ProjectModal.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Client Component SSR]
+    ./listago-kanban/src/components/layout/AppShell.tsx [Server Component]
+    ./listago-kanban/src/app/layout.tsx [Server Component] 
+✓ Compiled in 44ms
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET / 200 in 237ms (next.js: 9ms, application-code: 228ms)
+ GET /?clean=3 200 in 228ms (next.js: 3ms, application-code: 225ms)
+✓ Compiled in 58ms
+✓ Compiled in 77ms
+[browser] Uncaught ReferenceError: useSyncExternalStore is not defined
+    at Sidebar (src/components/layout/Sidebar.tsx:60:21)
+    at Set.forEach (<anonymous>)
+    at AppShell (src/components/layout/AppShell.tsx:28:7)
+    at RootLayout (src\app\layout.tsx:38:9)
+  58 |    * the same way the board renders its cards.
+  59 |    */
+> 60 |   const isMounted = useSyncExternalStore(emptySubscribe, () => true, () => false);
+     |                     ^
+  61 |   const counts = useMemo(
+  62 |     () => (isMounted ? getTaskCounts(tasks) : EMPTY_COUNTS),
+  63 |     [isMounted, tasks],
+⚠ Fast Refresh had to perform a full reload due to a runtime error.
+✓ Compiled in 65ms
+ GET /?clean=3 200 in 89ms (next.js: 5ms, application-code: 85ms)
+✓ Compiled in 43ms
+ GET /?clean=3 200 in 37ms (next.js: 3ms, application-code: 34ms)
+✓ Compiled in 62ms
+✓ Compiled in 35ms
+✓ Compiled in 59ms
+ GET /?clean=3 200 in 35ms (next.js: 4ms, application-code: 31ms)
+✓ Compiled in 60ms
+  Turbopack has seen frequent file updates and is waiting for the filesystem to settle (0.5s elapsed so far; last modified: "\\\\?\\C:\\Users\\John Jeslhee\\Projects\\To-do List\\listago-kanban\\node_modules\\@unrs\\resolver-binding-wasm32-wasi").
+✓ Compiled in 33ms
+✓ Compiled in 42ms
+ GET /?p3=1 200 in 96ms (next.js: 2ms, application-code: 93ms)
+✓ Compiled in 37ms
+ GET /projects/seed-project-2 200 in 703ms (next.js: 12ms, generate-params: 556ms, application-code: 136ms)
+ GET /projects/does-not-exist 200 in 72ms (next.js: 2ms, generate-params: 5ms, application-code: 64ms)
+ GET / 200 in 50ms (next.js: 3ms, application-code: 47ms)
+✓ Compiled in 51ms
+ GET / 200 in 59ms (next.js: 2ms, application-code: 57ms)
+ GET /projects/inbox 200 in 77ms (next.js: 3ms, generate-params: 6ms, application-code: 69ms)
