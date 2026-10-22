@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useMemo, useSyncExternalStore, type ReactNode } from "react";
 import {
   FiCalendar,
   FiEdit,
@@ -19,9 +21,6 @@ import { useUIStore } from "@/store/useUIStore";
 import { getTaskCounts } from "@/lib/filters";
 import { isInboxProject, type Project } from "@/types";
 import { ProjectIcon } from "@/components/ui/ProjectIcon";
-
-/** Sidebar view navigation. "all" is live; the others land in Phase 4. */
-type SidebarView = "dashboard" | "all" | "today" | "upcoming";
 
 /** No-op event subscription for the hydration-detection snapshot. */
 function emptySubscribe(): () => void {
@@ -42,7 +41,6 @@ export function Sidebar() {
   const tasks = useTaskStore((state) => state.tasks);
   const projects = useProjectStore((state) => state.projects);
 
-  const selectedProjectId = useUIStore((state) => state.selectedProjectId);
   const setSelectedProjectId = useUIStore(
     (state) => state.setSelectedProjectId,
   );
@@ -50,7 +48,8 @@ export function Sidebar() {
   const closeSidebar = useUIStore((state) => state.closeSidebar);
   const openProjectModal = useUIStore((state) => state.openProjectModal);
 
-  const [activeView, setActiveView] = useState<SidebarView>("all");
+  /** The URL is the source of truth for active nav highlighting. */
+  const pathname = usePathname();
 
   /**
    * Overdue counting reads the current date, which prerendering forbids
@@ -82,20 +81,17 @@ export function Sidebar() {
     [projects],
   );
 
-  /** View nav: Phase 4 adds the actual view filters; today they clear the project filter. */
-  const handleViewSelect = (view: SidebarView) => {
-    setActiveView(view);
+  /**
+   * View links navigate with Next.js `Link`; the click handler only resets
+   * the project filter (these views show all tasks) and closes the mobile
+   * drawer. Active highlighting comes from `pathname`.
+   */
+  const handleViewNavigate = () => {
     setSelectedProjectId(null);
     closeSidebar();
   };
 
-  const handleProjectSelect = (projectId: string) => {
-    setSelectedProjectId(projectId);
-    closeSidebar();
-  };
-
-  const viewActive = (view: SidebarView) =>
-    activeView === view && selectedProjectId === null;
+  const isActiveRoute = (href: string) => pathname === href;
 
   return (
     <>
@@ -141,27 +137,31 @@ export function Sidebar() {
           <SidebarNavButton
             icon={<FiLayout size={16} />}
             label="Dashboard"
-            active={viewActive("dashboard")}
-            onClick={() => handleViewSelect("dashboard")}
+            href="/dashboard"
+            active={isActiveRoute("/dashboard")}
+            onClick={handleViewNavigate}
           />
           <SidebarNavButton
             icon={<FiList size={16} />}
             label="All Tasks"
-            active={viewActive("all")}
+            href="/board"
+            active={isActiveRoute("/board")}
             count={counts.total}
-            onClick={() => handleViewSelect("all")}
+            onClick={handleViewNavigate}
           />
           <SidebarNavButton
             icon={<FiSun size={16} />}
             label="Today"
-            active={viewActive("today")}
-            onClick={() => handleViewSelect("today")}
+            href="/today"
+            active={isActiveRoute("/today")}
+            onClick={handleViewNavigate}
           />
           <SidebarNavButton
             icon={<FiCalendar size={16} />}
             label="Upcoming"
-            active={viewActive("upcoming")}
-            onClick={() => handleViewSelect("upcoming")}
+            href="/upcoming"
+            active={isActiveRoute("/upcoming")}
+            onClick={handleViewNavigate}
           />
         </nav>
 
@@ -195,8 +195,7 @@ export function Sidebar() {
               key={project.id}
               project={project}
               count={projectCounts.get(project.id) ?? 0}
-              active={selectedProjectId === project.id}
-              onSelect={() => handleProjectSelect(project.id)}
+              active={isActiveRoute(`/projects/${project.id}`)}
             />
           ))}
         </nav>
@@ -214,25 +213,27 @@ export function Sidebar() {
   );
 }
 
-/** Sidebar view nav row (Dashboard / All Tasks / Today / Upcoming). */
+/** Sidebar view nav link (Dashboard / All Tasks / Today / Upcoming). */
 function SidebarNavButton({
   icon,
   label,
+  href,
   active,
   count,
   onClick,
 }: {
   icon: ReactNode;
   label: string;
+  href: string;
   active: boolean;
   count?: number;
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <Link
+      href={href}
       aria-current={active ? "page" : undefined}
+      onClick={onClick}
       className={`flex w-full items-center gap-2.5 rounded-xl border border-l-2 px-3 py-2 text-left text-sm transition ${
         active
           ? "border-white/10 border-l-indigo-500 bg-white/12 text-white/90"
@@ -244,7 +245,7 @@ function SidebarNavButton({
       {count !== undefined ? (
         <span className="text-xs tabular-nums text-white/40">{count}</span>
       ) : null}
-    </button>
+    </Link>
   );
 }
 
@@ -256,29 +257,42 @@ function ProjectRow({
   project,
   count,
   active,
-  onSelect,
 }: {
   project: Project;
   count: number;
   active: boolean;
-  onSelect: () => void;
 }) {
   const openProjectModal = useUIStore((state) => state.openProjectModal);
   const openDeleteProjectModal = useUIStore(
     (state) => state.openDeleteProjectModal,
   );
+  const setSelectedProjectId = useUIStore(
+    (state) => state.setSelectedProjectId,
+  );
+  const closeSidebar = useUIStore((state) => state.closeSidebar);
   const protectedInbox = isInboxProject(project);
+
+  /**
+   * Navigates to `/projects/[id]`. The filter is set immediately so the
+   * board never renders an unfiltered frame — the route page also sets it
+   * on mount and clears it again when the route unmounts.
+   */
+  const handleNavigate = () => {
+    setSelectedProjectId(project.id);
+    closeSidebar();
+  };
 
   return (
     <div className="group/row relative">
-      <button
-        type="button"
-        onClick={onSelect}
-        aria-current={active ? "page" : undefined}        className={`flex w-full items-center gap-2.5 rounded-xl border border-l-2 px-3 py-2 text-left text-sm transition ${
+      <Link
+        href={`/projects/${project.id}`}
+        aria-current={active ? "page" : undefined}
+        onClick={handleNavigate}
+        className={`flex w-full items-center gap-2.5 rounded-xl border border-l-2 px-3 py-2 text-left text-sm transition ${
           active
             ? "border-white/10 bg-white/12 text-white/90"
             : "border-transparent border-l-transparent text-white/60 hover:bg-white/5 hover:text-white/90"
-          }`}
+        }`}
         style={active ? { borderLeftColor: project.color } : undefined}
       >
         <ProjectIcon
@@ -290,7 +304,7 @@ function ProjectRow({
         <span className="text-xs tabular-nums text-white/40 transition-opacity group-hover/row:opacity-0">
           {count}
         </span>
-      </button>
+      </Link>
 
       {/* Hover actions — swap in over the count badge */}
       <div className="absolute right-1.5 top-1/2 flex -translate-y-1/2 gap-0.5 opacity-0 transition-opacity focus-within:opacity-100 group-hover/row:opacity-100">
@@ -320,6 +334,56 @@ function ProjectRow({
         )}
       </div>
     </div>
+  );
+}
+
+/**
+ * Prerender fallback for the sidebar.
+ *
+ * `usePathname()` suspends while prerendering routes with params that are
+ * not known at build time (e.g. `/projects/[id]` without
+ * `generateStaticParams`), because the pathname only exists at request
+ * time. AppShell wraps the real sidebar in `<Suspense fallback={…}>`, so
+ * the static shell shows this skeleton and the live sidebar streams in —
+ * static routes (dashboard, board, today, upcoming) resolve instantly and
+ * never show it.
+ */
+export function SidebarFallback() {
+  return (
+    <aside
+      aria-hidden
+      className="fixed inset-y-0 left-0 z-40 w-64 shrink-0 -translate-x-full border-r border-white/10 bg-white/5 p-4 backdrop-blur-xl lg:static lg:z-auto lg:translate-x-0"
+    >
+      {/* Branding */}
+      <div className="flex items-center gap-3 px-1">
+        <div className="size-[34px] animate-pulse rounded-xl bg-white/10" />
+        <div className="h-5 w-24 animate-pulse rounded bg-white/10" />
+      </div>
+
+      {/* View navigation rows */}
+      <div className="mt-6 flex flex-col gap-2">
+        {Array.from({ length: 4 }, (_, index) => (
+          <div key={index} className="h-9 animate-pulse rounded-xl bg-white/5" />
+        ))}
+      </div>
+
+      {/* Stats strip */}
+      <div className="mt-5 grid grid-cols-2 gap-2">
+        {Array.from({ length: 4 }, (_, index) => (
+          <div
+            key={index}
+            className="h-14 animate-pulse rounded-xl bg-white/5"
+          />
+        ))}
+      </div>
+
+      {/* Project rows */}
+      <div className="mt-5 flex flex-col gap-2">
+        {Array.from({ length: 3 }, (_, index) => (
+          <div key={index} className="h-9 animate-pulse rounded-xl bg-white/5" />
+        ))}
+      </div>
+    </aside>
   );
 }
 

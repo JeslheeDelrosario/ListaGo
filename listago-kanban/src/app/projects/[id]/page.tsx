@@ -66,7 +66,7 @@ function ProjectView() {
             </p>
           </div>
           <Link
-            href="/"
+            href="/board"
             className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:brightness-110"
           >
             <FiArrowLeft size={15} />

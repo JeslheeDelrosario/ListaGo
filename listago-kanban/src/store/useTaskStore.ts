@@ -76,6 +76,7 @@ function createSeedTasks(): Task[] {
       id: "seed-task-6",
       title: "Set up CI pipeline",
       completed: true,
+      completedAt: createdAt,
       dueDate: daysFromToday(-3),
       projectId: "inbox",
       priority: "high",
@@ -201,11 +202,21 @@ export const useTaskStore = create<TaskState>()(
 
       moveTask: (taskId, newStatus) => {
         set((state) => ({
-          tasks: state.tasks.map((task) =>
-            task.id === taskId
-              ? { ...task, status: newStatus, completed: newStatus === "done" }
-              : task,
-          ),
+          tasks: state.tasks.map((task) => {
+            if (task.id !== taskId) return task;
+            const completed = newStatus === "done";
+            return {
+              ...task,
+              status: newStatus,
+              completed,
+              // Stamp completion time for the dashboard charts; clear it
+              // when the task leaves "done". A legacy done task without a
+              // stamp gets backfilled the first time it is moved.
+              completedAt: completed
+                ? (task.completedAt ?? new Date().toISOString())
+                : null,
+            };
+          }),
         }));
       },
 
@@ -214,7 +225,12 @@ export const useTaskStore = create<TaskState>()(
           tasks: state.tasks.map((task) => {
             if (task.id !== id) return task;
             const completed = !task.completed;
-            return { ...task, completed, status: completed ? "done" : "todo" };
+            return {
+              ...task,
+              completed,
+              status: completed ? "done" : "todo",
+              completedAt: completed ? new Date().toISOString() : null,
+            };
           }),
         }));
       },

@@ -27,6 +27,13 @@ export interface Task {
   description: string;
   /** Whether the task is completed. Kept in sync with `status === "done"`. */
   completed: boolean;
+  /**
+   * ISO timestamp of when the task was completed (`null` while open).
+   * Set when the task enters the "done" status and cleared when it leaves.
+   * Optional because tasks persisted before Phase 4 may not have it yet —
+   * consumers must treat `undefined` as "unknown completion time".
+   */
+  completedAt?: string | null;
   /** ISO timestamp of task creation. */
   createdAt: string;
   /** Due date in `YYYY-MM-DD` format, or `null` when the task has no due date. */
