@@ -22,7 +22,9 @@ function isTypingTarget(target: EventTarget | null): boolean {
 /**
  * Registers ListaGo's global keyboard shortcuts:
  * - "/" focuses the search input (ignored while typing in a field)
- * - Ctrl/Cmd + N opens the create-task modal (ignored while typing)
+ * - "c" opens the create-task modal (ignored while typing) — plain keys are
+ *   used because browsers reserve Ctrl/Cmd + N (and C) for themselves
+ * - Ctrl/Cmd + N also opens the create-task modal, for muscle memory
  * - Escape closes any open modal, or clears the search when none is open
  */
 export function useKeyboardShortcuts(): void {
@@ -55,7 +57,17 @@ export function useKeyboardShortcuts(): void {
         return;
       }
 
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "n") {
+      const key = event.key.toLowerCase();
+
+      // Plain "c" — safe because a Ctrl/Cmd/Alt chord would have been
+      // swallowed above only for the combos we handle explicitly.
+      if (key === "c" && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        event.preventDefault();
+        ui.openCreateTask();
+        return;
+      }
+
+      if ((event.ctrlKey || event.metaKey) && key === "n") {
         event.preventDefault();
         ui.openCreateTask();
       }

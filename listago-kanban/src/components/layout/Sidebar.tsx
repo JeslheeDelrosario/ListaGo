@@ -204,7 +204,7 @@ export function Sidebar() {
         <p className="mt-4 select-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[11px] leading-relaxed text-white/40">
           <kbd className="font-sans font-semibold text-white/60">/</kbd> search
           <span className="mx-1.5 text-white/20">·</span>
-          <kbd className="font-sans font-semibold text-white/60">⌘N</kbd> new task
+          <kbd className="font-sans font-semibold text-white/60">c</kbd> new task
           <span className="mx-1.5 text-white/20">·</span>
           <kbd className="font-sans font-semibold text-white/60">esc</kbd> close
         </p>
