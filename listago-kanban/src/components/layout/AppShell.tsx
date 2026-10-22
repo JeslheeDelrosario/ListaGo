@@ -1,15 +1,16 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { Toaster } from "sonner";
 
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { DeleteModal } from "@/components/modals/DeleteModal";
 import { DeleteProjectModal } from "@/components/modals/DeleteProjectModal";
 import { ProjectModal } from "@/components/modals/ProjectModal";
+import { TaskDetailModal } from "@/components/modals/TaskDetailModal";
 import { TaskModal } from "@/components/modals/TaskModal";
 import { Header } from "./Header";
-import { Sidebar } from "./Sidebar";
+import { Sidebar, SidebarFallback } from "./Sidebar";
 
 interface AppShellProps {
   /** The routed page content (the Kanban board). */
@@ -26,7 +27,13 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      {/* The sidebar's active-link highlight needs `usePathname`, which
+          suspends while prerendering routes whose params are only known at
+          request time (e.g. `/projects/[id]`). The boundary keeps the rest
+          of the shell prerendered; static routes resolve instantly. */}
+      <Suspense fallback={<SidebarFallback />}>
+        <Sidebar />
+      </Suspense>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header />
@@ -39,6 +46,9 @@ export function AppShell({ children }: AppShellProps) {
       <DeleteModal />
       <ProjectModal />
       <DeleteProjectModal />
+      {/* Rendered last so it stacks above the other modals; it closes
+          itself before opening the delete or edit modals from its footer. */}
+      <TaskDetailModal />
       <Toaster theme="dark" richColors position="top-right" closeButton />
     </div>
   );

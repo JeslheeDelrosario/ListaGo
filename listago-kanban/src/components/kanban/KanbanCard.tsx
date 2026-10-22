@@ -36,7 +36,7 @@ interface KanbanCardBodyProps {
   isOverlay?: boolean;
   /** True while the card itself is being dragged (reduced opacity + tilt). */
   isDragging?: boolean;
-  /** Opens the edit modal for this task. */
+  /** Opens the task detail popup for this task. */
   onTaskClick?: (task: Task) => void;
   /** Opens the delete confirmation modal for this task. */
   onTaskDelete?: (task: Task) => void;
@@ -67,7 +67,7 @@ export function KanbanCardBody({
       className={`group rounded-xl border p-4 backdrop-blur-xl transition-all duration-200 ${
         isOverlay
           ? "cursor-grabbing border-accent-purple/60 bg-glass-hover shadow-2xl shadow-black/40"
-          : "cursor-grab border-white/10 bg-glass hover:-translate-y-0.5 hover:border-white/20 hover:bg-glass-hover active:cursor-grabbing"
+          : "cursor-pointer border-white/10 bg-glass hover:-translate-y-0.5 hover:scale-[1.02] hover:border-white/20 hover:bg-glass-hover active:cursor-grabbing"
       } ${isDragging ? "rotate-2 opacity-40 shadow-2xl shadow-black/40" : ""}`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -115,15 +115,15 @@ interface KanbanCardProps {
 }
 
 /**
- * Sortable task card (`useSortable`). A plain click opens the edit modal;
- * a press that turned into a drag does not (checked via a small movement
- * threshold). Delegates rendering to `KanbanCardBody`.
+ * Sortable task card (`useSortable`). A plain click opens the Jira-style
+ * task detail popup; a press that turned into a drag does not (checked via
+ * a small movement threshold). Delegates rendering to `KanbanCardBody`.
  */
 export function KanbanCard({ task }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: task.id });
 
-  const openEditTask = useUIStore((state) => state.openEditTask);
+  const openTaskDetail = useUIStore((state) => state.openTaskDetail);
   const openDeleteTask = useUIStore((state) => state.openDeleteTask);
 
   /** Press coordinates, used to tell clicks apart from drag ends. */
@@ -164,7 +164,7 @@ export function KanbanCard({ task }: KanbanCardProps) {
       <KanbanCardBody
         task={task}
         isDragging={isDragging}
-        onTaskClick={(clicked) => openEditTask(clicked.id)}
+        onTaskClick={(clicked) => openTaskDetail(clicked.id)}
         onTaskDelete={(deleted) => openDeleteTask(deleted.id)}
       />
     </div>

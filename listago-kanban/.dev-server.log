@@ -2371,3 +2371,9 @@ Import traces:
 ✓ Compiled in 51ms
  GET / 200 in 59ms (next.js: 2ms, application-code: 57ms)
  GET /projects/inbox 200 in 77ms (next.js: 3ms, generate-params: 6ms, application-code: 69ms)
+ GET / 200 in 67ms (next.js: 2ms, application-code: 65ms)
+ GET / 200 in 61ms (next.js: 2ms, application-code: 59ms)
+ GET / 200 in 60ms (next.js: 3ms, application-code: 57ms)
+ GET / 200 in 51ms (next.js: 1.8ms, application-code: 49ms)
+ GET / 200 in 56ms (next.js: 2.0ms, application-code: 54ms)
+ GET / 200 in 53ms (next.js: 2ms, application-code: 51ms)

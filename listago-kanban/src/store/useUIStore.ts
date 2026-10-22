@@ -47,6 +47,15 @@ export interface UIState {
   /** Closes the task modal and clears the pre-filled status. */
   closeTaskModal: () => void;
 
+  /** Task detail popup (Jira-style view): the task being viewed. */
+  selectedTaskId: string | null;
+  /** Whether the task detail popup is open. */
+  isTaskDetailOpen: boolean;
+  /** Opens the task detail popup for the given task. */
+  openTaskDetail: (taskId: string) => void;
+  /** Closes the task detail popup and clears the selected task. */
+  closeTaskDetail: () => void;
+
   /** State of the delete confirmation modal (tasks and bulk selection). */
   deleteModal: DeleteModalState;
   /** Opens the delete modal for a single task. */
@@ -120,6 +129,13 @@ export const useUIStore = create<UIState>()((set, get) => ({
       taskModal: { ...state.taskModal, open: false },
       initialStatus: null,
     })),
+
+  selectedTaskId: null,
+  isTaskDetailOpen: false,
+  openTaskDetail: (taskId) =>
+    set({ selectedTaskId: taskId, isTaskDetailOpen: true }),
+  closeTaskDetail: () =>
+    set({ selectedTaskId: null, isTaskDetailOpen: false }),
 
   deleteModal: { open: false, type: "task", id: null },
   openDeleteTask: (taskId) =>

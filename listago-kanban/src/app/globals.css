@@ -82,3 +82,234 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* -------------------------------------------------------------------------- */
+/*                        Dashboard animations (Phase 4)                      */
+/* -------------------------------------------------------------------------- */
+
+/** Soft red glow behind the overdue stat card while its count is > 0. */
+@keyframes pulse-red {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(239, 68, 68, 0);
+  }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/** Slide-up entrance used by the dashboard sections. */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* `both` keeps each section hidden until its staggered delay has passed. */
+.animate-fade-in-up {
+  animation: fade-in-up 500ms ease-out both;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-pulse-red {
+    animation: none;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                       Recharts dark theme overrides                        */
+/* -------------------------------------------------------------------------- */
+
+/* Axis tick labels (SVG fill presentation attribute is overridden by CSS). */
+.recharts-text {
+  fill: rgba(255, 255, 255, 0.5);
+}
+
+/* Hairline grid lines tuned for the dark glass background. */
+.recharts-cartesian-grid line {
+  stroke: rgba(255, 255, 255, 0.06);
+}
+
+/* Glassmorphism tooltip: frosted dark panel over the charts. */
+.recharts-tooltip-wrapper {
+  z-index: 40;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: rgba(15, 12, 41, 0.88) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.recharts-tooltip-wrapper .recharts-tooltip-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------- */
+/*                       Task detail modal (Jira-style)                       */
+/* -------------------------------------------------------------------------- */
+
+/* Task detail modal animations */
+@keyframes modal-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes overlay-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-modal-scale-in {
+  animation: modal-scale-in 0.3s ease-out forwards;
+}
+
+.animate-overlay-fade-in {
+  animation: overlay-fade-in 0.2s ease-out forwards;
+}
+
+/* Inline edit focus ring */
+.inline-edit-active {
+  outline: 2px solid #6366f1;
+  outline-offset: 2px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+}
+
+/* Description prose styling for dark theme */
+.task-description h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 1rem 0 0.5rem;
+}
+
+.task-description h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0.8rem 0 0.4rem;
+}
+
+.task-description h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0.6rem 0 0.3rem;
+}
+
+.task-description p {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  margin: 0.4rem 0;
+}
+
+.task-description ul,
+.task-description ol {
+  color: rgba(255, 255, 255, 0.7);
+  padding-left: 1.5rem;
+  margin: 0.4rem 0;
+}
+
+.task-description li {
+  margin: 0.2rem 0;
+}
+
+.task-description a {
+  color: #818cf8;
+  text-decoration: underline;
+}
+
+.task-description code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #c4b5fd;
+}
+
+.task-description blockquote {
+  border-left: 3px solid #6366f1;
+  padding-left: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-style: italic;
+}
+
+.task-description strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Saved indicator */
+@keyframes saved-fade {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+.animate-saved {
+  animation: saved-fade 2s ease-out forwards;
+}
+
+/* Custom scrollbar for the modal */
+.task-detail-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-detail-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.task-detail-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.task-detail-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}

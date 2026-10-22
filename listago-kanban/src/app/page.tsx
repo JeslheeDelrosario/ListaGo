@@ -1,10 +1,9 @@
-import { KanbanBoard } from "@/components/kanban/KanbanBoard";
+import { redirect } from "next/navigation";
 
 /**
- * Main Kanban board page.
- * Server component: the app chrome (sidebar, header, modals) lives in
- * `AppShell`, mounted by the root layout — this page is just the board.
+ * `/` lands on the dashboard now — the Kanban board moved to `/board`
+ * (FILE 8 of the Phase 4 migration).
  */
 export default function Home() {
-  return <KanbanBoard />;
+  redirect("/dashboard");
 }
