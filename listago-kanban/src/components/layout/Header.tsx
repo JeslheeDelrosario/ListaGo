@@ -1,6 +1,7 @@
 "use client";
 
-import { FiMenu, FiPlus, FiSearch } from "react-icons/fi";
+import { FiMenu, FiMoon, FiPlus, FiSearch, FiSun } from "react-icons/fi";
+import { useSyncExternalStore } from "react";
 
 import { useProjectStore } from "@/store/useProjectStore";
 import { useUIStore } from "@/store/useUIStore";
@@ -16,7 +17,40 @@ import {
  * The raw query is stored in the UI store so typing stays instant; the
  * board debounces it (250ms) before running the filter pipeline.
  */
+const THEME_STORAGE_KEY = "listago-theme";
+const THEME_CHANGE_EVENT = "listago-theme-change";
+
+function subscribeToTheme(callback: () => void): () => void {
+  window.addEventListener(THEME_CHANGE_EVENT, callback);
+  return () => window.removeEventListener(THEME_CHANGE_EVENT, callback);
+}
+
+function getThemeSnapshot(): "dark" | "light" {
+  return document.documentElement.dataset.theme === "light" ? "light" : "dark";
+}
+
+function getServerThemeSnapshot(): "dark" {
+  return "dark";
+}
+
 export function Header() {
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    getThemeSnapshot,
+    getServerThemeSnapshot,
+  );
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nextTheme;
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    } catch {
+      // Keep the current page usable when browser storage is unavailable.
+    }
+    window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
+  };
+
   const searchQuery = useUIStore((state) => state.searchQuery);
   const setSearchQuery = useUIStore((state) => state.setSearchQuery);
   const selectedProjectId = useUIStore((state) => state.selectedProjectId);
@@ -75,6 +109,18 @@ export function Header() {
           {selectedProject.name}
         </span>
       ) : null}
+
+      <button
+        type="button"
+        onClick={toggleTheme}
+        aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        aria-pressed={theme === "light"}
+        title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        className="flex shrink-0 items-center gap-2 rounded-xl border border-white/10 bg-white/5 p-2 text-sm text-white/70 transition hover:bg-white/10 hover:text-white/90"
+      >
+        {theme === "dark" ? <FiSun size={16} /> : <FiMoon size={16} />}
+        <span className="hidden sm:inline">{theme === "dark" ? "Light" : "Dark"} mode</span>
+      </button>
 
       <button
         type="button"

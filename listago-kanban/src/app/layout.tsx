@@ -34,7 +34,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="en" data-theme="dark" className={`${inter.variable} h-full`} suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem("listago-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})()`,
+          }}
+        />
+      </head>
       <body className="min-h-screen font-sans antialiased">
         <AppShell>{children}</AppShell>
         {/* Global toast notifications — dark glass, bottom-right. */}
@@ -45,9 +52,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           duration={3000}
           toastOptions={{
             style: {
-              background: "rgba(26, 26, 46, 0.95)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              color: "rgba(255,255,255,0.9)",
+              background: "var(--toast-background)",
+              border: "1px solid var(--toast-border)",
+              color: "var(--toast-color)",
               backdropFilter: "blur(20px)",
             },
           }}

@@ -10,6 +10,8 @@
 :root {
   /* Dark glassmorphism palette from the original ListaGo app */
   --app-background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --app-background-color: #0f0c29;
+  --panel-background: #1a1a2e;
   --glass-bg: rgba(255, 255, 255, 0.08);
   --glass-bg-hover: rgba(255, 255, 255, 0.12);
   --glass-border: rgba(255, 255, 255, 0.1);
@@ -18,8 +20,28 @@
   --text-heading: rgba(255, 255, 255, 0.9);
   --text-body: rgba(255, 255, 255, 0.6);
   --text-muted: rgba(255, 255, 255, 0.4);
+  --toast-background: rgba(26, 26, 46, 0.95);
+  --toast-border: rgba(255, 255, 255, 0.1);
+  --toast-color: rgba(255, 255, 255, 0.9);
 
   color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  --app-background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 52%, #f5f3ff 100%);
+  --app-background-color: #f8fafc;
+  --panel-background: #fff;
+  --glass-bg: rgba(255, 255, 255, 0.76);
+  --glass-bg-hover: rgba(255, 255, 255, 0.94);
+  --glass-border: rgba(71, 85, 105, 0.18);
+  --text-heading: #1e293b;
+  --text-body: #475569;
+  --text-muted: #64748b;
+  --toast-background: rgba(255, 255, 255, 0.97);
+  --toast-border: rgba(71, 85, 105, 0.18);
+  --toast-color: #1e293b;
+
+  color-scheme: light;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -32,10 +54,76 @@ html {
 
 body {
   min-height: 100vh;
-  background-color: #0f0c29;
+  background-color: var(--app-background-color);
   background-image: var(--app-background);
   background-attachment: fixed;
   color: var(--text-heading);
+}
+
+html[data-theme="light"] [class~="text-white"]:not([class*="bg-gradient-to"]),
+html[data-theme="light"] [class~="text-white/90"],
+html[data-theme="light"] [class~="text-white/80"] {
+  color: #1e293b;
+}
+
+html[data-theme="light"] [class~="text-white/70"],
+html[data-theme="light"] [class~="text-white/60"],
+html[data-theme="light"] [class~="text-white/50"] {
+  color: #475569;
+}
+
+html[data-theme="light"] [class~="text-white/45"],
+html[data-theme="light"] [class~="text-white/40"],
+html[data-theme="light"] [class~="text-white/30"],
+html[data-theme="light"] [class~="text-white/20"] {
+  color: #64748b;
+}
+
+html[data-theme="light"] [class~="bg-white/5"] {
+  background-color: rgba(255, 255, 255, 0.64);
+}
+
+html[data-theme="light"] [class~="bg-white/8"] {
+  background-color: rgba(255, 255, 255, 0.78);
+}
+
+html[data-theme="light"] [class~="bg-white/10"],
+html[data-theme="light"] [class~="bg-white/12"] {
+  background-color: rgba(226, 232, 240, 0.76);
+}
+
+html[data-theme="light"] [class~="border-white/10"] {
+  border-color: rgba(71, 85, 105, 0.18);
+}
+
+html[data-theme="light"] [class~="border-white/20"] {
+  border-color: rgba(71, 85, 105, 0.28);
+}
+
+html[data-theme="light"] .border-dashed {
+  border-color: rgba(71, 85, 105, 0.28);
+}
+
+html[data-theme="light"] .bg-\[\#1a1a2e\] {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea {
+  color-scheme: light;
+}
+
+html[data-theme="light"] [class~="hover:bg-white/5"]:hover,
+html[data-theme="light"] [class~="hover:bg-white/8"]:hover,
+html[data-theme="light"] [class~="hover:bg-white/10"]:hover {
+  background-color: rgba(203, 213, 225, 0.7);
+}
+
+html[data-theme="light"] [class~="hover:text-white/90"]:hover,
+html[data-theme="light"] [class~="hover:text-white/80"]:hover,
+html[data-theme="light"] [class~="hover:text-white/70"]:hover {
+  color: #0f172a;
 }
 
 ::selection {
@@ -152,10 +240,15 @@ body {
   fill: rgba(255, 255, 255, 0.5);
 }
 
+html[data-theme="light"] .recharts-text {
+  fill: #64748b;
+}
+
 /* Hairline grid lines tuned for the dark glass background. */
 .recharts-cartesian-grid line {
   stroke: rgba(255, 255, 255, 0.06);
 }
+
 
 /* Glassmorphism tooltip: frosted dark panel over the charts. */
 .recharts-tooltip-wrapper {
@@ -404,6 +497,159 @@ body {
   color: rgba(255, 255, 255, 0.9) !important;
 }
 
+/* Light-mode component overrides; utility selectors cover the existing UI. */
+html[data-theme="light"] [class~="text-white"]:not([class*="bg-gradient-to"]),
+html[data-theme="light"] [class~="text-white/90"],
+html[data-theme="light"] [class~="text-white/80"] {
+  color: #1e293b;
+}
+
+html[data-theme="light"] [class~="text-white/70"],
+html[data-theme="light"] [class~="text-white/60"],
+html[data-theme="light"] [class~="text-white/50"] {
+  color: #475569;
+}
+
+html[data-theme="light"] [class~="text-white/45"],
+html[data-theme="light"] [class~="text-white/40"],
+html[data-theme="light"] [class~="text-white/30"],
+html[data-theme="light"] [class~="text-white/20"] {
+  color: #64748b;
+}
+
+html[data-theme="light"] [class~="bg-white/5"] {
+  background-color: rgba(255, 255, 255, 0.64);
+}
+
+html[data-theme="light"] [class~="bg-white/8"] {
+  background-color: rgba(255, 255, 255, 0.78);
+}
+
+html[data-theme="light"] [class~="bg-white/10"],
+html[data-theme="light"] [class~="bg-white/12"] {
+  background-color: rgba(226, 232, 240, 0.76);
+}
+
+html[data-theme="light"] [class~="border-white/10"] {
+  border-color: rgba(71, 85, 105, 0.18);
+}
+
+html[data-theme="light"] [class~="border-white/20"],
+html[data-theme="light"] .border-dashed {
+  border-color: rgba(71, 85, 105, 0.28);
+}
+
+html[data-theme="light"] [class~="hover:bg-white/5"]:hover,
+html[data-theme="light"] [class~="hover:bg-white/8"]:hover,
+html[data-theme="light"] [class~="hover:bg-white/10"]:hover {
+  background-color: rgba(203, 213, 225, 0.7);
+}
+
+html[data-theme="light"] [class~="hover:text-white/90"]:hover,
+html[data-theme="light"] [class~="hover:text-white/80"]:hover,
+html[data-theme="light"] [class~="hover:text-white/70"]:hover {
+  color: #0f172a;
+}
+
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] textarea {
+  color-scheme: light;
+}
+
+html[data-theme="light"] .task-detail-scroll,
+html[data-theme="light"] .task-detail-scroll [role="menu"] {
+  background: var(--panel-background) !important;
+  border-color: rgba(71, 85, 105, 0.18);
+}
+
+html[data-theme="light"] .task-detail-scroll::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.24);
+}
+
+html[data-theme="light"] .task-detail-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(71, 85, 105, 0.4);
+}
+
+html[data-theme="light"] .task-detail-scroll .inline-edit-active {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+html[data-theme="light"] .task-description h1,
+html[data-theme="light"] .task-description h2,
+html[data-theme="light"] .task-description h3,
+html[data-theme="light"] .task-description strong {
+  color: #1e293b;
+}
+
+html[data-theme="light"] .task-description p,
+html[data-theme="light"] .task-description ul,
+html[data-theme="light"] .task-description ol,
+html[data-theme="light"] .task-description blockquote {
+  color: #475569;
+}
+
+html[data-theme="light"] .task-description code {
+  background: rgba(99, 102, 241, 0.1);
+  color: #5b21b6;
+}
+
+html[data-theme="light"] .recharts-cartesian-grid line {
+  stroke: rgba(71, 85, 105, 0.18);
+}
+
+html[data-theme="light"] .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(71, 85, 105, 0.18);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+}
+
+html[data-theme="light"] .recharts-tooltip-wrapper .recharts-tooltip-label {
+  color: #1e293b;
+}
+
+html[data-theme="light"] .ck-editor__editable {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1e293b !important;
+  border-color: rgba(71, 85, 105, 0.2) !important;
+}
+
+html[data-theme="light"] .ck-toolbar {
+  background: #f1f5f9 !important;
+  border-color: rgba(71, 85, 105, 0.2) !important;
+}
+
+html[data-theme="light"] .ck-button {
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .ck-button:hover {
+  background: rgba(99, 102, 241, 0.1) !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .ck-list,
+html[data-theme="light"] .ck-dropdown__panel,
+html[data-theme="light"] .ck.ck-balloon-panel {
+  background: #fff !important;
+  border-color: rgba(71, 85, 105, 0.2) !important;
+  color: #1e293b !important;
+}
+
+html[data-theme="light"] .ck-dropdown__list-item,
+html[data-theme="light"] .ck-content p,
+html[data-theme="light"] .ck-content h2,
+html[data-theme="light"] .ck-content h3 {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .ck.ck-balloon-panel .ck-input,
+html[data-theme="light"] .ck.ck-balloon-panel .ck-input__input {
+  background: #fff !important;
+  color: #1e293b !important;
+  border-color: rgba(71, 85, 105, 0.24) !important;
+}
+
 /* Link / bookmark balloon dialogs */
 .ck.ck-balloon-panel {
   background: #1a1a2e !important;
@@ -414,6 +660,5 @@ body {
 .ck.ck-balloon-panel .ck-input,
 .ck.ck-balloon-panel .ck-input__input {
   background: rgba(255, 255, 255, 0.05) !important;
-  color: white !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;  border-color: rgba(255, 255, 255, 0.15) !important;
 }

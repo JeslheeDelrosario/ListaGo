@@ -288,7 +288,7 @@ function TaskForm({
             type="date"
             value={dueDate}
             onChange={(event) => setDueDate(event.target.value)}
-            className={`${MODAL_INPUT_CLASSES} [color-scheme:dark]`}
+            className={MODAL_INPUT_CLASSES}
           />
         </div>
 
