@@ -73,13 +73,13 @@ export function ProjectModal() {
         </>
       }
     >
-      {isOpen ? (
-        <ProjectForm
-          key={formKey}
-          editingProjectId={editingProjectId}
-          onClose={closeProjectModal}
-        />
-      ) : null}
+      {/* Always passed: `Modal` only mounts children while open or exiting,
+          so the form remains visible through the close animation. */}
+      <ProjectForm
+        key={formKey}
+        editingProjectId={editingProjectId}
+        onClose={closeProjectModal}
+      />
     </Modal>
   );
 }
@@ -173,7 +173,7 @@ function ProjectForm({ editingProjectId, onClose }: ProjectFormProps) {
         toast.error("A project with this name already exists");
         return;
       }
-      toast.success("Project updated");
+      toast.success("Project updated!");
     } else {
       const created = addProject({ name: trimmed, color, icon });
       if (!created) {
@@ -181,7 +181,7 @@ function ProjectForm({ editingProjectId, onClose }: ProjectFormProps) {
         toast.error("A project with this name already exists");
         return;
       }
-      toast.success("Project created");
+      toast.success("Project created!");
     }
 
     onClose();

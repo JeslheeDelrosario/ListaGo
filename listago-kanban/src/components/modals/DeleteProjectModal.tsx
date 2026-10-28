@@ -32,14 +32,22 @@ export function DeleteProjectModal() {
 
   const project = projects.find((p) => p.id === deletingProjectId) ?? null;
 
-  // Never render for a closed modal, a missing project, or the Inbox.
-  if (!isOpen || !project || isInboxProject(project)) return null;
+  // Render whenever a target project exists — even while closing, so the
+  // exit animation can play (`Modal` hides its content once `open` is false).
+  // Never render for a missing project or the Inbox.
+  if (!project || isInboxProject(project)) return null;
 
-  return <DeleteProjectDialog key={project.id} project={project} />;
+  return <DeleteProjectDialog key={project.id} project={project} open={isOpen} />;
 }
 
 /** The dialog body; remounted per project via the key above. */
-function DeleteProjectDialog({ project }: { project: Project }) {
+function DeleteProjectDialog({
+  project,
+  open,
+}: {
+  project: Project;
+  open: boolean;
+}) {
   const closeDeleteProjectModal = useUIStore(
     (state) => state.closeDeleteProjectModal,
   );
@@ -65,17 +73,17 @@ function DeleteProjectDialog({ project }: { project: Project }) {
       return;
     }
     if (selectedProjectId === project.id) setSelectedProjectId(null);
-    toast.success(
-      action === "delete-tasks"
-        ? `Project "${project.name}" and its ${taskCount} task${taskCount === 1 ? "" : "s"} deleted`
-        : `Project "${project.name}" deleted — tasks moved to Inbox`,
-    );
+    if (action === "delete-tasks") {
+      toast.error("Project deleted");
+    } else {
+      toast.success("Tasks moved to Inbox");
+    }
     closeDeleteProjectModal();
   };
 
   return (
     <Modal
-      open
+      open={open}
       onClose={closeDeleteProjectModal}
       title="Delete project?"
       maxWidth="max-w-md"

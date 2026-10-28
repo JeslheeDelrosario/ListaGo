@@ -4,7 +4,10 @@ import { FiMenu, FiPlus, FiSearch } from "react-icons/fi";
 
 import { useProjectStore } from "@/store/useProjectStore";
 import { useUIStore } from "@/store/useUIStore";
-import { SEARCH_INPUT_ID } from "@/hooks/useKeyboardShortcuts";
+import {
+  SEARCH_INPUT_ATTR,
+  SEARCH_INPUT_ID,
+} from "@/hooks/useKeyboardShortcuts";
 
 /**
  * App header: mobile menu button, debounced search field, active project
@@ -43,13 +46,23 @@ export function Header() {
         />
         <input
           id={SEARCH_INPUT_ID}
+          {...{ [SEARCH_INPUT_ATTR]: "" }}
           type="search"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
-          placeholder="Search tasks...  /"
+          placeholder="Search tasks..."
           aria-label="Search tasks"
-          className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-9 pr-3 text-sm text-white/90 placeholder:text-white/30 transition focus:border-accent-indigo/60 focus:outline-none focus:ring-2 focus:ring-accent-indigo/40"
+          className="w-full rounded-xl border border-white/10 bg-white/5 py-2 pl-9 pr-14 text-sm text-white/90 placeholder:text-white/30 transition focus:border-accent-indigo/60 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
         />
+        {/* Keyboard hint badge — shown until the field has content */}
+        {searchQuery === "" ? (
+          <kbd
+            aria-hidden
+            className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded-md border border-white/10 bg-white/5 px-1.5 py-0.5 font-sans text-xs text-white/20 sm:block"
+          >
+            ⌘K
+          </kbd>
+        ) : null}
       </div>
 
       {selectedProject ? (

@@ -1,14 +1,14 @@
 # ListaGo - Kanban Task Management Platform
-**Current Version: 2.0** | Next.js + TypeScript Modern Rewrite
+**Current Version: 2.0** | **Phase 5 complete** | Next.js + TypeScript
 
-A modern, drag-and-drop Kanban task management application built with Next.js 16, React 19, TypeScript, and Zustand. Features a professional Kanban board with project organization, task prioritization, and real-time state management.
+A drag-and-drop Kanban task management application built with Next.js 16, React 19, TypeScript, and Zustand. It includes project management, dashboard and date-based views, rich-text task descriptions, keyboard shortcuts, animations, and browser-local persistence.
 
 ## 🚀 Project Structure
 
-This repository contains two versions of ListaGo:
+This repository contains the current ListaGo application in the `listago-kanban/` directory. The old vanilla-JavaScript implementation and its generated build output have been removed so there is one active codebase.
 
-### 🆕 Current: Modern Next.js Kanban (listago-kanban/)
-The actively developed version - a full-featured Kanban board with drag-and-drop functionality:
+### 🆕 Current: Modern Next.js Kanban ([`listago-kanban/`](listago-kanban/))
+The current application is a full-featured Kanban board with drag-and-drop functionality:
 ```
 listago-kanban/
 ├── src/
@@ -41,25 +41,7 @@ listago-kanban/
 └── package.json           # Dependencies and scripts
 ```
 
-### 📜 Legacy: Vanilla JavaScript Version (Root Directory)
-The original stable v1.1 release with glassmorphism design and dashboard views:
-```
-/ (root)
-├── js/                    # ES6 modules
-│   ├── modules/
-│   │   ├── taskManager.js
-│   │   ├── projectManager.js
-│   │   ├── storage.js
-│   │   └── ...
-│   └── app.js             # Main entry point
-├── css/                   # Stylesheets
-├── assets/                # Images and favicons
-│   └── screenshots/       # App screenshots
-├── index.html             # Main HTML file
-└── package.json           # Vite configuration
-```
-
-## ✨ v2.0 Features (Current Development)
+## ✨ ListaGo Features
 
 ### 🎯 Kanban Board Core
 - **Drag & Drop Tasks**: Smooth dnd-kit powered drag-and-drop between columns
@@ -78,7 +60,9 @@ The original stable v1.1 release with glassmorphism design and dashboard views:
 - **Tailwind CSS 4**: Utility-first modern styling
 - **Framer Motion**: Smooth animations and transitions
 - **Lucide Icons**: Beautiful, consistent iconography
-- **Sonner Notifications**: Elegant toast notifications
+- **Sonner Notifications**: Elegant toast notifications that dismiss automatically
+- **CKEditor 5**: Rich-text task descriptions with a plain-text fallback
+- **Keyboard Shortcuts**: Search, create tasks, navigate, and close dialogs without interrupting text entry
 - **Fully Responsive**: Works on all screen sizes
 
 ### ⚡ State Management
@@ -93,8 +77,8 @@ The original stable v1.1 release with glassmorphism design and dashboard views:
 - **Styling**: Tailwind CSS 4
 - **State Management**: Zustand
 - **Drag & Drop**: @dnd-kit/core, @dnd-kit/sortable
-- **Animations**: Motion (Framer Motion)
-- **Icons**: Lucide React
+- **Animations**: Framer Motion
+- **Icons**: React Icons
 - **Notifications**: Sonner
 
 ## 🚀 Getting Started
@@ -102,17 +86,12 @@ The original stable v1.1 release with glassmorphism design and dashboard views:
 ### Modern Next.js Version (Recommended)
 ```bash
 cd listago-kanban
-npm install
+npm ci
 npm run dev
 # Open http://localhost:3000
 ```
 
-### Legacy Vanilla JS Version
-```bash
-# Serve root directory with any static file server
-npx serve .
-# Open http://localhost:3000
-```
+The root route redirects to `/dashboard`; open `/board` for the Kanban board. See the [application README](listago-kanban/README.md) for full setup details and [project guides](listago-kanban/docs/README.md) for usage, keyboard shortcuts, and architecture.
 
 ## 📝 Available Scripts (listago-kanban)
 - `npm run dev` - Start development server
@@ -120,13 +99,11 @@ npx serve .
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
-## 📸 Screenshots (Legacy v1.1)
-![ListaGo App Screenshot](assets/screenshots/dashboard.png)
-*Legacy version dashboard view*
+## 📸 App Preview
 
-## 🔄 Version History
-- **v2.0** - Next.js 16 + TypeScript + Kanban rewrite (current development)
-- **v1.1** - Stable vanilla JavaScript release with glassmorphism design and comprehensive dashboard
+![ListaGo Kanban board preview](listago-kanban/docs/images/listago-board-preview-phase5.png)
+
+This image and the guide links above use repository-relative paths, so GitHub renders them directly from the default branch once these files are committed and pushed.
 
 ## 📄 License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -1,0 +1,63 @@
+
+> listago-kanban@0.1.0 dev
+> next dev
+
+▲ Next.js 16.4.2 (Turbopack)
+- Local:         http://localhost:59378
+- Network:       http://192.168.1.197:59378
+✓ Ready in 1647ms
+✓ Running next.config.ts took 173ms
+- Cache Components enabled
+- Partial Prefetching enabled
+
+○ Compiling / ...
+ GET / 307 in 1677ms (next.js: 944ms, application-code: 733ms)
+Error: Route "/": Could not validate `instant` because an error prevented the target segment from rendering.
+    at ignore-listed frames {
+  [cause]: Error: NEXT_REDIRECT
+      at Home (src\app\page.tsx:8:11)
+     6 |  */
+     7 | export default function Home() {
+  >  8 |   redirect("/dashboard");
+       |           ^
+     9 | }
+    10 | {
+    environmentName: 'Prerender',
+    digest: 'NEXT_REDIRECT;replace;/dashboard;307;'
+  }
+}
+ GET / 307 in 1222ms (next.js: 173ms, application-code: 1049ms)
+Error: Route "/": Could not validate `instant` because an error prevented the target segment from rendering.
+    at ignore-listed frames {
+  [cause]: Error: NEXT_REDIRECT
+      at Home (src\app\page.tsx:8:11)
+     6 |  */
+     7 | export default function Home() {
+  >  8 |   redirect("/dashboard");
+       |           ^
+     9 | }
+    10 | {
+    environmentName: 'Prerender',
+    digest: 'NEXT_REDIRECT;replace;/dashboard;307;'
+  }
+}
+○ Compiling /dashboard ...
+ GET /dashboard 200 in 510ms (next.js: 30ms, application-code: 480ms)
+[browser] CKEditor mounting error: CKEditorError: license-key-missing
+Read more: https://ckeditor.com/docs/ckeditor5/latest/support/error-codes.html#error-license-key-missing
+[browser] CKEditor unmounting error: CKEditorError: license-key-missing
+Read more: https://ckeditor.com/docs/ckeditor5/latest/support/error-codes.html#error-license-key-missing
+[browser] CKEditor mounting error: CKEditorError: license-key-missing
+Read more: https://ckeditor.com/docs/ckeditor5/latest/support/error-codes.html#error-license-key-missing
+✓ Compiled in 1772ms
+[browser] CKEditor unmounting error: CKEditorError: license-key-missing
+Read more: https://ckeditor.com/docs/ckeditor5/latest/support/error-codes.html#error-license-key-missing
+ GET /board 200 in 518ms (next.js: 138ms, application-code: 380ms)
+✓ Compiled in 374ms
+✓ Compiled in 223ms
+ GET /board 200 in 268ms (next.js: 19ms, application-code: 249ms)
+✓ Compiled in 626ms
+✓ Compiled in 316ms
+ GET /board 200 in 301ms (next.js: 28ms, application-code: 273ms)
+ GET /board 200 in 154ms (next.js: 4ms, application-code: 151ms)
+ GET /board 200 in 312ms (next.js: 18ms, application-code: 294ms)

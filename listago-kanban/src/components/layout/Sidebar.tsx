@@ -3,7 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useMemo,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   FiCalendar,
   FiEdit,
@@ -31,11 +36,32 @@ function emptySubscribe(): () => void {
 const EMPTY_COUNTS = { total: 0, pending: 0, done: 0, overdue: 0 };
 
 /**
+ * Matches the Tailwind `lg` breakpoint (1024px). Returns `undefined` during
+ * SSR and the hydration render (so the server HTML and first client paint
+ * agree and the CSS translate classes stay in control), then flips to the
+ * real value right after mount. This keeps the desktop rail visible and the
+ * mobile drawer hidden on first paint with zero flash.
+ */
+function useIsDesktop(): boolean | undefined {
+  return useSyncExternalStore(
+    (callback) => {
+      const query = window.matchMedia("(min-width: 1024px)");
+      query.addEventListener("change", callback);
+      return () => query.removeEventListener("change", callback);
+    },
+    () => window.matchMedia("(min-width: 1024px)").matches,
+    () => undefined,
+  );
+}
+
+/**
  * Glassmorphism sidebar: branding, view navigation, full project
  * management (live counts, create/edit/delete) and a shortcuts hint.
  *
  * Desktop: fixed left rail, w-64, border-r. Mobile: hidden by default,
- * slides in as an overlay drawer when `isSidebarOpen` is true.
+ * slides in as an overlay drawer when `isSidebarOpen` is true, with a
+ * swipe-to-close gesture. Before hydration the CSS translate classes hide
+ * it on mobile; after mount framer-motion takes over the transform.
  */
 export function Sidebar() {
   const tasks = useTaskStore((state) => state.tasks);
@@ -50,6 +76,9 @@ export function Sidebar() {
 
   /** The URL is the source of truth for active nav highlighting. */
   const pathname = usePathname();
+
+  /** True on desktop (`lg+`); `undefined` until after hydration. */
+  const isDesktop = useIsDesktop();
 
   /**
    * Overdue counting reads the current date, which prerendering forbids
@@ -93,19 +122,42 @@ export function Sidebar() {
 
   const isActiveRoute = (href: string) => pathname === href;
 
+  /** Transform target for the drawer; `undefined` defers to CSS pre-mount. */
+  const drawerTransform =
+    isDesktop === undefined
+      ? undefined
+      : { x: isDesktop || isSidebarOpen ? "0%" : "-100%" };
+
   return (
     <>
-      {/* Mobile drawer backdrop */}
-      {isSidebarOpen ? (
-        <div
-          aria-hidden
-          onClick={closeSidebar}
-          className="fixed inset-0 z-30 animate-fade-in bg-black/60 backdrop-blur-sm lg:hidden"
-        />
-      ) : null}
+      {/* Mobile drawer backdrop — fades in/out with the drawer */}
+      <AnimatePresence>
+        {isSidebarOpen ? (
+          <motion.div
+            key="sidebar-backdrop"
+            aria-hidden
+            onClick={closeSidebar}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm lg:hidden"
+          />
+        ) : null}
+      </AnimatePresence>
 
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-white/5 p-4 backdrop-blur-xl transition-transform duration-200 lg:static lg:z-auto lg:translate-x-0 ${
+      <motion.aside
+        animate={drawerTransform}
+        transition={{ type: "tween", duration: 0.25, ease: "easeOut" }}
+        // Swipe-to-close: drag left on mobile to dismiss the drawer.
+        drag={isDesktop === false ? "x" : false}
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={{ left: 0.4, right: 0 }}
+        dragMomentum={false}
+        onDragEnd={(_event, info) => {
+          if (info.offset.x < -80) closeSidebar();
+        }}
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-white/5 p-4 backdrop-blur-xl lg:static lg:z-auto lg:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -190,10 +242,11 @@ export function Sidebar() {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1" aria-label="Projects">
-          {orderedProjects.map((project) => (
+          {orderedProjects.map((project, index) => (
             <ProjectRow
               key={project.id}
               project={project}
+              index={index}
               count={projectCounts.get(project.id) ?? 0}
               active={isActiveRoute(`/projects/${project.id}`)}
             />
@@ -202,13 +255,13 @@ export function Sidebar() {
 
         {/* Keyboard shortcuts hint */}
         <p className="mt-4 select-none rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[11px] leading-relaxed text-white/40">
-          <kbd className="font-sans font-semibold text-white/60">/</kbd> search
-          <span className="mx-1.5 text-white/20">·</span>
-          <kbd className="font-sans font-semibold text-white/60">c</kbd> new task
-          <span className="mx-1.5 text-white/20">·</span>
-          <kbd className="font-sans font-semibold text-white/60">esc</kbd> close
+          <kbd className="font-sans font-semibold text-white/60">/</kbd> Search
+          <span className="mx-1.5 text-white/20">•</span>
+          <kbd className="font-sans font-semibold text-white/60">N</kbd> New task
+          <span className="mx-1.5 text-white/20">•</span>
+          <kbd className="font-sans font-semibold text-white/60">Esc</kbd> Close
         </p>
-      </aside>
+      </motion.aside>
     </>
   );
 }
@@ -252,13 +305,17 @@ function SidebarNavButton({
 /**
  * A single project row: colored icon, name, live task count, and hover
  * actions for edit and delete. The permanent Inbox shows no delete action.
+ * Rows stagger in on mount, and the active row's highlight slides between
+ * projects via a shared `layoutId`.
  */
 function ProjectRow({
   project,
+  index,
   count,
   active,
 }: {
   project: Project;
+  index: number;
   count: number;
   active: boolean;
 }) {
@@ -283,18 +340,32 @@ function ProjectRow({
   };
 
   return (
-    <div className="group/row relative">
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.2, delay: index * 0.05, ease: "easeOut" }}
+      className="group/row relative"
+    >
       <Link
         href={`/projects/${project.id}`}
         aria-current={active ? "page" : undefined}
         onClick={handleNavigate}
-        className={`flex w-full items-center gap-2.5 rounded-xl border border-l-2 px-3 py-2 text-left text-sm transition ${
+        className={`relative isolate flex w-full items-center gap-2.5 rounded-xl border border-l-2 px-3 py-2 text-left text-sm transition ${
           active
-            ? "border-white/10 bg-white/12 text-white/90"
+            ? "border-white/10 text-white/90"
             : "border-transparent border-l-transparent text-white/60 hover:bg-white/5 hover:text-white/90"
         }`}
         style={active ? { borderLeftColor: project.color } : undefined}
       >
+        {/* Sliding active highlight, shared across all project rows. */}
+        {active ? (
+          <motion.span
+            layoutId="activeProject"
+            transition={{ type: "spring", damping: 28, stiffness: 320 }}
+            className="absolute inset-0 -z-10 rounded-xl bg-white/12"
+          />
+        ) : null}
+
         <ProjectIcon
           iconName={project.icon}
           color={project.color}
@@ -333,7 +404,7 @@ function ProjectRow({
           </button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -163,7 +163,9 @@ export const useUIStore = create<UIState>()((set, get) => ({
       editingProjectId: null,
     }),
   closeDeleteProjectModal: () =>
-    set({ isDeleteProjectModalOpen: false, deletingProjectId: null }),
+    // Keep `deletingProjectId` so the dialog can stay mounted through its
+    // exit animation; opening always sets a fresh id.
+    set({ isDeleteProjectModalOpen: false }),
 
   selectedTaskIds: [],
   setSelectedTaskIds: (ids) => set({ selectedTaskIds: ids }),

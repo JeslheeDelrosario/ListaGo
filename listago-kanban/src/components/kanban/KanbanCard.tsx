@@ -6,6 +6,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { motion, useIsPresent } from "framer-motion";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { FiCalendar, FiTrash2 } from "react-icons/fi";
@@ -64,10 +65,10 @@ export function KanbanCardBody({
           onTaskClick?.(task);
         }
       }}
-      className={`group rounded-xl border p-4 backdrop-blur-xl transition-all duration-200 ${
+      className={`group rounded-xl border p-4 backdrop-blur-xl transition-colors duration-200 ${
         isOverlay
           ? "cursor-grabbing border-accent-purple/60 bg-glass-hover shadow-2xl shadow-black/40"
-          : "cursor-pointer border-white/10 bg-glass hover:-translate-y-0.5 hover:scale-[1.02] hover:border-white/20 hover:bg-glass-hover active:cursor-grabbing"
+          : "cursor-pointer border-white/10 bg-glass hover:border-white/20 hover:bg-glass-hover active:cursor-grabbing"
       } ${isDragging ? "rotate-2 opacity-40 shadow-2xl shadow-black/40" : ""}`}
     >
       <div className="flex items-start justify-between gap-2">
@@ -112,16 +113,34 @@ export function KanbanCardBody({
 interface KanbanCardProps {
   /** Task displayed by the card. */
   task: Task;
+  /**
+   * True while any card on the board is being dragged. Layout animations
+   * are frozen for every card during a drag: dnd-kit moves the outer
+   * wrappers imperatively, and a concurrent framer-motion layout measure
+   * would fight those transforms (and, at drag end, could wedge the exit
+   * animation of the card that changed columns).
+   */
+  isDragActive?: boolean;
 }
 
 /**
  * Sortable task card (`useSortable`). A plain click opens the Jira-style
  * task detail popup; a press that turned into a drag does not (checked via
  * a small movement threshold). Delegates rendering to `KanbanCardBody`.
+ *
+ * Animation note: the outer div owns the dnd-kit transform (via `style`),
+ * while a separate inner `motion.div` owns the framer-motion transforms
+ * (entry / hover / exit / layout). Keeping them on different nodes stops the
+ * two systems from fighting over the same `transform`. While this card is
+ * being dragged, `layout` and `whileHover` are disabled so framer-motion
+ * never interferes with the drag.
  */
-export function KanbanCard({ task }: KanbanCardProps) {
+export function KanbanCard({ task, isDragActive = false }: KanbanCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id: task.id });
+
+  /** False while this card is exiting — disables layout so the exit can finish. */
+  const isPresent = useIsPresent();
 
   const openTaskDetail = useUIStore((state) => state.openTaskDetail);
   const openDeleteTask = useUIStore((state) => state.openDeleteTask);
@@ -161,12 +180,25 @@ export function KanbanCard({ task }: KanbanCardProps) {
       onClickCapture={handleClickCapture}
       className="touch-none"
     >
-      <KanbanCardBody
-        task={task}
-        isDragging={isDragging}
-        onTaskClick={(clicked) => openTaskDetail(clicked.id)}
-        onTaskDelete={(deleted) => openDeleteTask(deleted.id)}
-      />
+      <motion.div
+        layout={isPresent && !isDragging && !isDragActive}
+        initial={{ opacity: 0, y: 10, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9, x: -20 }}
+        whileHover={
+          isDragging
+            ? undefined
+            : { scale: 1.02, y: -2, transition: { duration: 0.15 } }
+        }
+        transition={{ duration: 0.2, ease: "easeOut" }}
+      >
+        <KanbanCardBody
+          task={task}
+          isDragging={isDragging}
+          onTaskClick={(clicked) => openTaskDetail(clicked.id)}
+          onTaskDelete={(deleted) => openDeleteTask(deleted.id)}
+        />
+      </motion.div>
     </div>
   );
 }

@@ -20,6 +20,7 @@ import {
   type Status,
 } from "@/types";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
 import {
   MODAL_BUTTON_GHOST_CLASSES,
   MODAL_BUTTON_PRIMARY_CLASSES,
@@ -72,15 +73,16 @@ export function TaskModal() {
         </>
       }
     >
-      {open ? (
-        <TaskForm
-          key={formKey}
-          mode={mode}
-          taskId={taskId}
-          initialStatus={initialStatus}
-          onClose={closeTaskModal}
-        />
-      ) : null}
+      {/* Always passed: `Modal` only mounts its children while open or
+          exiting, so the form stays visible during the close animation and
+          still resets through its key on the next open. */}
+      <TaskForm
+        key={formKey}
+        mode={mode}
+        taskId={taskId}
+        initialStatus={initialStatus}
+        onClose={closeTaskModal}
+      />
     </Modal>
   );
 }
@@ -203,7 +205,7 @@ function TaskForm({
         status,
         projectId,
       });
-      toast.success("Task updated");
+      toast.success("Task updated!");
     } else {
       addTask({
         title: trimmed,
@@ -214,7 +216,7 @@ function TaskForm({
         priority,
         status,
       });
-      toast.success("Task created");
+      toast.success("Task created!");
     }
 
     onClose();
@@ -269,13 +271,10 @@ function TaskForm({
         <label htmlFor="task-description" className={MODAL_LABEL_CLASSES}>
           Description
         </label>
-        <textarea
-          id="task-description"
+        <RichTextEditor
           value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          rows={4}
-          placeholder="Add more details (plain text for now)"
-          className={`${MODAL_INPUT_CLASSES} resize-y`}
+          onChange={setDescription}
+          placeholder="Add more details…"
         />
       </div>
 

@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ListaGo Kanban
 
-## Getting Started
+A polished task-management app migrated from the original vanilla JavaScript ListaGo project. The current project is at **Phase 5 — Polish, Animations, Keyboard Shortcuts & Rich Text**, building on the Kanban board, project management, dashboard, and task views from Phases 1–4.
 
-First, run the development server:
+![ListaGo Kanban board preview](docs/images/listago-board-preview-phase5.png)
+
+## Features
+
+- Drag-and-drop Kanban board with **To Do**, **In Progress**, **Review**, and **Done** columns.
+- Task creation, editing, detail view, priority, due dates, completion, project assignment, and deletion.
+- Rich-text descriptions powered by CKEditor 5, with a plain-text fallback if the editor cannot load.
+- Projects with color and icon selection; deleting a project can move its tasks to Inbox or delete them.
+- Dashboard statistics and charts, plus Today, Upcoming, and project-filtered views.
+- Search, browser-local persistence, animated interactions, keyboard shortcuts, and three-second toast notifications.
+- Dark glassmorphism UI with responsive navigation.
+
+## Tech stack
+
+Next.js App Router, React, TypeScript, Tailwind CSS, Zustand (persisted to localStorage), dnd-kit, Framer Motion, Recharts, CKEditor 5, Sonner, and date-fns.
+
+## Requirements
+
+- Node.js supported by the installed Next.js version (Node.js 20.9+ recommended).
+- npm (the repository includes `package-lock.json`).
+
+## Run locally
+
+From this directory (`listago-kanban/`):
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). The root route redirects to `/dashboard`; use `/board` for the Kanban board.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Common commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev       # Development server
+npm run lint      # ESLint
+npx tsc --noEmit  # TypeScript check
+npm run build     # Production build
+npm run start     # Serve the production build (run npm run build first)
+```
 
-## Learn More
+## Documentation
 
-To learn more about Next.js, take a look at the following resources:
+- [Getting started](docs/GETTING_STARTED.md) — installation, scripts, routes, and local data.
+- [User guide](docs/USER_GUIDE.md) — tasks, projects, dashboard, and keyboard shortcuts.
+- [Architecture guide](docs/ARCHITECTURE.md) — app structure, state, persistence, and key interaction flows.
+- [Documentation index](docs/README.md) — guide directory overview.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Data and privacy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Tasks, projects, and preferences are stored in this browser's `localStorage`. This prototype does not include an account system or cloud synchronization. Clearing browser site data removes locally stored changes. Do not use the demo seed data as a backup for real work.
 
-## Deploy on Vercel
+## Rich-text editor licensing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The editor is configured with CKEditor's `GPL` license key. Ensure your distribution complies with CKEditor 5's GPL licensing terms; proprietary use may require an appropriate commercial license. Review CKEditor's current license before shipping.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Project status
+
+**Phase 5 implementation complete; local checks pass.** The feature work is ready for review. Deployment, production hosting verification, and any remaining launch-specific configuration should be completed in the intended production environment before calling the app production-ready.

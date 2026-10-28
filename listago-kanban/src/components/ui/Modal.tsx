@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { FiX } from "react-icons/fi";
 
 /** Shared input/select/textarea styling for all modals. */
@@ -45,6 +46,10 @@ interface ModalProps {
  * Shared overlay + glass panel wrapper used by the task, delete and project
  * modals. Handles accessibility basics: dialog roles, focus management,
  * a Tab focus trap and background scroll locking.
+ *
+ * Animation: the overlay fades while the panel springs in (and back out)
+ * via `AnimatePresence`, so closing plays a real exit animation instead of
+ * an instant unmount.
  */
 export function Modal({
   open,
@@ -96,42 +101,54 @@ export function Modal({
     };
   }, [open]);
 
-  if (!open) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        aria-hidden
-        onClick={onClose}
-        className="absolute inset-0 animate-fade-in bg-black/60 backdrop-blur-sm"
-      />
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className={`modal-panel relative flex max-h-[90vh] w-full ${maxWidth} animate-modal-in flex-col overflow-y-auto rounded-2xl border border-white/10 bg-white/8 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl`}
-      >
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <h2 id={titleId} className="text-lg font-semibold text-white/90">
-            {title}
-          </h2>
-          <button
-            type="button"
+    <AnimatePresence>
+      {open ? (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+        >
+          <div
+            aria-hidden
             onClick={onClose}
-            aria-label="Close dialog"
-            className="rounded-lg p-1 text-white/40 transition hover:bg-white/10 hover:text-white/90"
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          />
+          <motion.div
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            className={`modal-panel relative flex max-h-[90vh] w-full ${maxWidth} flex-col overflow-y-auto rounded-2xl border border-white/10 bg-white/8 p-6 shadow-2xl shadow-black/40 backdrop-blur-xl`}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
           >
-            <FiX size={16} />
-          </button>
-        </div>
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <h2 id={titleId} className="text-lg font-semibold text-white/90">
+                {title}
+              </h2>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close dialog"
+                className="rounded-lg p-1 text-white/40 transition hover:bg-white/10 hover:text-white/90"
+              >
+                <FiX size={16} />
+              </button>
+            </div>
 
-        {children}
+            {children}
 
-        {footer ? (
-          <div className="mt-6 flex justify-end gap-3">{footer}</div>
-        ) : null}
-      </div>
-    </div>
+            {footer ? (
+              <div className="mt-6 flex justify-end gap-3">{footer}</div>
+            ) : null}
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }

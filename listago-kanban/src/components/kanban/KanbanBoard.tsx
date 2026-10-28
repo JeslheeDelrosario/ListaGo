@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
 import {
   DndContext,
   DragOverlay,
@@ -108,7 +110,18 @@ export function KanbanBoard() {
       if (overTask) targetStatus = overTask.status;
     }
 
-    if (targetStatus) moveTask(String(active.id), targetStatus);
+    if (targetStatus) {
+      // Toast only when the card actually changed columns, not on a reorder
+      // within the same column.
+      const task = tasks.find((item) => item.id === active.id);
+      moveTask(String(active.id), targetStatus);
+      if (task && task.status !== targetStatus) {
+        const columnTitle = KANBAN_COLUMNS.find(
+          (column) => column.id === targetStatus,
+        )?.title;
+        if (columnTitle) toast.success(`Task moved to ${columnTitle}`);
+      }
+    }
   };
 
   /** Clears the overlay ghost when a drag is cancelled (e.g. Escape). */
@@ -151,11 +164,18 @@ export function KanbanBoard() {
         </div>
       ) : null}
 
-      <div className="flex flex-1 items-stretch gap-4 overflow-x-auto pb-4">
-        {KANBAN_COLUMNS.map((column) => (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="flex flex-1 items-stretch gap-4 overflow-x-auto pb-4"
+      >
+        {KANBAN_COLUMNS.map((column, columnIndex) => (
           <KanbanColumn
             key={column.id}
             column={column}
+            columnIndex={columnIndex}
+            isDragActive={activeTask !== null}
             tasks={
               isMounted
                 ? visibleTasks.filter((task) => task.status === column.id)
@@ -164,7 +184,7 @@ export function KanbanBoard() {
             onAddTask={(status) => openCreateTask(status)}
           />
         ))}
-      </div>
+      </motion.div>
 
       <DragOverlay dropAnimation={null}>
         {activeTask ? <KanbanCardBody task={activeTask} isOverlay /> : null}

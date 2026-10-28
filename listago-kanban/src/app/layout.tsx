@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Toaster } from "sonner";
 
 import { AppShell } from "@/components/layout/AppShell";
 
@@ -36,6 +37,21 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`${inter.variable} h-full`}>
       <body className="min-h-screen font-sans antialiased">
         <AppShell>{children}</AppShell>
+        {/* Global toast notifications — dark glass, bottom-right. */}
+        <Toaster
+          position="bottom-right"
+          richColors
+          closeButton
+          duration={3000}
+          toastOptions={{
+            style: {
+              background: "rgba(26, 26, 46, 0.95)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              color: "rgba(255,255,255,0.9)",
+              backdropFilter: "blur(20px)",
+            },
+          }}
+        />
       </body>
     </html>
   );

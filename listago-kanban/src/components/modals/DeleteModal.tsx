@@ -49,13 +49,13 @@ export function DeleteModal() {
         return;
       }
       deleteTask(task.id);
-      toast.success("Task deleted");
+      toast.error("Task deleted");
     } else {
       const count = selectedTaskIds.length;
       if (count > 0) {
         deleteBulk(selectedTaskIds);
         clearTaskSelection();
-        toast.success(`${count} task${count === 1 ? "" : "s"} deleted`);
+        toast.error(`${count} task${count === 1 ? "" : "s"} deleted`);
       }
     }
     closeDeleteModal();

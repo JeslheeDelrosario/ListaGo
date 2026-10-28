@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, type ReactNode } from "react";
-import { Toaster } from "sonner";
 
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { DeleteModal } from "@/components/modals/DeleteModal";
@@ -19,8 +18,8 @@ interface AppShellProps {
 
 /**
  * The chrome around the Kanban board: sidebar, header, global modals,
- * toast notifications and the keyboard shortcuts. Mounted once by the
- * root layout.
+ * the keyboard shortcuts and (via the root layout) toast notifications.
+ * Mounted once by the root layout.
  */
 export function AppShell({ children }: AppShellProps) {
   useKeyboardShortcuts();
@@ -49,7 +48,6 @@ export function AppShell({ children }: AppShellProps) {
       {/* Rendered last so it stacks above the other modals; it closes
           itself before opening the delete or edit modals from its footer. */}
       <TaskDetailModal />
-      <Toaster theme="dark" richColors position="top-right" closeButton />
     </div>
   );
 }

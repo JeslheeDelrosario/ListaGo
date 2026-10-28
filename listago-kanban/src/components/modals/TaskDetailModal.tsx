@@ -8,6 +8,8 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
 } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "sonner";
 import { format, parseISO } from "date-fns";
 import {
   FiCalendar,
@@ -39,6 +41,11 @@ import {
 } from "@/types";
 import { PriorityBadge } from "@/components/ui/PriorityBadge";
 import { ProjectIcon } from "@/components/ui/ProjectIcon";
+import { RichTextEditor } from "@/components/ui/RichTextEditor";
+import {
+  MODAL_BUTTON_GHOST_CLASSES,
+  MODAL_BUTTON_PRIMARY_CLASSES,
+} from "@/components/ui/Modal";
 
 /** Priority options, most severe first. */
 const PRIORITY_ORDER: readonly Priority[] = ["urgent", "high", "medium", "low"];
@@ -70,10 +77,16 @@ export function TaskDetailModal() {
     if (isOpen && selectedTaskId && !task) closeTaskDetail();
   }, [isOpen, selectedTaskId, task, closeTaskDetail]);
 
-  if (!isOpen || !task) return null;
-
-  // Keyed per task so inline-edit drafts reset when switching tasks.
-  return <TaskDetailContent key={task.id} task={task} />;
+  // AnimatePresence lets the popup play an exit animation instead of
+  // unmounting instantly. Keyed per task so inline-edit drafts reset when
+  // switching tasks.
+  return (
+    <AnimatePresence>
+      {isOpen && task ? (
+        <TaskDetailContent key={task.id} task={task} />
+      ) : null}
+    </AnimatePresence>
+  );
 }
 
 /** The modal card itself. Mounted only while the popup is open. */
@@ -95,12 +108,18 @@ function TaskDetailContent({ task }: { task: Task }) {
   /** Transient "✓ Saved" indicator after any inline edit. */
   const [saved, setSaved] = useState(false);
   const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Debounce handle so rapid inline edits produce a single toast. */
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  /** Shows the saved indicator for 2s (re-triggering restarts it). */
+  /** Shows the saved indicator for 2s and queues a debounced "updated" toast. */
   const flashSaved = () => {
     setSaved(true);
     if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
     savedTimerRef.current = setTimeout(() => setSaved(false), 2000);
+
+    // Coalesce rapid edits (e.g. picking a date then a status) into one toast.
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => toast.success("Task updated"), 600);
   };
 
   // While the popup is open the page behind it must not scroll.
@@ -115,6 +134,7 @@ function TaskDetailContent({ task }: { task: Task }) {
   useEffect(
     () => () => {
       if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     },
     [],
   );
@@ -152,27 +172,34 @@ function TaskDetailContent({ task }: { task: Task }) {
     setTitleDraft(null);
   };
 
-  const cancelDescriptionEdit = (
-    event: ReactKeyboardEvent<HTMLTextAreaElement>,
-  ) => {
-    event.stopPropagation();
+  const cancelDescriptionEdit = () => {
     setDescriptionDraft(null);
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.15, ease: "easeOut" }}
+    >
       {/* Overlay — click to close */}
       <div
         aria-hidden
         onClick={closeTaskDetail}
-        className="absolute inset-0 animate-overlay-fade-in bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
 
-      <div
+      <motion.div
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="task-detail-scroll relative mx-4 flex max-h-[90vh] w-full max-w-3xl animate-modal-scale-in flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#1a1a2e]/95 p-6 shadow-2xl shadow-black/50 backdrop-blur-2xl sm:p-7"
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="task-detail-scroll relative mx-4 flex max-h-[90vh] w-full max-w-3xl flex-col overflow-y-auto rounded-2xl border border-white/10 bg-[#1a1a2e]/95 p-6 shadow-2xl shadow-black/50 backdrop-blur-2xl sm:p-7"
       >
         {/* Header: status + priority + saved indicator + close */}
         <div className="flex items-center gap-2">
@@ -311,7 +338,7 @@ function TaskDetailContent({ task }: { task: Task }) {
               </button>
             ) : (
               <span className="text-xs text-white/40">
-                Ctrl+Enter to save · Esc to cancel
+                Save or cancel below
               </span>
             )}
           </div>
@@ -325,22 +352,29 @@ function TaskDetailContent({ task }: { task: Task }) {
               <TaskDescription description={task.description} />
             </div>
           ) : (
-            <textarea
-              autoFocus
-              value={descriptionDraft}
-              aria-label="Task description"
-              onChange={(event) => setDescriptionDraft(event.target.value)}
-              onBlur={saveDescription}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
-                  event.preventDefault();
-                  saveDescription();
-                } else if (event.key === "Escape") {
-                  cancelDescriptionEdit(event);
-                }
-              }}
-              className="min-h-[200px] w-full resize-y rounded-xl border border-white/10 bg-white/5 p-4 text-sm leading-relaxed text-white/70 transition focus:border-accent-indigo/60 focus:outline-none focus:ring-2 focus:ring-accent-indigo/40"
-            />
+            <div className="flex flex-col gap-3">
+              <RichTextEditor
+                value={descriptionDraft}
+                onChange={setDescriptionDraft}
+                placeholder="Add a description…"
+              />
+              <div className="flex items-center justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={cancelDescriptionEdit}
+                  className={MODAL_BUTTON_GHOST_CLASSES}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={saveDescription}
+                  className={MODAL_BUTTON_PRIMARY_CLASSES}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
           )}
         </section>
 
@@ -373,8 +407,8 @@ function TaskDetailContent({ task }: { task: Task }) {
             Edit in Form
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
